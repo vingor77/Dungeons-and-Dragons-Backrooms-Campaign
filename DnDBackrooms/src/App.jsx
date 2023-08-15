@@ -14,10 +14,10 @@ function App() {
         <div className='content'>
           <Routes>
             <Route path='/' element={<Groups />} />
-            <Route path='/levels' element={<Levels />} />
-            <Route path='/items' element={<Items />} />
-            <Route path='/quests' element={<Quests />} />
-            <Route path='/info' element={<GeneralInfo />} />
+            <Route path='levels' element={<Levels />} />
+            <Route path='items' element={<Items />} />
+            <Route path='quests' element={<Quests />} />
+            <Route path='info' element={<GeneralInfo />} />
           </Routes>
         </div>
       </div>

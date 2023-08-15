@@ -1,13 +1,13 @@
 import React from 'react'
-import elixir from '../assets/strengthElixir0.png';
-import candy from '../assets/candy5.png';
-//import cube from '../assets/cube23.png';
-import umi from '../assets/umi27.png';
-import darkRep from '../assets/darkRep35.png';
-import backROM from '../assets/backROM47.png';
-import sack from '../assets/sack87.png';
-import blanche from '../assets/blanche96.png';
-import dice from '../assets/dice666.png';
+import elixir from '../Images/strengthElixir0.png';
+import candy from '../Images/candy5.png';
+//import cube from '../Images/cube23.png';
+import umi from '../Images/umi27.png';
+import darkRep from '../Images/darkRep35.png';
+import backROM from '../Images/backROM47.png';
+import sack from '../Images/sack87.png';
+import blanche from '../Images/blanche96.png';
+import dice from '../Images/dice666.png';
 
 
 export default function BackroomsItem(props) {
