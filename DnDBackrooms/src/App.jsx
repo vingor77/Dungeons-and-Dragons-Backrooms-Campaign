@@ -4,7 +4,7 @@ import Levels from './Pages/Levels';
 import Items from './Pages/Items';
 import Quests from './Pages/Quests';
 import Navbar from './Components/Navbar';
-import GeneralInfo from './Pages/GeneralInfo';
+import GeneralInfo from './Pages/PlayerInfo';
 
 function App() {
   return (

@@ -19,12 +19,16 @@ export default function BackroomsItem(props) {
         return <img src={candy}></img>
       /*
       case 23:
-        <img src={candy}></img>
+        <img src={cube}></img>
       */
       case 27:
         return <img src={umi}></img>
       case 35:
         return <img src={darkRep}></img>
+      /*
+      case 43:
+        return <img src={tarot}></img>
+      */
       case 47:
         return <img src={backROM}></img>
       case 87:
@@ -32,7 +36,11 @@ export default function BackroomsItem(props) {
       case 96:
         return <img src={blanche}></img>
       case 666:
+        console.log("666");
         return <img src={dice}></img>
+      default:
+        console.log("return");
+        return
     }
   }
 
@@ -41,28 +49,19 @@ export default function BackroomsItem(props) {
       <p>Name: {props.name}</p>
       <p>Item #: {props.itemNum}</p>
       <p>Rarity: {props.rarity}</p>
-      <p>
-        Locations:
-        <br />
-        <ul>
-          {props.locations.map(element => {
-            return (
-              <li>{element}</li>
-            );
-          })}
-        </ul>
-      </p>
+      <p>Locations:</p>
+      <ul>
+        {props.locations.map(element => {
+          return (
+            <li>{element}</li>
+          );
+        })}
+      </ul>
       {props.artifactPrice === -1 ? "": <p>Artifact price: {props.artifactPrice}</p>}
 
-      {props.table ?
-        <>
-          <p>Description: {props.description}</p>
-          <SpecialItem />
-          {/*If item 5, 23, 27, 35, 47, 87, 96, 666 */}
-        </>
-      :
-        <p>Description: {props.description}</p>
-      }
+      <p>Description: {props.description}</p>
+      {props.table ? <SpecialItem />: ""}
+      {/*If item 5, 23, 27, 35, 47, 87, 96, 666 */}
 
     </div>
   )
