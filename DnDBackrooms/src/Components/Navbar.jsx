@@ -1,20 +1,21 @@
 import React from 'react'
+import { AppBar, Stack, Toolbar, Link, Container } from '@mui/material';
 
 export default function Navbar() {
-  const linksStyle = {
-    marginLeft: '10px'
-  }
-
   return (
-    <nav className='navbar'>
-        <h1>Test</h1>
-        <div className='links'>
-          <a href='/'>Groups</a>
-          <a href='/levels' style={linksStyle}>Levels</a>
-          <a href='/items' style={linksStyle}>Items</a>
-          <a href='/quests' style={linksStyle}>Quests</a>
-          <a href='/info' style={linksStyle}>Player page</a>
-        </div>
-    </nav>
+    <Container className='navbar'>
+      <AppBar position='sticky'>
+        <Toolbar>
+          <Stack direction='row' spacing={2}>
+            <Link href='/' color='inherit' underline='none'>Home</Link>
+            <Link href='/groups' color='inherit' underline='none'>Groups</Link>
+            <Link href='/quests' color='inherit' underline='none'>Quests</Link>
+            <Link href='/items' color='inherit' underline='none'>Items</Link>
+            <Link href='/levels' color='inherit' underline='none'>Levels</Link>
+            <Link href='/info' color='inherit' underline='none'>Player Info</Link>
+          </Stack>
+        </Toolbar>
+      </AppBar>
+    </Container>
   )
 }

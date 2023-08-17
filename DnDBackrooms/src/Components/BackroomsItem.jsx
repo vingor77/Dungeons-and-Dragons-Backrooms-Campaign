@@ -4,17 +4,20 @@ import candy from '../Images/candy5.png';
 //import cube from '../Images/cube23.png';
 import umi from '../Images/umi27.png';
 import darkRep from '../Images/darkRep35.png';
+import tarot1 from '../Images/tarot43_1.png';
+import tarot2 from '../Images/tarot43_2.png';
 import backROM from '../Images/backROM47.png';
 import sack from '../Images/sack87.png';
 import blanche from '../Images/blanche96.png';
 import dice from '../Images/dice666.png';
+import { Card, CardContent, CardMedia, Stack, Typography } from '@mui/material';
 
 
 export default function BackroomsItem(props) {
   const SpecialItem = () => {
     switch(props.itemNum) {
       case 0:
-        return <img src={elixir}></img>
+        return props.name === "Strength Elixir(Level Items)" ? <img src={elixir}></img>: ""
       case 5:
         return <img src={candy}></img>
       /*
@@ -25,10 +28,13 @@ export default function BackroomsItem(props) {
         return <img src={umi}></img>
       case 35:
         return <img src={darkRep}></img>
-      /*
       case 43:
-        return <img src={tarot}></img>
-      */
+        return (
+          <>
+            <img src={tarot1}></img>
+            <img src={tarot2}></img>
+          </>
+        )
       case 47:
         return <img src={backROM}></img>
       case 87:
@@ -36,14 +42,36 @@ export default function BackroomsItem(props) {
       case 96:
         return <img src={blanche}></img>
       case 666:
-        console.log("666");
         return <img src={dice}></img>
       default:
-        console.log("return");
         return
     }
   }
 
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant='h4'>{props.name}</Typography>
+        <Stack direction='row' spacing={2}>
+          <Typography variant='h6'>Item#: {props.itemNum}</Typography>
+          <Typography variant='h6'>Rarity: {props.rarity}</Typography>
+          {props.artifactPrice === -1 ? "": <Typography variant='h6'>Price: {props.artifactPrice}</Typography>}
+        </Stack>
+        <Typography variant='h4'>Spawn locations:</Typography>
+        <ul>
+          {props.locations.map((element, index) => {
+            return (
+              <li key={index} disablePadding>{element}</li>
+            );
+          })}
+        </ul>
+        <Typography variant='body1'>Description: {props.description}</Typography>
+        <SpecialItem style={{textAlign: 'center'}}/>  
+      </CardContent>
+    </Card>
+  )
+
+  /*
   return (
     <div>
       <p>Name: {props.name}</p>
@@ -51,9 +79,9 @@ export default function BackroomsItem(props) {
       <p>Rarity: {props.rarity}</p>
       <p>Locations:</p>
       <ul>
-        {props.locations.map(element => {
+        {props.locations.map((element, index) => {
           return (
-            <li>{element}</li>
+            <li key={index}>{element}</li>
           );
         })}
       </ul>
@@ -61,8 +89,7 @@ export default function BackroomsItem(props) {
 
       <p>Description: {props.description}</p>
       {props.table ? <SpecialItem />: ""}
-      {/*If item 5, 23, 27, 35, 47, 87, 96, 666 */}
-
     </div>
   )
+*/
 }
