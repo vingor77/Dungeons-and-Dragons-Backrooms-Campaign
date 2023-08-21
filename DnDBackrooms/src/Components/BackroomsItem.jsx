@@ -10,7 +10,7 @@ import backROM from '../Images/backROM47.png';
 import sack from '../Images/sack87.png';
 import blanche from '../Images/blanche96.png';
 import dice from '../Images/dice666.png';
-import { Card, CardContent, CardMedia, Stack, Typography } from '@mui/material';
+import { Card, CardContent, Typography } from '@mui/material';
 
 
 export default function BackroomsItem(props) {
@@ -49,8 +49,8 @@ export default function BackroomsItem(props) {
   return (
     <Card>
       <CardContent>
-        <Typography variant='h1'>{props.name}</Typography>
-        <Typography variant='h4'>Spawn locations:</Typography>
+        <Typography variant='h2'>{props.name}</Typography>
+        <Typography variant='h5'>Spawn locations:</Typography>
         <ul>
           {props.locations.map((element, index) => {
             return (
@@ -58,7 +58,7 @@ export default function BackroomsItem(props) {
             );
           })}
         </ul>
-        <Typography variant='h4'>Description:</Typography>
+        <Typography variant='h5'>Description:</Typography>
         <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
         <SpecialItem style={{textAlign: 'center'}}/>  
       </CardContent>
