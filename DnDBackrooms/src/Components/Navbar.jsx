@@ -11,6 +11,7 @@ export default function Navbar() {
             <Link href='/groups' color='inherit' underline='none'>Groups</Link>
             <Link href='/quests' color='inherit' underline='none'>Quests</Link>
             <Link href='/items' color='inherit' underline='none'>Items</Link>
+            <Link href='/entities' color='inherit' underline='none'>Entities</Link>
             <Link href='/levels' color='inherit' underline='none'>Levels</Link>
             <Link href='/info' color='inherit' underline='none'>Player Info</Link>
           </Stack>

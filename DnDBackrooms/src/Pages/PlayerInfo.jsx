@@ -1,6 +1,7 @@
 import { collection, onSnapshot } from 'firebase/firestore'
 import db from '../Components/firebase'
 import React, { useEffect, useState } from 'react'
+import { Container } from '@mui/material';
 
 export default function GeneralInfo() {
   const [uncoveredDocs, setUncoveredDocs] = useState([]);
@@ -79,6 +80,7 @@ export default function GeneralInfo() {
             <li>1 ration is required per day.</li>
             <li>Maximum carry limit of 100 Backrooms specific items. This does not include magic items, armor, shields, weapons, or ammo.</li>
             <li>Fully implemented fleeing system for fights too difficult to win.</li>
+            <li>Any effects that recharge after 24 hours also resets on a long rest.</li>
           </ul>
         </div>
         <div className='fleeing'>
@@ -139,28 +141,32 @@ export default function GeneralInfo() {
   switch(showing) {
     case "btns":
       return (
-        <div className='playerinfobtns'>
-          <button onClick={e => setShowing("info")}>Show game information</button>
-          <button onClick={() => setShowing("availablePages")}>Wi-Fi page calculator</button>
-        </div>
+        <Container>
+          <div className='playerinfobtns'>
+            <button onClick={e => setShowing("info")}>Show game information</button>
+            <button onClick={() => setShowing("availablePages")}>Wi-Fi page calculator</button>
+          </div>
+        </Container>
       );
     case "info":
       return <DisplayInfo />
     case "availablePages":
       return (
-        <div className='playerFunctions'>
-          <label htmlFor='wifi'>Enter Wi-Fi value</label>
-          <input type='number' value={wifiStrength} onChange={e => handleWifiStrength(e)} min="0" max="100" id='wifi'></input>
-          <label htmlFor='roll'>Enter roll value</label>
-          <input type='number' value={roll} onChange={e => handleRoll(e)} min="0" max="100" id='roll'></input>
-          <button onClick={getPages}>Generate documents</button>
-          <ul>
-            {availabeDocs.map(item => {
-              return <li>{item.pageName}</li>
-            })}
-          </ul>
-          <button onClick={() => setShowing("btns")}>Go back</button>
-        </div>
+        <Container>
+          <div className='playerFunctions'>
+            <label htmlFor='wifi'>Enter Wi-Fi value</label>
+            <input type='number' value={wifiStrength} onChange={e => handleWifiStrength(e)} min="0" max="100" id='wifi'></input>
+            <label htmlFor='roll'>Enter roll value</label>
+            <input type='number' value={roll} onChange={e => handleRoll(e)} min="0" max="100" id='roll'></input>
+            <button onClick={getPages}>Generate documents</button>
+            <ul>
+              {availabeDocs.map(item => {
+                return <li>{item.pageName}</li>
+              })}
+            </ul>
+            <button onClick={() => setShowing("btns")}>Go back</button>
+          </div>
+        </Container>
       )
   }
 }

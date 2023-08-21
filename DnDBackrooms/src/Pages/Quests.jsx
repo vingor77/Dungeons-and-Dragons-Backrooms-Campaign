@@ -1,7 +1,10 @@
 import React from 'react'
+import { Container } from '@mui/material'
 
 export default function Quests() {
   return (
-    <div>Quests</div>
+    <Container>
+      <div>Quests</div>
+    </Container>
   )
 }

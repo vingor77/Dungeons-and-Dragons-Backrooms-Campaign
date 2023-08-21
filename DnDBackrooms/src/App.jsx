@@ -6,6 +6,7 @@ import Items from './Pages/Items';
 import Quests from './Pages/Quests';
 import Navbar from './Components/Navbar';
 import GeneralInfo from './Pages/PlayerInfo';
+import Entities from './Pages/Entities';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path='/groups' element={<Groups />} />
             <Route path='/levels' element={<Levels />} />
             <Route path='/items' element={<Items />} />
+            <Route path='/entities' element={<Entities />} />
             <Route path='/quests' element={<Quests />} />
             <Route path='/info' element={<GeneralInfo />} />
           </Routes>

@@ -1,7 +1,10 @@
+import { Container } from '@mui/material'
 import React from 'react'
 
 export default function Groups() {
   return (
-    <div>Groups</div>
+    <Container>
+      <div>Groups</div>
+    </Container>
   )
 }

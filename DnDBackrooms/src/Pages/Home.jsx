@@ -1,7 +1,10 @@
 import React from 'react'
+import { Container } from '@mui/material'
 
 export default function Home() {
   return (
-    <div>Home</div>
+    <Container>
+      <div>Home</div>
+    </Container>
   )
 }

@@ -1,13 +1,13 @@
-import { collection, onSnapshot, doc, addDoc, orderBy, query } from 'firebase/firestore'
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import db from '../Components/firebase'
 import React, { useEffect, useState } from 'react'
 import Item from '../Components/BackroomsItem';
-import { Container, Divider, FormControl, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Container, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 
 export default function Items() {
   const [items, setItems] = useState([]);
-  const [itemIndex, setItemIndex] = useState(-1);
-  const [raritySelection, setRaritySelection] = useState("All");
+  const [currItem, setCurrItem] = useState("");
 
   const collectionRef = collection(db, 'items');
 
@@ -27,9 +27,19 @@ export default function Items() {
     }
   }, [])
 
-  const displayItem = index => {
-    setItemIndex(index);
+  /*
+  const getItemLocations = () => {
+    for(let i = 0; i < items.length; i++) {
+      let found = false;
+      for(let j = 0; j < items[i].locations.length; j++) {
+        if(items[i].locations[j] !== 'All' && !found) {
+          console.log(items[i].name);
+          found = true;
+        }
+      }
+    }
   }
+  */
 
   const rows = [
     ["Common", "1", "0", "0", "0", "0", "0"],
@@ -41,47 +51,103 @@ export default function Items() {
     ["One-of-a-kind", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"],
   ]
 
+  const CreateDataGrid = () => {
+    const dataGridCols = [
+      { field: 'id', headerName: 'ID', width: 90},
+      { 
+        field: 'name', 
+        headerName: 'Item Name', 
+        width: 250 
+      },
+      {
+        field: 'num',
+        headerName: 'Item number',
+        width: 250,
+      },
+      {
+        field: 'rarity',
+        headerName: 'Rarity',
+        width: 250,
+        editable: true,
+      },
+      {
+        field: 'price',
+        headerName: 'Artifact Price',
+        width: 250,
+        editable: true,
+      },
+    ];
+
+    let count = 0;
+    let arPrice = 0;
+    const dataGridRows = [];
+
+    items.map(item => {
+      {item.artifactPrice === -1 ? arPrice = "N/A": arPrice = item.artifactPrice}
+      count++;
+      const row = {
+        id: count,
+        name: item.name,
+        num: item.itemNum,
+        rarity: item.rarity,
+        price: arPrice,
+      }
+      dataGridRows.push(row);
+    })
+
+    return (
+      <DataGrid
+        onRowClick={(dataGridRows, event) => {
+          event.defaultPrevented = true;
+          setCurrItem(dataGridRows.row.name);
+        }}
+        rows={dataGridRows}
+        columns={dataGridCols}
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 10,
+            }
+          }
+        }}
+        pageSizeOptions={[10]}
+        disableRowSelectionOnClick
+      />
+    );
+  }
+
   return (
     <Container className='items'>
       <div className='generaliteminfo'>
-        <Typography variant='h1'>Item Info and Pricing</Typography>
-        <Typography variant='body1'>
-          Note: Items of item number 0 are custom and/or magical, not innate to the Backrooms. Almond water is worth the equivalent of 500 gold in D&D.
-          Magic item prices work per regular D&D rules such as a rare is 2,000 to 20,000 gold, which translates to 4 to 40 almond water.
-          Almond water is the only unbuyable resource within the game.
-        </Typography>
+        <Typography variant='h1' sx={{textAlign: 'center'}}>Item Info and Pricing</Typography>
+        <ul>
+          <li>Almond water is worth the equivalent of 500 gold in D&D.</li>
+          <li>Magic item prices work per regular D&D rules such as a rare is 2,000 to 20,000 gold, which translates to 4 to 40 almond water.</li>
+          <li>Almond water is the only unbuyable resource within the game.</li>
+        </ul>
         <ItemPrices rows={rows}/>
+        <br />
         <Typography variant='caption' fontWeight='bold'>Prices may vary.</Typography>
         <Divider />
       </div>
+      <br />
       <div className='iteminfo'>
-        <FormControl size='small' fullWidth>
-          <InputLabel id='itemRarityLabel'>Item rarity</InputLabel>
-          <Select labelId='itemRarityLabel' id='itemRarity' label='rarityPicker' value={raritySelection} onChange={(e, value) => {setRaritySelection(e.target.value); setItemIndex(-1)}}>
-            <MenuItem value='All'>All</MenuItem>
-            <MenuItem value='Common'>Common</MenuItem>
-            <MenuItem value='Uncommon'>Uncommon</MenuItem>
-            <MenuItem value='Rare'>Rare</MenuItem>
-            <MenuItem value='Very Rare'>Very Rare</MenuItem>
-            <MenuItem value='Legendary'>Legendary</MenuItem>
-            <MenuItem value='Artifact'>Artifact</MenuItem>
-            <MenuItem value='One-of-a-kind'>One-of-a-kind</MenuItem>
-          </Select>
-        </FormControl>
+        <Typography variant='h2'>Items:</Typography>
+        <Typography variant='body1'>Items of item number 0 are custom and/or magical.</Typography>
+        <CreateDataGrid />
         {items.map((item, index) => {
-          return raritySelection === 'All' ? <button onClick={() => {displayItem(index)}} key={index}>{item.name}</button>: item.rarity === raritySelection ? <button onClick={() => {displayItem(index)}} key={index}>{item.name}</button>: "";
+          return (
+            item.name === currItem ? 
+            <Item 
+              key={index}
+              name={item.name}
+              itemNum={item.itemNum}
+              locations={item.locations}
+              description={item.description}
+              table={item.table}
+            />: ""
+          )
         })}
-        {itemIndex >= 0 ? 
-          <Item 
-            name={items[itemIndex].name}
-            itemNum={items[itemIndex].itemNum}
-            rarity={items[itemIndex].rarity}
-            locations={items[itemIndex].locations}
-            artifactPrice={items[itemIndex].artifactPrice}
-            description={items[itemIndex].description}
-            table={items[itemIndex].table}
-          />: ""
-        }
       </div>
     </Container>
   )
