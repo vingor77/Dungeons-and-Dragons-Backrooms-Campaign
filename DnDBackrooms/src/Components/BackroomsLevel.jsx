@@ -56,16 +56,38 @@ export default function BackroomsLevel(props) {
         grid[i][size - 1] = 1;
       }
     }
-  
-    //Algorithm to create the rooms. Needs to be done. TODO if you will
+
+    //Wall spawning algorithm. Jank for now.
+    let randNum = Math.floor(Math.random() * 100);
+    if(randNum % 2 === 0) grid[1][1] = 1;
+
+    for(let i = 1; i < grid.length; i++) {
+      for(let j = 1; j < grid[i].length; j++) {
+        if(i === 1 && j === 1) continue;
+
+        randNum = Math.floor(Math.random() * 100);
+        if(grid[i - 1][j] === 1 || grid[i][j - 1]) {
+          if(randNum % 3 === 0) {
+            grid[i][j] = 1;
+          }
+        }
+        else {
+          if(randNum % 6 === 0) {
+            grid[i][j] = 1;
+          }
+        }
+      }
+    }
+
+    //Spawn location on the map.
     if(spawn !== -1) {
       const spawnLocation = () => {
         let xSpawn = Math.floor(Math.random() * size);
         let ySpawn = Math.floor(Math.random() * size);
   
         while(grid[xSpawn][ySpawn] === 1) {
-          xSpawn = Math.round(Math.random() * size);
-          ySpawn = Math.round(Math.random() * size);
+          xSpawn = Math.floor(Math.random() * size);
+          ySpawn = Math.floor(Math.random() * size);
         }
   
         switch(spawnType) {

@@ -1,9 +1,9 @@
-import { Container } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import db from '../Components/firebase';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { DataGrid } from '@mui/x-data-grid';
 import BackroomsLevel from '../Components/BackroomsLevel';
+import { Container } from '@mui/material';
 
 export default function Levels() {
   const [levels, setLevels] = useState([]);
@@ -14,12 +14,13 @@ export default function Levels() {
   const [filteredItems, setFilteredItems] = useState([]);
   const [filteredEntities, setFilteredEntities] = useState([]);
 
-  //Levels
   useEffect(() => {
     const levelsRef = collection(db, 'levels');
     const q = query(levelsRef, orderBy("levelNum", "asc"));
-
-    const unsub = onSnapshot(q, (querySnapshot) => {
+    const itemsRef = collection(db, 'items');
+    const entitiesRef = collection(db, 'entities');
+  
+    const unsubLevels = onSnapshot(q, (querySnapshot) => {
       const objects = [];
       querySnapshot.forEach((doc) => {
         objects.push(doc.data());
@@ -27,16 +28,7 @@ export default function Levels() {
       setLevels(objects);
     })
 
-    return () => {
-      unsub();
-    }
-  }, []);
-
-  //Items
-  useEffect(() => {
-    const itemsRef = collection(db, 'items');
-  
-    const unsub = onSnapshot(itemsRef, (querySnapshot) => {
+    const unsubItems = onSnapshot(itemsRef, (querySnapshot) => {
       const objects = [];
       querySnapshot.forEach((doc) => {
         objects.push(doc.data());
@@ -44,16 +36,7 @@ export default function Levels() {
       setItems(objects);
     })
   
-    return () => {
-      unsub();
-    }
-  }, []);
-
-  //Entities
-  useEffect(() => {
-    const entitiesRef = collection(db, 'entities');
-  
-    const unsub = onSnapshot(entitiesRef, (querySnapshot) => {
+    const unsubEntities = onSnapshot(entitiesRef, (querySnapshot) => {
       const objects = [];
       querySnapshot.forEach((doc) => {
         objects.push(doc.data());
@@ -62,7 +45,9 @@ export default function Levels() {
     })
   
     return () => {
-      unsub();
+      unsubLevels();
+      unsubItems();
+      unsubEntities();
     }
   }, []);
 

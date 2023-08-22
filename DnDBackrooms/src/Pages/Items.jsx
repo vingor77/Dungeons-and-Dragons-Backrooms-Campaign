@@ -27,20 +27,6 @@ export default function Items() {
     }
   }, [])
 
-  /*
-  const getItemLocations = () => {
-    for(let i = 0; i < items.length; i++) {
-      let found = false;
-      for(let j = 0; j < items[i].locations.length; j++) {
-        if(items[i].locations[j] !== 'All' && !found) {
-          console.log(items[i].name);
-          found = true;
-        }
-      }
-    }
-  }
-  */
-
   const rows = [
     ["Common", "1", "0", "0", "0", "0", "0"],
     ["Uncommon", "2", "1", "1", "1", "1.5", "1.5"],
@@ -98,7 +84,6 @@ export default function Items() {
     return (
       <DataGrid
         onRowClick={(dataGridRows, event) => {
-          event.defaultPrevented = true;
           setCurrItem(dataGridRows.row.name);
         }}
         rows={dataGridRows}
@@ -119,7 +104,7 @@ export default function Items() {
   return (
     <Container className='items'>
       <div className='generaliteminfo'>
-        <Typography variant='h1' sx={{textAlign: 'center'}}>Item Info and Pricing</Typography>
+        <Typography variant='h1'>Item Info and Pricing</Typography>
         <ul>
           <li>Almond water is worth the equivalent of 500 gold in D&D.</li>
           <li>Magic item prices work per regular D&D rules such as a rare is 2,000 to 20,000 gold, which translates to 4 to 40 almond water.</li>

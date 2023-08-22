@@ -7,6 +7,7 @@ import Quests from './Pages/Quests';
 import Navbar from './Components/Navbar';
 import GeneralInfo from './Pages/PlayerInfo';
 import Entities from './Pages/Entities';
+import Outposts from './Pages/Outposts';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/groups' element={<Groups />} />
+            <Route path='/outposts' element={<Outposts />} />
             <Route path='/levels' element={<Levels />} />
             <Route path='/items' element={<Items />} />
             <Route path='/entities' element={<Entities />} />
