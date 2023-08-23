@@ -93,6 +93,11 @@ export default function Items() {
             paginationModel: {
               pageSize: 10,
             }
+          },
+          columns: {
+            columnVisibilityModel: {
+              id: false
+            }
           }
         }}
         pageSizeOptions={[10]}

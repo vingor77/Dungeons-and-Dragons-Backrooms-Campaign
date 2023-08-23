@@ -3,6 +3,8 @@ import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react'
 import BackroomsItem from './BackroomsItem';
 import BackroomsEntities from './BackroomsEntities';
+import { collection, onSnapshot } from 'firebase/firestore';
+import db from '../Components/firebase';
 
 export default function BackroomsLevel(props) {
   const [spawn, setSpawn] = useState(-1);
@@ -10,6 +12,25 @@ export default function BackroomsLevel(props) {
   const [map, setMap] = useState({});
   const [currItem, setCurrItem] = useState("");
   const [currEntity, setCurrEntity] = useState("");
+  const [regSpawns, setRegSpawns] = useState([]);
+  const [possibleRegSpawns, setPossibleRegSpawns] = useState([]);
+  const [flag, setFlag] = useState(false);
+
+  useEffect(() => {
+    const collectionRef = collection(db, 'regularSpawns');
+
+    const unsub = onSnapshot(collectionRef, (querySnapshot) => {
+      const objects = [];
+      querySnapshot.forEach((doc) => {
+        objects.push(doc.data());
+      })
+      setPossibleRegSpawns(objects);
+    })
+
+    return () => {
+      unsub();
+    }
+  }, [])
 
   useEffect(() => {
     if(spawn <= props.spawns[0]) {
@@ -35,7 +56,7 @@ export default function BackroomsLevel(props) {
     if(size % 2 == 0) {
       size++;
     }
-    const center = Math.round(size / 2);
+    const center = Math.ceil(size / 2) - 1;
   
     //Create grid with 0's, meaning passable terrain
     let grid = [];
@@ -49,7 +70,7 @@ export default function BackroomsLevel(props) {
   
     //Make sure the rooms can connect.
     for(let i = 0; i < grid.length; i++) {
-      if(i !== (center - 3) && i !== (center - 2) && i !== (center - 1) && i !== (center) && i !== (center + 1)) {
+      if(i !== (center - 2) && i !== (center - 1) && i !== center && i !== (center + 1) && i !== (center + 2)) {
         grid[0][i] = 1;
         grid[i][0] = 1;
         grid[size - 1][i] = 1;
@@ -64,23 +85,30 @@ export default function BackroomsLevel(props) {
     for(let i = 1; i < grid.length; i++) {
       for(let j = 1; j < grid[i].length; j++) {
         if(i === 1 && j === 1) continue;
+        if((i === (center - 2) || i === (center - 1) || i === center || i === (center + 1) || i === (center + 2) || i === (size - 1))
+        && (j === (center - 2) || j === (center - 1) || j === center || j === (center + 1) || j === (center + 2) || j === (size - 1))) continue;
 
         randNum = Math.floor(Math.random() * 100);
-        if(grid[i - 1][j] === 1 || grid[i][j - 1]) {
-          if(randNum % 3 === 0) {
-            grid[i][j] = 1;
-          }
-        }
-        else {
-          if(randNum % 6 === 0) {
-            grid[i][j] = 1;
-          }
+        if(randNum % 4 === 0) {
+          grid[i][j] = 1;
         }
       }
     }
 
+    let regSpawnCount = Math.floor(Math.random() * (Number(props.regSpawnCount) + 1));
+
+    if(possibleRegSpawns.length > 0) {
+      let tempRegs = [];
+      for(let i = 0; i < regSpawnCount; i++) {
+        let noun = possibleRegSpawns[0].spawns[Math.floor(Math.random() * possibleRegSpawns[0].spawns.length)];
+        tempRegs.push(noun);
+      }
+      setRegSpawns(tempRegs);
+    }
+
     //Spawn location on the map.
     if(spawn !== -1) {
+
       const spawnLocation = () => {
         let xSpawn = Math.floor(Math.random() * size);
         let ySpawn = Math.floor(Math.random() * size);
@@ -101,7 +129,16 @@ export default function BackroomsLevel(props) {
             grid[xSpawn][ySpawn] = 4;
             break;
         }
+
+        for(let i = 0; i < regSpawnCount; i++) {
+          while(grid[xSpawn][ySpawn] !== 0) {
+            xSpawn = Math.floor(Math.random() * size);
+            ySpawn = Math.floor(Math.random() * size);
+          }
+          grid[xSpawn][ySpawn] = 5;
+        }
       }
+     
   
       spawnLocation();
     }
@@ -115,15 +152,17 @@ export default function BackroomsLevel(props) {
                 {row.map((cell, index) => {
                   switch(cell) {
                     case 0:
-                      return <TableCell sx={{color: 'white', border: '1px solid black', bgcolor: 'white'}} key={index}>{cell}</TableCell>
+                      return <TableCell sx={flag ? {color: 'purple', border: '1px solid black', bgcolor: 'purple'} : {color: 'white', border: '1px solid black', bgcolor: 'white'}} key={index}>{cell}</TableCell>
                     case 1:
                       return <TableCell sx={{color: 'black', border: '1px solid black', bgcolor: 'black'}} key={index}>{cell}</TableCell>
                     case 2:
                       return <TableCell sx={{color: 'green', border: '1px solid black', bgcolor: 'green'}} key={index}>{cell}</TableCell>
                     case 3:
                       return <TableCell sx={{color: 'red', border: '1px solid black', bgcolor: 'red'}} key={index}>{cell}</TableCell>
-                    default:
+                    case 4:
                       return <TableCell sx={{color: 'orange', border: '1px solid black', bgcolor: 'orange'}} key={index}>{cell}</TableCell>
+                    default:
+                      return <TableCell sx={{color: 'blue', border: '1px solid black', bgcolor: 'blue'}} key={index}>{cell}</TableCell>
                   }
                 })}
               </TableRow>
@@ -133,7 +172,7 @@ export default function BackroomsLevel(props) {
       </Table>
     )
   }, [spawn, spawnType]);
-
+  
   const CreateItemGrid = () => {
     const dataGridCols = [
       { field: 'id', headerName: 'ID', width: 90},
@@ -192,6 +231,11 @@ export default function BackroomsLevel(props) {
             pagination: {
               paginationModel: {
                 pageSize: 5,
+              }
+            },
+            columns: {
+              columnVisibilityModel: {
+                id: false
               }
             }
           }}
@@ -255,6 +299,11 @@ export default function BackroomsLevel(props) {
                 paginationModel: {
                   pageSize: 5,
                 }
+              },
+              columns: {
+                columnVisibilityModel: {
+                  id: false
+                }
               }
             }}
             pageSizeOptions={[5]}
@@ -291,6 +340,16 @@ export default function BackroomsLevel(props) {
                 />: ""
               )
             })}
+            {regSpawns.length !== 0 ?
+            <>
+              <Typography variant='h5'>Regular spawns(blue):</Typography>
+              <ul>
+                {regSpawns.map((spawn, index) => {
+                  return <li key={index}>{spawn} </li>
+                })}
+              </ul>
+            </>:
+            ""}
           </>: 
           ""}
           {spawnType === "Entity" ?
@@ -310,6 +369,16 @@ export default function BackroomsLevel(props) {
                 />: ""
               )
             })}
+            {regSpawns.length !== 0 ?
+            <>
+              <Typography variant='h5'>Regular spawns(blue):</Typography>
+              <ul>
+                {regSpawns.map((spawn, index) => {
+                  return <li key={index}>{spawn}</li>
+                })}
+              </ul>
+            </>:
+            ""}
           </>: 
           ""}
           {spawnType === "Special" ?
@@ -320,8 +389,33 @@ export default function BackroomsLevel(props) {
                 return <li key={index}>{special}</li>
               })}
             </ul>
+            {regSpawns.length !== 0 ?
+            <>
+              <Typography variant='h5'>Regular spawns(blue):</Typography>
+              <ul>
+                {regSpawns.map((spawn, index) => {
+                  return <li key={index}>{spawn}</li>
+                })}
+              </ul>
+            </>:
+            ""}
           </>:
           ""}
+          {spawnType === 'Nothing' ?
+            <>
+              {regSpawns.length !== 0 ?
+              <>
+                <Typography variant='h5'>Regular spawns(blue):</Typography>
+                <ul>
+                  {regSpawns.map((spawn, index) => {
+                    return <li key={index}>{spawn}</li>
+                  })}
+                </ul>
+              </>:
+              ""}
+            </>
+            :""
+          }
         </>
       }
     </>

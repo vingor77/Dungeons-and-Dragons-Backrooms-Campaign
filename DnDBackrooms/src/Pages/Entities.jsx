@@ -76,6 +76,11 @@ export default function Entities() {
                 paginationModel: {
                   pageSize: 10,
                 }
+              },
+              columns: {
+                columnVisibilityModel: {
+                  id: false
+                }
               }
             }}
             pageSizeOptions={[10]}

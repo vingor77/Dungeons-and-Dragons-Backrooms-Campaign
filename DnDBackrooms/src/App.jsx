@@ -8,6 +8,7 @@ import Navbar from './Components/Navbar';
 import GeneralInfo from './Pages/PlayerInfo';
 import Entities from './Pages/Entities';
 import Outposts from './Pages/Outposts';
+import Functions from './Components/Functions';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path='/entities' element={<Entities />} />
             <Route path='/quests' element={<Quests />} />
             <Route path='/info' element={<GeneralInfo />} />
+            <Route path='/functions' element={<Functions />} />
           </Routes>
         </div>
       </div>

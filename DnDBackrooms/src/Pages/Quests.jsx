@@ -2,9 +2,11 @@ import { Container, Typography } from '@mui/material'
 import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
 import db from '../Components/firebase';
+import BackroomsQuests from '../Components/BackroomsQuests';
 
 export default function Quests() {
   const [quests, setQuests] = useState([]);
+  const [unlock, setUnlock] = useState([]);
 
   useEffect(() => {
     const collectionRef = collection(db, 'quests');
@@ -22,22 +24,17 @@ export default function Quests() {
     }
   }, [])
 
+  useEffect(() => {
+    let unlockQuests = [];
+    for(let i = 0; i < quests.length; i++) {
+      if(quests[i].unlocked) unlockQuests.push(quests[i]);
+    }
+    setUnlock(unlockQuests);
+  }, [quests])
+
   return (
     <Container>
-      {quests.map((quest, index) => {
-        return (
-          <div key={index}>
-            <Typography variant='h2'>Description:</Typography>
-            <Typography variant='body1'>{quest.description}</Typography>
-            <Typography variant='h2'>Outpost:</Typography>
-            <Typography variant='body1'>{quest.outpost}</Typography>
-            <Typography variant='h2'>Quest giver:</Typography>
-            <Typography variant='body1'>{quest.questGiver}</Typography>
-            <Typography variant='h2'>Reward:</Typography>
-            <Typography variant='body1'>{quest.reward}</Typography>
-          </div>
-        )
-      })}
+      <BackroomsQuests quests={unlock} />
     </Container>
   )
 }

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import db from '../Components/firebase';
-import { Button, Container, Typography } from '@mui/material';
+import { Button, Container, Divider, Typography } from '@mui/material';
 import { collection, onSnapshot } from 'firebase/firestore';
+import BackroomsGroup from '../Components/BackroomsGroup';
+import BackroomsOutposts from '../Components/BackroomsOutposts';
 
 export default function Groups() {
   const [groups, setGroups] = useState([]);
@@ -55,7 +57,7 @@ export default function Groups() {
 
     let group = {};
     for(let i = 0; i < groups.length; i++) {
-      if(groups[i].name === currGroup) {
+      if(groups[i].name === currGroup.name) {
         group = groups[i];
         break;
       }
@@ -75,7 +77,7 @@ export default function Groups() {
   useEffect(() => {
     let group = {};
     for(let i = 0; i < groups.length; i++) {
-      if(groups[i].name === currGroup) {
+      if(groups[i].name === currGroup.name) {
         group = groups[i];
         break;
       }
@@ -85,7 +87,7 @@ export default function Groups() {
 
     for(let i = 0; i < quests.length; i++) {
       for(let j = 0; j < filteredOutposts.length; j++) {
-        if(quests[i].outpost === filteredOutposts[j].name && filteredOutposts[j].group === group.name) {
+        if(quests[i].outpost === filteredOutposts[j].name && filteredOutposts[j].group === group.name && quests[i].unlocked) {
           filter.push(quests[i]);
         }
       }
@@ -95,39 +97,20 @@ export default function Groups() {
 
   }, [filteredOutposts])
 
+  //TODO: Figure out how to render out outposts and quests, if even at all.
   return (
     <Container>
       {groups.map((group, index) => {
         return (
-          <Button onClick={() => setCurrGroup(group.name)} key={index} variant='outlined'>{group.name}</Button>
+          <Button onClick={() => setCurrGroup(group)} key={index} variant='outlined'>{group.name}</Button>
         )
       })}
-      {filteredOutposts.length === 0 && currGroup !== null ? "No outposts":
-        groups.map((group, index) => {
-          if(group.name === currGroup) {
-            return (
-              <>
-                <Typography variant='h2' key={index}>Group: {group.name}</Typography>
-                {filteredOutposts.map((outpost, index) => {
-                  return (
-                    <>
-                      <Typography variant='h4' key={index}>Outpost: {outpost.name}</Typography>
-                      {filteredQuests.map((quest, index) => {
-                        if(quest.unlocked) {
-                          return <Typography variant='body1' key={index}>Quest: {quest.name} unlocked</Typography>
-                        }
-                        else {
-                          return <Typography variant='body1' key={index}>Quest: {quest.name} stll locked</Typography>
-                        }
-                      })}
-                    </>
-                  )
-                })}
-              </>
-            )
-          }
-        })
-      }
+      <BackroomsGroup currGroup={currGroup}/>
+      <br />
+      <Divider />
+      <br />
+      <BackroomsOutposts outposts={filteredOutposts}/>
+      {/*Outposts and quests go here. Outpost will be a data grid where onRowClick display description, notable people, and shops(if needed). Quests may just stay on its own or it will be displayed underneath the shops. Idk about that yet.*/}
     </Container>
   )
 }

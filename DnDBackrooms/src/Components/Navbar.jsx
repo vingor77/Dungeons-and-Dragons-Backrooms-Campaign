@@ -1,20 +1,94 @@
-import React from 'react'
-import { AppBar, Stack, Toolbar, Link, Container } from '@mui/material';
+import React, { useState } from 'react'
+import { AppBar, Stack, Toolbar, Link, Container, Menu, Button, MenuItem } from '@mui/material';
 
 export default function Navbar() {
+  const [open, setOpen] = useState(null);
+  const [open2, setOpen2] = useState(null);
+  const [open3, setOpen3] = useState(null);
+
   return (
     <Container>
       <AppBar position='sticky'>
         <Toolbar>
-          <Stack direction='row' spacing={2}>
-            <Link href='/' color='inherit' underline='none'>Home</Link>
-            <Link href='/groups' color='inherit' underline='none'>Groups</Link>
-            <Link href='/outposts' color='inherit' underline='none'>Outposts</Link>
-            <Link href='/quests' color='inherit' underline='none'>Quests</Link>
-            <Link href='/items' color='inherit' underline='none'>Items</Link>
-            <Link href='/entities' color='inherit' underline='none'>Entities</Link>
-            <Link href='/levels' color='inherit' underline='none'>Levels</Link>
-            <Link href='/info' color='inherit' underline='none'>Player Info</Link>
+          <Stack direction='row' spacing={2} sx={{color: 'white'}}>
+            <Button href='/' color='inherit' underline='none'>Home</Button>
+
+            <div className='general'>
+              <Button
+                id="basic-link"
+                aria-controls={open ? 'basic-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? 'true' : undefined}
+                onClick={(event) => setOpen(event.currentTarget)}
+                color='inherit'
+              >
+                General information
+              </Button>
+              <Menu
+                id="basic-menu"
+                anchorEl={open}
+                open={open}
+                onClose={() => setOpen(false)}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-link',
+                }}
+              >
+                <MenuItem><Link href='/outposts' color='inherit' underline='none'>Outposts</Link></MenuItem>
+                <MenuItem><Link href='/quests' color='inherit' underline='none'>Quests</Link></MenuItem>
+                <MenuItem><Link href='/items' color='inherit' underline='none'>Items</Link></MenuItem>
+                <MenuItem><Link href='/entities' color='inherit' underline='none'>Entities</Link></MenuItem>
+              </Menu>
+            </div>
+
+            <div className='player'>
+              <Button
+                id="basic-link"
+                aria-controls={open2 ? 'basic-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open2 ? 'true' : undefined}
+                onClick={(event) => setOpen2(event.currentTarget)}
+                color='inherit'
+              >
+                Player information
+              </Button>
+              <Menu
+                id="basic-menu"
+                anchorEl={open2}
+                open={open2}
+                onClose={() => setOpen2(false)}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-link',
+                }}
+              >
+                <MenuItem><Link href='/info' color='inherit' underline='none'>Player Info</Link></MenuItem>
+                <MenuItem><Link href='/functions' color='inherit' underline='none'>Player Functions</Link></MenuItem>
+              </Menu>
+            </div>
+
+            <div className='dm'>
+              <Button
+                id="basic-link"
+                aria-controls={open3 ? 'basic-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open3 ? 'true' : undefined}
+                onClick={(event) => setOpen3(event.currentTarget)}
+                color='inherit'
+              >
+                DM information
+              </Button>
+              <Menu
+                id="basic-menu"
+                anchorEl={open3}
+                open={open3}
+                onClose={() => setOpen3(false)}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-link',
+                }}
+              >
+                <MenuItem><Link href='/groups' color='inherit' underline='none'>Groups</Link></MenuItem>
+                <MenuItem><Link href='/levels' color='inherit' underline='none'>Levels</Link></MenuItem>
+              </Menu>
+            </div>
           </Stack>
         </Toolbar>
       </AppBar>

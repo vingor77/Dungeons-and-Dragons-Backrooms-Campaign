@@ -159,6 +159,11 @@ export default function Levels() {
               paginationModel: {
                 pageSize: 5,
               }
+            },
+            columns: {
+              columnVisibilityModel: {
+                id: false
+              }
             }
           }}
           pageSizeOptions={[5]}
@@ -183,6 +188,7 @@ export default function Levels() {
             items={filteredItems}
             entities={filteredEntities}
             specials={level.specials}
+            regSpawnCount={level.regSpawns}
           />: ""
         )
       })}
