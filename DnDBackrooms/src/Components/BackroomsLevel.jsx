@@ -1,6 +1,6 @@
-import { Button, Divider, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
+import { Box, Button, Divider, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import BackroomsItem from './BackroomsItem';
 import BackroomsEntities from './BackroomsEntities';
 import { collection, onSnapshot } from 'firebase/firestore';
@@ -9,12 +9,13 @@ import db from '../Components/firebase';
 export default function BackroomsLevel(props) {
   const [spawn, setSpawn] = useState(-1);
   const [spawnType, setSpawnType] = useState("");
-  const [map, setMap] = useState({});
+  const [map, setMap] = useState(null);
   const [currItem, setCurrItem] = useState("");
   const [currEntity, setCurrEntity] = useState("");
   const [regSpawns, setRegSpawns] = useState([]);
   const [possibleRegSpawns, setPossibleRegSpawns] = useState([]);
-  const [flag, setFlag] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  const [initalize, setInitialize] = useState(true);
 
   useEffect(() => {
     const collectionRef = collection(db, 'regularSpawns');
@@ -33,17 +34,29 @@ export default function BackroomsLevel(props) {
   }, [])
 
   useEffect(() => {
+    let currType = spawnType;
+    let nextType;
+
     if(spawn <= props.spawns[0]) {
       setSpawnType("Nothing");
+      nextType = "Nothing"
     }
     else if(spawn > props.spawns[0] && spawn <= props.spawns[1]) {
       setSpawnType("Item");
+      nextType = "Item"
     }
     else if(spawn > props.spawns[1] && spawn <= props.spawns[2]) {
       setSpawnType("Entity");
+      nextType = "Entity"
     }
     else {
       setSpawnType("Special");
+      nextType = "Special"
+    }
+
+    //Change it to force the map to actually update in the useEffect underneath.
+    if(currType === nextType) {
+      setSpawnType(currType + "1");
     }
 
     setCurrEntity("");
@@ -101,14 +114,18 @@ export default function BackroomsLevel(props) {
       let tempRegs = [];
       for(let i = 0; i < regSpawnCount; i++) {
         let noun = possibleRegSpawns[0].spawns[Math.floor(Math.random() * possibleRegSpawns[0].spawns.length)];
+        for(let j = 0; j < tempRegs.length; j++) {
+          while(noun === tempRegs[j]) {
+            noun = possibleRegSpawns[0].spawns[Math.floor(Math.random() * possibleRegSpawns[0].spawns.length)];
+          }
+        }
         tempRegs.push(noun);
       }
       setRegSpawns(tempRegs);
     }
 
     //Spawn location on the map.
-    if(spawn !== -1) {
-
+    if(spawn !== -1 && showMap) {
       const spawnLocation = () => {
         let xSpawn = Math.floor(Math.random() * size);
         let ySpawn = Math.floor(Math.random() * size);
@@ -122,10 +139,19 @@ export default function BackroomsLevel(props) {
           case "Item":
             grid[xSpawn][ySpawn] = 2;
             break;
+          case "Item1":
+            grid[xSpawn][ySpawn] = 2;
+            break;
           case "Entity":
             grid[xSpawn][ySpawn] = 3;
             break;
+          case "Entity1":
+            grid[xSpawn][ySpawn] = 3;
+            break;
           case "Special":
+            grid[xSpawn][ySpawn] = 4;
+            break;
+          case "Special1":
             grid[xSpawn][ySpawn] = 4;
             break;
         }
@@ -139,7 +165,6 @@ export default function BackroomsLevel(props) {
         }
       }
      
-  
       spawnLocation();
     }
 
@@ -152,7 +177,7 @@ export default function BackroomsLevel(props) {
                 {row.map((cell, index) => {
                   switch(cell) {
                     case 0:
-                      return <TableCell sx={flag ? {color: 'purple', border: '1px solid black', bgcolor: 'purple'} : {color: 'white', border: '1px solid black', bgcolor: 'white'}} key={index}>{cell}</TableCell>
+                      return <TableCell sx={{color: 'white', border: '1px solid black', bgcolor: 'white'}} key={index}>{cell}</TableCell>
                     case 1:
                       return <TableCell sx={{color: 'black', border: '1px solid black', bgcolor: 'black'}} key={index}>{cell}</TableCell>
                     case 2:
@@ -171,7 +196,7 @@ export default function BackroomsLevel(props) {
         </TableBody>
       </Table>
     )
-  }, [spawn, spawnType]);
+  }, [spawnType]);
   
   const CreateItemGrid = () => {
     const dataGridCols = [
@@ -285,32 +310,85 @@ export default function BackroomsLevel(props) {
     })
 
     return (
-        <>
-          <br />
-          <Typography variant='h5'>Possible entities:</Typography>
-          <Divider />
-          <br />
-          <DataGrid
-            onRowClick={(dataGridRows) => setCurrEntity(dataGridRows.row.name)}
-            rows={dataGridRows}
-            columns={dataGridCols}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
-                }
-              },
-              columns: {
-                columnVisibilityModel: {
-                  id: false
-                }
+      <>
+        <br />
+        <Typography variant='h5'>Possible entities:</Typography>
+        <Divider />
+        <br />
+        <DataGrid
+          onRowClick={(dataGridRows) => setCurrEntity(dataGridRows.row.name)}
+          rows={dataGridRows}
+          columns={dataGridCols}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 5,
               }
-            }}
-            pageSizeOptions={[5]}
-            disableRowSelectionOnClick
-          />
-        </>
+            },
+            columns: {
+              columnVisibilityModel: {
+                id: false
+              }
+            }
+          }}
+          pageSizeOptions={[5]}
+          disableRowSelectionOnClick
+        />
+      </>
     );
+  }
+
+  const handleShowMap = () => {
+    if(initalize) {
+      setSpawn(Math.round(Math.random() * 100) + 1);
+      setInitialize(false);
+    }
+    setShowMap(true);
+  }
+
+  const handleHideMap = () => {
+    setShowMap(false);
+  }
+
+  const SpawnTable = () => {
+    return (
+      <Box border='1px solid black'>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{fontWeight: 'bold'}}>Rarity</TableCell>
+              <TableCell sx={{fontWeight: 'bold'}}>Roll</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell>Rare</TableCell>
+              <TableCell>1-13</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Legendary</TableCell>
+              <TableCell>14-16</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Common</TableCell>
+              <TableCell>17-66</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Artifact</TableCell>
+              <TableCell>67-68</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Uncommon</TableCell>
+              <TableCell>69-93</TableCell> 
+            </TableRow>
+            <TableRow>
+              <TableCell>Very Rare</TableCell>
+              <TableCell>94-100</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Box>
+    )
   }
 
   return (
@@ -318,13 +396,13 @@ export default function BackroomsLevel(props) {
       <Typography variant='h2'>Level {props.levelNum}, {props.name}</Typography>
       <Typography variant='h5'>Description:</Typography>
       <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
-      {spawn === -1 ? 
-        <Button variant='outlined' onClick={() => setSpawn(Math.round(Math.random() * 100) + 1)}>Generate map</Button>: 
+      {!showMap ? 
+        <Button variant='outlined' onClick={handleShowMap}>Show Map</Button>: 
         <>
-          <Button onClick={() => setSpawn(Math.round(Math.random() * 100) + 1)}>New map</Button>
-          <Button onClick={() => setSpawn(-1)} variant='outlined'>Delete map</Button>
+          <Button variant='outlined' onClick={handleHideMap}>Hide Map</Button>
+          <Button onClick={() => setSpawn(Math.round(Math.random() * 100) + 1)} variant='outlined'>Generate new map</Button>
           {map}
-          {spawnType === "Item" ?
+          {spawnType === "Item" || spawnType === 'Item1' ?
           <>
             <CreateItemGrid />
             {props.items.map((item, index) => {
@@ -340,19 +418,26 @@ export default function BackroomsLevel(props) {
                 />: ""
               )
             })}
+            <br />
+            <Typography variant='h5'>Rarity chances:</Typography>
+            <SpawnTable />
             {regSpawns.length !== 0 ?
             <>
+              <br />
               <Typography variant='h5'>Regular spawns(blue):</Typography>
-              <ul>
-                {regSpawns.map((spawn, index) => {
-                  return <li key={index}>{spawn} </li>
-                })}
-              </ul>
+              <Box border='1px solid black'>
+                <br />
+                <ul>
+                  {regSpawns.map((spawn, index) => {
+                    return <li key={index}>{spawn} </li>
+                  })}
+                </ul>
+              </Box>
             </>:
             ""}
           </>: 
           ""}
-          {spawnType === "Entity" ?
+          {spawnType === "Entity" || spawnType === "Entity1" ?
           <>
             <CreateEntityGrid />
             {props.entities.map((entity, index) => {
@@ -371,46 +456,60 @@ export default function BackroomsLevel(props) {
             })}
             {regSpawns.length !== 0 ?
             <>
+              <br />
               <Typography variant='h5'>Regular spawns(blue):</Typography>
-              <ul>
-                {regSpawns.map((spawn, index) => {
-                  return <li key={index}>{spawn}</li>
-                })}
-              </ul>
+              <Box border='1px solid black'>
+                <br />
+                <ul>
+                  {regSpawns.map((spawn, index) => {
+                    return <li key={index}>{spawn} </li>
+                  })}
+                </ul>
+              </Box>
             </>:
             ""}
           </>: 
           ""}
-          {spawnType === "Special" ?
+          {spawnType === "Special" || spawnType === "Special1" ?
           <>
             <Typography variant='h5'>Possible specials:</Typography>
-            <ul>
-              {props.specials.map((special, index) => {
-                return <li key={index}>{special}</li>
-              })}
-            </ul>
-            {regSpawns.length !== 0 ?
-            <>
-              <Typography variant='h5'>Regular spawns(blue):</Typography>
+            <Box border='1px solid black'>
               <ul>
-                {regSpawns.map((spawn, index) => {
-                  return <li key={index}>{spawn}</li>
+                {props.specials.map((special, index) => {
+                  return <li key={index}>{special}</li>
                 })}
               </ul>
+            </Box>
+            {regSpawns.length !== 0 ?
+            <>
+              <br />
+              <Typography variant='h5'>Regular spawns(blue):</Typography>
+              <Box border='1px solid black'>
+                <br />
+                <ul>
+                  {regSpawns.map((spawn, index) => {
+                    return <li key={index}>{spawn} </li>
+                  })}
+                </ul>
+              </Box>
             </>:
             ""}
           </>:
           ""}
-          {spawnType === 'Nothing' ?
+          {spawnType === 'Nothing' || spawnType === 'Nothing1' ?
             <>
               {regSpawns.length !== 0 ?
               <>
+                <br />
                 <Typography variant='h5'>Regular spawns(blue):</Typography>
-                <ul>
-                  {regSpawns.map((spawn, index) => {
-                    return <li key={index}>{spawn}</li>
-                  })}
-                </ul>
+                <Box border='1px solid black'>
+                  <br />
+                  <ul>
+                    {regSpawns.map((spawn, index) => {
+                      return <li key={index}>{spawn} </li>
+                    })}
+                  </ul>
+                </Box>
               </>:
               ""}
             </>

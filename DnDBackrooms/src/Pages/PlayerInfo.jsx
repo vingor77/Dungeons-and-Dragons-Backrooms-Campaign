@@ -16,6 +16,7 @@ export default function GeneralInfo() {
               <li>Maximum carry limit of 100 Backrooms specific items. This does not include magic items, armor, shields, weapons, or ammo.</li>
               <li>Fully implemented fleeing system for fights too difficult to win.</li>
               <li>Any effects that recharge after 24 hours also resets on a long rest.</li>
+              <li>Armor/Gear is slot based, similar to a video game. The slots are Helmet, Chest, Arms/Hands, Belts, Legs/Feet, Rings, Necklace, Cloak, Main hand, Off hand, and Misc. All slots can only have 1 item in it except rings and misc.</li>
             </ul>
           </div>
           <div className='fleeing'>

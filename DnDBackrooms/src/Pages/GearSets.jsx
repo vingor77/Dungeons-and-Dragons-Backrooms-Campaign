@@ -1,4 +1,4 @@
-import { Container, Typography } from '@mui/material';
+import { Container, Divider, Stack, Typography } from '@mui/material';
 import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useState } from 'react';
 import db from '../Components/firebase';
@@ -20,18 +20,21 @@ export default function GearSets() {
     return () => unsub();
   }
 
-  const showSetBonuses = (bonus) => {
-    let revealedBonuses = [];
-    for(let i = 0; i < bonus; i++) {
-      revealedBonuses.push(bonus[i]);
-    }
-
+  const ShowSetBonuses = (props) => {
     return (
-      <ul>
-        {revealedBonuses.map((b, index) => {
-          return <li key={index}>{b}</li>
-        })}
-      </ul>
+      props.set.bonus.map((b, index) => {
+        if(index < props.set.revealed) {
+          let parts = b.split(".");
+          return (
+            <>
+              {parts.map((p, index) => {
+                return <Typography variant='body1' key={index}>{p}</Typography>
+              })}
+              <br />
+            </>
+          )
+        }
+      })
     )
   }
 
@@ -60,10 +63,12 @@ export default function GearSets() {
                     :
                     <>
                       <Typography variant='h5'>Bonuses for the set:</Typography>
-                      {showSetBonuses(set.bonus)}
+                      <ShowSetBonuses set={set}/>
                     </>
                   }
-                  {}
+                  <br />
+                  <Divider />
+                  <br />
                 </div>
               )
             })}
