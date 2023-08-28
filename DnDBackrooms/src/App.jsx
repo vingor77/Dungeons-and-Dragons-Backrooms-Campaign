@@ -9,6 +9,7 @@ import GeneralInfo from './Pages/PlayerInfo';
 import Entities from './Pages/Entities';
 import Outposts from './Pages/Outposts';
 import Functions from './Components/Functions';
+import GearSets from './Pages/gearSets';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path='/outposts' element={<Outposts />} />
             <Route path='/levels' element={<Levels />} />
             <Route path='/items' element={<Items />} />
+            <Route path='/gearSets' element={<GearSets />} />
             <Route path='/entities' element={<Entities />} />
             <Route path='/quests' element={<Quests />} />
             <Route path='/info' element={<GeneralInfo />} />

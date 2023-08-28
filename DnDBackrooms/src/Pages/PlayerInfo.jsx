@@ -31,6 +31,7 @@ export default function GeneralInfo() {
               <li><b>Athletics or Acrobatics:</b> Run away. This includes anything from jumping up ledges and slopes to good old fashion running.</li>
               <li><b>Nature:</b> Blend within the environment. Similar to stealth but may give advantage or disadvantage depending on the environment.</li>
               <li><b>Deception:</b> Throw off your trail by some means.</li>
+              <li><b>Survival:</b> Learn the environment around you and lead the entity to a slow point while avoiding it yourself.</li>
               <li><b>Others:</b> If a skill check comes to mind that is not listed and would work for the situation, it may be used.</li>
             </ul>
             <Typography variant='body1'>

@@ -33,10 +33,10 @@ export default function Navbar() {
                   'aria-labelledby': 'basic-link',
                 }}
               >
-                <MenuItem><Link href='/outposts' color='inherit' underline='none'>Outposts</Link></MenuItem>
-                <MenuItem><Link href='/quests' color='inherit' underline='none'>Quests</Link></MenuItem>
                 <MenuItem><Link href='/items' color='inherit' underline='none'>Items</Link></MenuItem>
-                <MenuItem><Link href='/entities' color='inherit' underline='none'>Entities</Link></MenuItem>
+                <MenuItem><Link href='/gearSets' color='inherit' underline='none'>Gear Sets</Link></MenuItem>
+                <MenuItem><Link href='/groups' color='inherit' underline='none'>Groups</Link></MenuItem>
+                <MenuItem><Link href='/quests' color='inherit' underline='none'>Quests</Link></MenuItem>
               </Menu>
             </div>
 
@@ -85,7 +85,8 @@ export default function Navbar() {
                   'aria-labelledby': 'basic-link',
                 }}
               >
-                <MenuItem><Link href='/groups' color='inherit' underline='none'>Groups</Link></MenuItem>
+                <MenuItem><Link href='/outposts' color='inherit' underline='none'>Outposts</Link></MenuItem>
+                <MenuItem><Link href='/entities' color='inherit' underline='none'>Entities</Link></MenuItem>
                 <MenuItem><Link href='/levels' color='inherit' underline='none'>Levels</Link></MenuItem>
               </Menu>
             </div>

@@ -10,6 +10,7 @@ import backROM from '../Images/backROM47.png';
 import sack from '../Images/sack87.png';
 import blanche from '../Images/blanche96.png';
 import dice from '../Images/dice666.png';
+import portableGod from '../Images/portableGod.png';
 import { Card, CardContent, Typography } from '@mui/material';
 
 
@@ -17,7 +18,15 @@ export default function BackroomsItem(props) {
   const SpecialItem = () => {
     switch(props.itemNum) {
       case 0:
-        return props.name === "Strength Elixir(Level Items)" ? <img src={elixir}></img>: ""
+        if(props.name === "Strength Elixir(Level Items)") {
+          return <img src={elixir}></img>
+        }
+        else if(props.name === "Portable God") {
+          return <img src={portableGod}></img>
+        }
+        else {
+          return
+        }
       case 5:
         return <img src={candy}></img>
       case 23:
@@ -60,7 +69,7 @@ export default function BackroomsItem(props) {
         </ul>
         <Typography variant='h5'>Description:</Typography>
         <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
-        <SpecialItem style={{textAlign: 'center'}}/>  
+        <SpecialItem style={{textAlign: 'center'}}/>
       </CardContent>
     </Card>
   )
