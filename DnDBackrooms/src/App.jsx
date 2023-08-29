@@ -9,7 +9,9 @@ import GeneralInfo from './Pages/PlayerInfo';
 import Entities from './Pages/Entities';
 import Outposts from './Pages/Outposts';
 import Functions from './Components/Functions';
-import GearSets from './Pages/gearSets';
+import GearSets from './Pages/GearSets';
+import Avatars from './Pages/Avatars';
+import Gods from './Pages/Gods';
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
             <Route path='/quests' element={<Quests />} />
             <Route path='/info' element={<GeneralInfo />} />
             <Route path='/functions' element={<Functions />} />
+            <Route path='/gods' element={<Gods />} />
+            <Route path='/avatars' element={<Avatars />} />
           </Routes>
         </div>
       </div>
