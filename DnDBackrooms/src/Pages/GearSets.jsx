@@ -28,7 +28,9 @@ export default function GearSets() {
           return (
             <>
               {parts.map((p, index) => {
-                return <Typography variant='body1' key={index}>{p}</Typography>
+                const split = p.split(":");
+                console.log(split);
+                return split.length !== 1 ? <Typography variant='body1' key={index}><b>{split[0]}:</b>{split[1]}</Typography> : ""
               })}
               <br />
             </>

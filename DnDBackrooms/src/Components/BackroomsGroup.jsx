@@ -13,7 +13,19 @@ export default function BackroomsGroup(props) {
         <Typography variant='h5'>Current relation levels:</Typography>
         {props.currGroup.relations[0] === 'None' ? 
           <Typography variant='body1'>Relations cannot be had with this group.</Typography>:
-          <Typography variant='body1'>You are currently at Tier {props.currGroup.relations[0]}/10 with {props.currGroup.relations[1]}/5 points.</Typography>
+          <>
+            <Typography variant='body1'>You are currently at Tier {props.currGroup.relations[0]}/10 with {props.currGroup.relations[1]}/5 points.</Typography>
+            {props.currGroup.tiers[0] === 'None' ? "" :
+              <>
+                <Typography variant='h5'>Tier rewards:</Typography>
+                <ul>
+                  {props.currGroup.tiers.map((tier, index) => {
+                    return <li key={index}><b>Tier {index + 1}:</b> {tier}</li>
+                  })}
+                </ul>
+              </>
+            }
+          </>
         }
         {props.currGroup.subGroups[0] === 'None' ?
         "":
@@ -21,7 +33,8 @@ export default function BackroomsGroup(props) {
           <Typography variant='h5'>Sub groups:</Typography>
           <ul>
             {props.currGroup.subGroups.map((sub, index) => {
-              return <li key={index}>{sub}</li>
+              const cut = sub.split(":");
+              return <li key={index}><b>{cut[0]}:</b>{cut[1]}</li>
             })}
           </ul>
         </>}

@@ -1,9 +1,67 @@
-import { Container, Typography } from '@mui/material'
+import { Button, Container, Typography } from '@mui/material'
 import React from 'react'
+import { doc, setDoc } from 'firebase/firestore';
+import db from '../Components/firebase';
 
 export default function Home() {
+  const data = [];
+  
+  //Add shit for levels
+  const addShit = () => {
+    for(let i = 0; i < data.length; i++) {
+      let gens = data[i].genType.split(",");
+      let spawn = data[i].spawns.split(",");
+      let special = data[i].specials.split(",");
+
+      setDoc(doc(db, 'levels', data[i].name), {
+        description: data[i].description,
+        levelNum: data[i].levelNum.toString(),
+        name: data[i].name,
+        noEntities: data[i].noEntities,
+        regSpawns: data[i].regSpawns,
+        sanityDrainClass: data[i].sanityDrainClass,
+        sanityDrainType: data[i].sanityDrainType,
+        survivalDifficultyClass: data[i].survivalDifficultyClass.toString(),
+        time: data[i].time,
+        wifi: data[i].wifi,
+        genType: gens,
+        spawns: spawn,
+        specials: special,
+      })
+    }
+  }
+  
+  /* //Add shit for outposts
+  const addShit = () => {
+    for(let i = 0; i < data.length; i++) {
+      let people = data[i].notablePeople.split(",");
+      let shops;
+      if(data[i].hasShops === 'FALSE') {
+        shops = false;
+      }
+      else {
+        shops = true;
+      }
+
+      setDoc(doc(db, 'outposts', data[i].name), {
+        description: data[i].description,
+        group: data[i].group,
+        hasShops: shops,
+        location: data[i].location,
+        name: data[i].name,
+        notablePeople: people,
+      })
+    }
+  }
+  */
+
   return (
     <Container>
+      {data.length === 0 ?
+        <Button variant='outlined'>This aint do shit</Button>
+      :
+        <button onClick={addShit}>Add shit</button>
+      }
       <Typography variant='h1'>Welcome!</Typography>
       <Typography variant='body1'>
         This is an application I have created to specifically run my Dungeons and Dragons Backrooms game. It is an open-world game so everything needs to be ready ahead of time.

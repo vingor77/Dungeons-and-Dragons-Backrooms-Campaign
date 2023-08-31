@@ -13,6 +13,7 @@ export default function Levels() {
   const [currLevel, setCurrLevel] = useState(null);
   const [filteredItems, setFilteredItems] = useState([]);
   const [filteredEntities, setFilteredEntities] = useState([]);
+  const [filteredLevels, setFilteredLevels] = useState([]);
 
   useEffect(() => {
     const levelsRef = collection(db, 'levels');
@@ -22,10 +23,15 @@ export default function Levels() {
   
     const unsubLevels = onSnapshot(q, (querySnapshot) => {
       const objects = [];
+      const noGens = [];
       querySnapshot.forEach((doc) => {
         objects.push(doc.data());
+        if(doc.data().genType[0] === 'None') {
+          noGens.push(doc.data().name);
+        }
       })
       setLevels(objects);
+      setFilteredLevels(noGens);
     })
 
     const unsubItems = onSnapshot(itemsRef, (querySnapshot) => {
@@ -157,7 +163,7 @@ export default function Levels() {
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 5,
+                pageSize: 10,
               }
             },
             columns: {
@@ -166,7 +172,7 @@ export default function Levels() {
               }
             }
           }}
-          pageSizeOptions={[5]}
+          pageSizeOptions={[10]}
           disableRowSelectionOnClick
         />
     );
@@ -189,6 +195,8 @@ export default function Levels() {
             entities={filteredEntities}
             specials={level.specials}
             regSpawnCount={level.regSpawns}
+            genType={level.genType}
+            noGens={filteredLevels}
           />: ""
         )
       })}

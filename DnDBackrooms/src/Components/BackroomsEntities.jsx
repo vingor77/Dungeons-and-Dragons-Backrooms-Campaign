@@ -226,21 +226,34 @@ export default function BackroomsEntities(props) {
   return (
     <Card>
       <CardContent>
-        <Typography variant='h5'>Spawn locations:</Typography>
-        <ul>
-          {props.locations.map((element, index) => {
-            return (
-              <li key={index}>{element}</li>
-            );
-          })}
-        </ul>
-        <Typography variant='h5'>Description:</Typography>
-        <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
         {creatures === null ? getCreatures() : ""}
         {props.challengeRating !== 0 && creatures !== null ?
-          <StatBlock />
-          :
           <>
+            <Typography variant='h5'>Spawn locations:</Typography>
+            <ul>
+              {props.locations.map((element, index) => {
+                return (
+                  <li key={index}>{element}</li>
+                );
+              })}
+            </ul>
+            <Typography variant='h5'>Description:</Typography>
+            <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
+            <StatBlock />
+          </>
+        :
+          <>
+            <Typography variant='h2'>{props.name}</Typography>
+            <Typography variant='h5'>Spawn locations:</Typography>
+            <ul>
+              {props.locations.map((element, index) => {
+                return (
+                  <li key={index}>{element}</li>
+                );
+              })}
+            </ul>
+            <Typography variant='h5'>Description:</Typography>
+            <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
             <Typography variant='body1'>No stat block available</Typography>
           </>
         }
