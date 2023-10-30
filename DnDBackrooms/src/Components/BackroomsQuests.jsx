@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 
@@ -11,7 +11,7 @@ export default function BackroomsQuests(props) {
       { 
         field: 'name', 
         headerName: 'Quest Name', 
-        width: 200
+        width: 400
       },
       {
         field: 'outpost',
@@ -21,11 +21,6 @@ export default function BackroomsQuests(props) {
       {
         field: 'questGiver',
         headerName: 'Quest giver',
-        width: 200,
-      },
-      {
-        field: 'reward',
-        headerName: 'Reward',
         width: 200,
       },
       {
@@ -45,8 +40,7 @@ export default function BackroomsQuests(props) {
         name : quest.name,
         outpost: quest.outpost,
         questGiver: quest.questGiver,
-        reward: quest.reward,
-        complete: quest.completed ? "Yes": "No",
+        completed: quest.completed ? "Yes": "No",
       }
       dataGridRows.push(row);
     })
@@ -85,7 +79,19 @@ export default function BackroomsQuests(props) {
                 {quest.name === currQuest ?
                   <>
                     <Typography variant='h2'>{quest.name}</Typography>
-                    <Typography variant='body1'>{quest.description}</Typography>
+                    <br />
+                    <Divider />
+                    <br />
+                    <Stack direction='row' spacing={2} divider={<Divider orientation="vertical" flexItem />}>
+                      <Box width='50%'>
+                        <Typography variant='h5'>Description</Typography>
+                        <Typography variant='body1'>{quest.description}</Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant='h5'>Reward</Typography>
+                        <Typography variant='body1'>{quest.reward}</Typography>
+                      </Box>
+                    </Stack>
                   </>
                 :""
                 }

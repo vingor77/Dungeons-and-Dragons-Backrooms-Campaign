@@ -5,8 +5,24 @@ import db from '../Components/firebase';
 
 export default function Home() {
   const data = [];
+
+  /* //Add shit for Quests
+  const addShit = () => {
+    for(let i = 0; i < data.length; i++) {
+      setDoc(doc(db, 'quests', data[i].name), {
+        completed: data[i].completed,
+        description: data[i].description,
+        name: data[i].name,
+        outpost: data[i].outpost,
+        questGiver: data[i].questGiver,
+        reward: data[i].reward,
+        unlocked: data[i].unlocked
+      })
+    }
+  }
+  */
   
-  //Add shit for levels
+  /* //Add shit for levels
   const addShit = () => {
     for(let i = 0; i < data.length; i++) {
       let gens = data[i].genType.split(",");
@@ -30,6 +46,7 @@ export default function Home() {
       })
     }
   }
+  */
   
   /* //Add shit for outposts
   const addShit = () => {

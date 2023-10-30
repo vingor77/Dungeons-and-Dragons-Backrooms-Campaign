@@ -1,20 +1,20 @@
-import { Box, Button, Divider, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid';
-import React, { useEffect, useReducer, useState } from 'react'
+import { Box, Button, Input, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import BackroomsItem from './BackroomsItem';
 import BackroomsEntities from './BackroomsEntities';
 import { collection, onSnapshot } from 'firebase/firestore';
 import db from '../Components/firebase';
+import CasinoShop from '../Images/CasinoRoomShop.png';
 
 export default function BackroomsLevel(props) {
   const [spawn, setSpawn] = useState(-1);
   const [spawnType, setSpawnType] = useState("");
-  const [currItem, setCurrItem] = useState("");
-  const [currEntity, setCurrEntity] = useState("");
   const [regSpawns, setRegSpawns] = useState([]);
   const [possibleRegSpawns, setPossibleRegSpawns] = useState([]);
   const [showMap, setShowMap] = useState(false);
   const [initalize, setInitialize] = useState(true);
+  const [currMap, setCurrMap] = useState(null);
+  const [mapRendered, setMapRendered] = useState(null);
 
   useEffect(() => {
     const collectionRef = collection(db, 'regularSpawns');
@@ -36,15 +36,15 @@ export default function BackroomsLevel(props) {
     let currType = spawnType;
     let nextType;
 
-    if(spawn <= props.spawns[0]) {
+    if(spawn <= props.level.spawns[0]) {
       setSpawnType("Nothing");
       nextType = "Nothing"
     }
-    else if(spawn > props.spawns[0] && spawn <= props.spawns[1]) {
+    else if(spawn > props.level.spawns[0] && spawn <= props.level.spawns[1]) {
       setSpawnType("Item");
       nextType = "Item"
     }
-    else if(spawn > props.spawns[1] && spawn <= props.spawns[2]) {
+    else if(spawn > props.level.spawns[1] && spawn <= props.level.spawns[2]) {
       setSpawnType("Entity");
       nextType = "Entity"
     }
@@ -58,11 +58,8 @@ export default function BackroomsLevel(props) {
       setSpawnType(currType + "1");
     }
 
-    setCurrEntity("");
-    setCurrItem("");
-
     //Regular spawn locations on the map.
-    let regSpawnCount = Math.floor(Math.random() * (Number(props.regSpawnCount) + 1));
+    let regSpawnCount = Math.floor(Math.random() * (Number(props.level.regSpawns) + 1));
 
     if(possibleRegSpawns.length > 0) {
       let tempRegs = [];
@@ -79,41 +76,200 @@ export default function BackroomsLevel(props) {
     }
   }, [spawn])
 
-  const CreateMap = () => {
-    if(props.genType[0] === 'None') return;
+  const createMap = () => {
+    if(props.level.genType[0] === 'None') return;
 
-    const type = props.genType[Math.floor(Math.random() * props.genType.length)];
+    const type = props.level.genType[Math.floor(Math.random() * props.level.genType.length)];
+    setMapRendered(true);
 
     switch(type) {
       case 'Room':
-        return <CreateRoomMap />
+        createRoomMap();
+        break;
       case 'Hall':
-        return <CreateRoomMap /> //Swap this to be CreateHallMap later.
+        createRoomMap(); //Swap this to be CreateHallMap later.
+        break;
     }
   };
 
-  const CreateRoomMap = () => {
-    //Get random number and make it odd then find the center piece
-    let size = Math.floor(Math.random() * 10) + 15;
+  const createRoomMap = () => {
+    let size = Math.floor(Math.random() * 10) + 15; //Size of 15 to 24
     if(size % 2 == 0) {
       size++;
     }
     const center = Math.ceil(size / 2) - 1;
 
-    //Create grid with 0's, meaning passable terrain
-    const grid = new Array(size).fill(0).map(() => new Array(size).fill(0));
+    //Create a grid and set any end pieces to -1 since that won't be used later on ever.
+    const grid = [];
+    for(let i = 0; i < size; i++) {
+      let tempArr = [];
+      for(let j = 0; j < size; j++) {
+        if(i >= (center - 2) && i <= (center + 2) && (j === 0 || j === (size - 1))) {
+          tempArr[j] = -1;
+        }
+        else if((i === 0 || i === (size - 1)) && j >= (center - 2) && j <= (center + 2)) {
+          tempArr[j] = -1;
+        }
+        else {
+          tempArr[j] = 1;
+        }
+      }
+      grid.push(tempArr);
+    }
 
-    //Make sure the rooms can connect.
-    for(let i = 0; i < grid.length; i++) {
-      if(i !== (center - 2) && i !== (center - 1) && i !== center && i !== (center + 1) && i !== (center + 2)) {
-        grid[0][i] = 1;
-        grid[i][0] = 1;
-        grid[size - 1][i] = 1;
-        grid[i][size - 1] = 1;
+    //Path algorithm
+    const paths = []; //2D array where 0 is path 1, 1 is path 2, etc.
+    
+    //Left
+    let randI = Math.floor(Math.random() * size);
+    while(grid[randI][0] !== -1) {
+      randI = Math.floor(Math.random() * size);
+    }
+    paths[0] = [{i: randI, j: 0}];
+
+    //Right
+    randI = Math.floor(Math.random() * size);
+    while(grid[randI][size - 1] !== -1) {
+      randI = Math.floor(Math.random() * size);
+    }
+    paths[1] = [{i: randI, j: (size - 1)}];
+
+    //Top
+    let randJ = Math.floor(Math.random() * size);
+    while(grid[0][randJ] !== -1) {
+      randJ = Math.floor(Math.random() * size);
+    }
+    paths[2] = [{i: 0, j: randJ}];
+
+    //Bottom
+    randJ = Math.floor(Math.random() * size);
+    while(grid[size - 1][randJ] !== -1) {
+      randJ = Math.floor(Math.random() * size);
+    }
+    paths[3] = [{i: (size - 1), j: randJ}];
+
+    //Go in a random direction with checks for edges of the map and end points. Cannot go backwards nor can it go off the map. If it hits an end point, end the algorithm.
+    for(let i = 0; i < paths.length; i++) {
+      let end = false;
+      while(!end) {
+        const currentTile = paths[i][paths[i].length - 1];
+
+        if(i === 0) {
+          if(((currentTile.i === (center - 2) || currentTile.i === (center - 1) || currentTile.i === (center) || currentTile.i === (center + 1) || currentTile.i === (center + 2)) && (currentTile.j === (size - 1))) && paths[i].length > 1) {
+            end = true;
+          }
+          else if(((currentTile.j === (center - 2) || currentTile.j === (center - 1) || currentTile.j === (center) || currentTile.j === (center + 1) || currentTile.j === (center + 2)) && (currentTile.i === 0 || currentTile.i === (size - 1))) && paths[i].length > 1) {
+            end = true;
+          }
+        }
+        else if(i === 1) {
+          if(((currentTile.i === (center - 2) || currentTile.i === (center - 1) || currentTile.i === (center) || currentTile.i === (center + 1) || currentTile.i === (center + 2)) && (currentTile.j === 0)) && paths[i].length > 1) {
+            end = true;
+          }
+          else if(((currentTile.j === (center - 2) || currentTile.j === (center - 1) || currentTile.j === (center) || currentTile.j === (center + 1) || currentTile.j === (center + 2)) && (currentTile.i === 0) || currentTile.i === (size - 1)) && paths[i].length > 1) {
+            end = true;
+          }
+        }
+        //Top
+        else if(i === 2) {
+          if(((currentTile.i === (center - 2) || currentTile.i === (center - 1) || currentTile.i === (center) || currentTile.i === (center + 1) || currentTile.i === (center + 2)) && (currentTile.j === 0 || currentTile.j === (size - 1))) && paths[i].length > 1) {
+            end = true;
+          }
+          else if(((currentTile.j === (center - 2) || currentTile.j === (center - 1) || currentTile.j === (center) || currentTile.j === (center + 1) || currentTile.j === (center + 2)) && (currentTile.i === (size - 1))) && paths[i].length > 1) {
+            end = true;
+          }
+        }
+        //Bottom
+        else {
+          if(((currentTile.i === (center - 2) || currentTile.i === (center - 1) || currentTile.i === (center) || currentTile.i === (center + 1) || currentTile.i === (center + 2)) && (currentTile.j === (size - 1) || currentTile.j === 0)) && paths[i].length > 1) {
+            end = true;
+          }
+          else if(((currentTile.j === (center - 2) || currentTile.j === (center - 1) || currentTile.j === (center) || currentTile.j === (center + 1) || currentTile.j === (center + 2)) && (currentTile.i === 0)) && paths[i].length > 1) {
+            end = true;
+          }
+        }
+
+        if(!end) {
+          let direction = Math.floor(Math.random() * 4);
+          let success = false;
+          let alreadyChosen = false;
+          while(!success) {
+            switch(direction) {
+              case 0:
+                //Left
+                if(currentTile.j - 1 < 0 || alreadyChosen) {
+                  alreadyChosen = false;
+                  direction = Math.floor(Math.random() * 4);
+                  break;
+                }
+
+                paths[i].push({i: paths[i][paths[i].length - 1].i, j: (paths[i][paths[i].length - 1].j - 1)});
+                success = true;
+                break;
+              case 1:
+                //Right
+                if(currentTile.j + 1 > (size - 1) || alreadyChosen) {
+                  alreadyChosen = false;
+                  direction = Math.floor(Math.random() * 4);
+                  break;
+                }
+
+                paths[i].push({i: paths[i][paths[i].length - 1].i, j: (paths[i][paths[i].length - 1].j + 1)});
+                success = true;
+                break;
+              case 2:
+                //Top
+                if(currentTile.i - 1 < 0 || alreadyChosen) {
+                  alreadyChosen = false;
+                  direction = Math.floor(Math.random() * 4);
+                  break;
+                }
+
+                paths[i].push({i: (paths[i][paths[i].length - 1].i - 1), j: paths[i][paths[i].length - 1].j});
+                success = true;
+                break;
+              case 3:
+                //Bottom
+                if(currentTile.i + 1 > (size - 1) || alreadyChosen) {
+                  alreadyChosen = false;
+                  direction = Math.floor(Math.random() * 4);
+                  break;
+                }
+
+                paths[i].push({i: (paths[i][paths[i].length - 1].i + 1), j: paths[i][paths[i].length - 1].j});
+                success = true;
+                break;
+              default:
+                break;
+            } 
+          }
+        }
       }
     }
 
-    //Spawn location on the map.
+    for(let i = 0; i < paths.length; i++) {
+      for(let j = 0; j < paths[i].length; j++) {
+        const pathI = paths[i][j].i;
+        const pathJ = paths[i][j].j;
+        if(grid[pathI][pathJ] !== -1 && grid[pathI][pathJ] !== 2 && grid[pathI][pathJ] !== 3 && grid[pathI][pathJ] !== 4) {
+          grid[pathI][pathJ] = 0;
+        }
+      }
+    }
+
+    //Setup room borders
+    for(let i = 0; i < grid.length; i++) {
+      for(let j = 0; j < grid[i].length; j++) {
+        if((i === 0 || i === (size - 1)) && (grid[i][j] !== -1)) {
+          grid[i][j] = 1;
+        }
+        if((j === 0 || j === (size - 1)) && (grid[i][j] !== -1)) {
+          grid[i][j] = 1;
+        }
+      }
+    }
+
+    //Add in regular spawns and items/entities.
     if(spawn !== -1 && showMap) {
       const spawnLocation = () => {
         let xSpawn = Math.floor(Math.random() * size);
@@ -144,9 +300,9 @@ export default function BackroomsLevel(props) {
             grid[xSpawn][ySpawn] = 4;
             break;
         }
-
+  
         for(let i = 0; i < regSpawns.length; i++) {
-          while(grid[xSpawn][ySpawn] !== 0) {
+          while(grid[xSpawn][ySpawn] !== 0 && grid[xSpawn][ySpawn] !== -1) {
             xSpawn = Math.floor(Math.random() * size);
             ySpawn = Math.floor(Math.random() * size);
           }
@@ -157,174 +313,49 @@ export default function BackroomsLevel(props) {
       spawnLocation();
     }
 
-    return(
-      <Table sx={{border: '1px solid black'}}>
-        <TableBody color='inherit'>
-          {grid.map((row, index) => {
-            return (
-              <TableRow sx={{border: '1px solid black'}} key={index}>
-                {row.map((cell, index) => {
-                  switch(cell) {
-                    case 0:
-                      return <TableCell sx={{color: 'white', border: '1px solid black', bgcolor: 'white'}} key={index}>{cell}</TableCell>
-                    case 1:
-                      return <TableCell sx={{color: 'black', border: '1px solid black', bgcolor: 'black'}} key={index}>{cell}</TableCell>
-                    case 2:
-                      return <TableCell sx={{color: 'green', border: '1px solid black', bgcolor: 'green'}} key={index}>{cell}</TableCell>
-                    case 3:
-                      return <TableCell sx={{color: 'red', border: '1px solid black', bgcolor: 'red'}} key={index}>{cell}</TableCell>
-                    case 4:
-                      return <TableCell sx={{color: 'orange', border: '1px solid black', bgcolor: 'orange'}} key={index}>{cell}</TableCell>
-                    default:
-                      return <TableCell sx={{color: 'blue', border: '1px solid black', bgcolor: 'blue'}} key={index}>{cell}</TableCell>
-                  }
-                })}
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+    //Change the placeholder end values
+    for(let i = 0; i < grid.length; i++) {
+      for(let j = 0; j < grid[i].length; j++) {
+        if(grid[i][j] === -1) {
+          grid[i][j] = 0;
+        }
+      }
+    }
+
+    setCurrMap(
+      <>
+        <Table sx={{border: '1px solid black'}}>
+          <TableBody color='inherit'>
+            {grid.map((row, index) => {
+              return (
+                <TableRow sx={{border: '1px solid black'}} key={index}>
+                  {row.map((cell, index) => {
+                    switch(cell) {
+                      case 0:
+                        return <TableCell sx={{color: 'white', border: '1px solid black', bgcolor: 'white'}} key={index}>{cell}</TableCell>
+                      case 1:
+                        return <TableCell sx={{color: 'black', border: '1px solid black', bgcolor: 'black'}} key={index}>{cell}</TableCell>
+                      case 2:
+                        return <TableCell sx={{color: 'green', border: '1px solid black', bgcolor: 'green'}} key={index}>{cell}</TableCell>
+                      case 3:
+                        return <TableCell sx={{color: 'red', border: '1px solid black', bgcolor: 'red'}} key={index}>{cell}</TableCell>
+                      case 4:
+                        return <TableCell sx={{color: 'orange', border: '1px solid black', bgcolor: 'orange'}} key={index}>{cell}</TableCell>
+                      default:
+                        return <TableCell sx={{color: 'blue', border: '1px solid black', bgcolor: 'blue'}} key={index}>{cell}</TableCell>
+                    }
+                  })}
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+        {spawnType === "Item" || spawnType === 'Item1' ? <CheckSpawnItem altDisplay='false' /> : ""}
+        {spawnType === "Entity" || spawnType === "Entity1" ? <CheckSpawnEntity altDisplay='false' /> : ""}
+        {spawnType === "Special" || spawnType === "Special1" ? <CheckSpawnSpecial altDisplay='false'/> : ""}
+        {spawnType === 'Nothing' || spawnType === 'Nothing1' ? <CheckSpawnNothing altDisplay='false' /> : ""}
+      </>
     )
-  }
-  
-  const CreateItemGrid = () => {
-    const dataGridCols = [
-      { field: 'id', headerName: 'ID', width: 90},
-      { 
-        field: 'name', 
-        headerName: 'Item Name', 
-        width: 250 
-      },
-      {
-        field: 'num',
-        headerName: 'Item number',
-        width: 250,
-      },
-      {
-        field: 'rarity',
-        headerName: 'Rarity',
-        width: 250,
-        editable: true,
-      },
-      {
-        field: 'price',
-        headerName: 'Artifact Price',
-        width: 250,
-        editable: true,
-      },
-    ];
-
-    let count = 0;
-    let arPrice = 0;
-    const dataGridRows = [];
-
-    props.items.map(item => {
-      {item.artifactPrice === -1 ? arPrice = "N/A": arPrice = item.artifactPrice}
-      count++;
-      const row = {
-        id: count,
-        name: item.name,
-        num: item.itemNum,
-        rarity: item.rarity,
-        price: arPrice,
-      }
-      dataGridRows.push(row);
-    })
-
-    return (
-      <>
-        <br />
-        <Typography variant='h5'>Possible items:</Typography>
-        <Divider />
-        <br />
-        <DataGrid
-          onRowClick={(dataGridRows) => setCurrItem(dataGridRows.row.name)}
-          rows={dataGridRows}
-          columns={dataGridCols}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 5,
-              }
-            },
-            columns: {
-              columnVisibilityModel: {
-                id: false
-              }
-            }
-          }}
-          pageSizeOptions={[5]}
-          disableRowSelectionOnClick
-        />
-      </>
-    );
-  }
-
-  const CreateEntityGrid = () => {
-    if(props.entities.length === 0 || props.noEntities === true) return;
-
-    const dataGridCols = [
-        { field: 'id', headerName: 'ID', width: 90},
-        { 
-          field: 'name', 
-          headerName: 'Entity Name', 
-          width: 250 
-        },
-        {
-          field: 'num',
-          headerName: 'Entity number',
-          width: 250,
-        },
-        {
-          field: 'cr',
-          headerName: 'Challenge Rating',
-          width: 250,
-        },
-    ];
-    
-    let count = 0;
-    let cr = "";
-    const dataGridRows = [];
-  
-    props.entities.map(entity => {
-      {entity.challengeRating === 0 ? cr = "N/A": cr = entity.challengeRating}
-      count++;
-      const row = {
-        id: count,
-        name: entity.name,
-        num: entity.entityNum,
-        cr: cr,
-      }
-      dataGridRows.push(row);
-    })
-
-    return (
-      <>
-        <br />
-        <Typography variant='h5'>Possible entities:</Typography>
-        <Divider />
-        <br />
-        <DataGrid
-          onRowClick={(dataGridRows) => setCurrEntity(dataGridRows.row.name)}
-          rows={dataGridRows}
-          columns={dataGridCols}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 5,
-              }
-            },
-            columns: {
-              columnVisibilityModel: {
-                id: false
-              }
-            }
-          }}
-          pageSizeOptions={[5]}
-          disableRowSelectionOnClick
-        />
-      </>
-    );
   }
 
   const handleShowMap = () => {
@@ -339,92 +370,109 @@ export default function BackroomsLevel(props) {
     setShowMap(false);
   }
 
-  const SpawnTable = () => {
-    return (
-      <Box border='1px solid black'>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{fontWeight: 'bold'}}>Rarity</TableCell>
-              <TableCell sx={{fontWeight: 'bold'}}>Roll</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>Rare</TableCell>
-              <TableCell>1-13</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Legendary</TableCell>
-              <TableCell>14-16</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Common</TableCell>
-              <TableCell>17-66</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Artifact</TableCell>
-              <TableCell>67-68</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Uncommon</TableCell>
-              <TableCell>69-93</TableCell> 
-            </TableRow>
-            <TableRow>
-              <TableCell>Very Rare</TableCell>
-              <TableCell>94-100</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </Box>
-    )
+  const getItemRarity = () => {
+    //Roll for rarity then filter out
+    const findRarity = Math.floor(Math.random() * 100) + 1;
+    let itemRaritySpawn = "";
+    if(findRarity > 0 && findRarity <= 13) {
+      itemRaritySpawn = 'Rare';
+    }
+    else if(findRarity > 13 && findRarity <= 16) {
+      itemRaritySpawn = "Legendary";
+    }
+    else if(findRarity > 16 && findRarity <= 66) {
+      itemRaritySpawn = "Common";
+    }
+    else if(findRarity > 66 && findRarity <= 68) {
+      itemRaritySpawn = "Artifact";
+    }
+    else if(findRarity > 68 && findRarity <= 93) {
+      itemRaritySpawn = "Uncommon";
+    }
+    else {
+      itemRaritySpawn = "Very Rare";
+    }
+    
+    const filteredItems = [];
+    props.items.map(item => {
+      if(item.rarity === itemRaritySpawn) {
+        filteredItems.push(item);
+      }
+    })
+
+    return filteredItems[Math.floor(Math.random() * filteredItems.length)];
   }
 
-  const CheckSpawnItem = () => {
+  const CheckSpawnItem = (properties) => {
+    const selectedItem = getItemRarity();
+
     return (
       <>
-        <CreateItemGrid />
-        {props.items.map((item, index) => {
-          return (
-            item.name === currItem ? 
-            <BackroomsItem 
-              key={index}
-              name={item.name}
-              itemNum={item.itemNum}
-              locations={item.locations}
-              description={item.description}
-              table={item.table}
-            />: ""
-          )
-        })}
+        <BackroomsItem 
+          name={selectedItem.name}
+          itemNum={selectedItem.itemNum}
+          locations={selectedItem.locations}
+          description={selectedItem.description}
+          table={selectedItem.table}
+        />
         <br />
-        <Typography variant='h5'>Rarity chances:</Typography>
-        <SpawnTable />
-        {regSpawns.length !== 0 ?
-        <>
-          <br />
-          <Typography variant='h5'>Regular spawns(blue):</Typography>
-          <Box border='1px solid black'>
+        {regSpawns.length !== 0 && properties.altDisplay === 'false' ?
+          <>
             <br />
-            <ul>
-              {regSpawns.map((spawn, index) => {
-                return <li key={index}>{spawn} </li>
-              })}
-            </ul>
-          </Box>
-        </>:
-        ""}
+            <Typography variant='h5'>Regular spawns(blue):</Typography>
+            <Box border='1px solid black'>
+              <br />
+              <ul>
+                {regSpawns.map((spawn, index) => {
+                  return <li key={index}>{spawn} </li>
+                })}
+              </ul>
+            </Box>
+          </>
+        :
+          ""
+        }
       </>
     )
   }
 
-  const CheckSpawnEntity = () => {
+  const CheckSpawnEntity = (properties) => {
+    //Determine maximum cr for the encounter then choose randomly until it is equal to the total. Stretch: Add a limit of entities in the encounter.
+    //TODO: Find a way to display the statblocks nicer.
+    const maxCR = (Math.floor(Math.random() * 11)) * 3;
+    const chosenEntities = [];
+    let cutOff = 100;
+    let currCR = maxCR;
+
+    if(maxCR > 0) {
+      while(chosenEntities.length < 5 && cutOff > 0) {
+        const entity = props.entities[Math.floor(Math.random() * props.entities.length)];
+  
+        if(entity.challengeRating <= currCR && entity.challengeRating > 0 && entity.entityNum > 0 && entity.entityNum < 16) { //entity num checks are for testing purposes. remove later
+          currCR -= entity.challengeRating;
+          chosenEntities.push(entity);
+        }
+  
+        if(currCR <= 0 && chosenEntities.length > 0) {
+          break;
+        }
+        cutOff--;
+      }
+    }
+    else {
+      let entity = props.entities[Math.floor(Math.random() * props.entities.length)];
+
+      while(entity.challengeRating !== 0) {
+        entity = props.entities[Math.floor(Math.random() * props.entities.length)];
+      }
+
+      chosenEntities.push(entity);
+    }
+
     return (
       <>
-        <CreateEntityGrid />
-        {props.entities.map((entity, index) => {
+        {chosenEntities.map((entity, index) => {
           return (
-            entity.name === currEntity ? 
             <BackroomsEntities 
               key={index}
               name={entity.name}
@@ -433,23 +481,25 @@ export default function BackroomsLevel(props) {
               statBlock={entity.statBlock}
               challengeRating={entity.challengeRating}
               entityNum={entity.entityNum}
-            />: ""
+            />
           )
         })}
-        {regSpawns.length !== 0 ?
-        <>
-          <br />
-          <Typography variant='h5'>Regular spawns(blue):</Typography>
-          <Box border='1px solid black'>
+        {regSpawns.length !== 0 && properties.altDisplay === 'false' ?
+          <>
             <br />
-            <ul>
-              {regSpawns.map((spawn, index) => {
-                return <li key={index}>{spawn} </li>
-              })}
-            </ul>
-          </Box>
-        </>:
-        ""}
+            <Typography variant='h5'>Regular spawns(blue):</Typography>
+            <Box border='1px solid black'>
+              <br />
+              <ul>
+                {regSpawns.map((spawn, index) => {
+                  return <li key={index}>{spawn} </li>
+                })}
+              </ul>
+            </Box>
+          </>
+        :
+          ""
+        }
       </>
     )
   }
@@ -462,32 +512,34 @@ export default function BackroomsLevel(props) {
             <Typography variant='h5'>Possible specials:</Typography>
             <Box border='1px solid black'>
               <ul>
-                {props.specials.map((special, index) => {
+                {props.level.specials.map((special, index) => {
                   return <li key={index}>{special}</li>
                 })}
               </ul>
             </Box>
             {regSpawns.length !== 0 ?
-            <>
-              <br />
-              <Typography variant='h5'>Regular spawns(blue):</Typography>
-              <Box border='1px solid black'>
+              <>
                 <br />
-                <ul>
-                  {regSpawns.map((spawn, index) => {
-                    return <li key={index}>{spawn} </li>
-                  })}
-                </ul>
-              </Box>
-            </>:
-            ""}
+                <Typography variant='h5'>Regular spawns(blue):</Typography>
+                <Box border='1px solid black'>
+                  <br />
+                  <ul>
+                    {regSpawns.map((spawn, index) => {
+                      return <li key={index}>{spawn} </li>
+                    })}
+                  </ul>
+                </Box>
+              </>
+            :
+              ""
+            }
           </>
         :
           <>
             <Typography variant='h5'>Main Options</Typography>
             <Box border='1px solid black'>
               <Stack spacing={1} padding={2}>
-                {props.specials.map((special, index) => {
+                {props.level.specials.map((special, index) => {
                   return <Typography variant='body1' key={index}>{special}</Typography>
                 })}
               </Stack>
@@ -530,40 +582,100 @@ export default function BackroomsLevel(props) {
   }
 
   const DisplayContent = () => {
-    for(let i = 0; i < props.noGens.length; i++) {
-      if(props.name === props.noGens[i]) {
-        //Put all content here.
-        return (
-          <>
-            <Button variant='outlined' onClick={handleHideMap}>Hide Content</Button>
-            <CheckSpawnSpecial altDisplay='true' />
-          </>
-        )
-      }
+    if(props.level.genType[0] === 'None') {
+      //Put all content here.
+      //Check for each specialty
+      //games, shop, playerLocation, map, items(for inside building. This doesn't need to be pulled or anything, we have it.)
+      return (
+        <>
+          <Button variant='outlined' onClick={handleHideMap}>Hide Content</Button>
+          <CheckSpawnSpecial altDisplay='true' />
+          {props.level.games === undefined ? 
+            ""
+          :
+            <>
+              <br />
+              <Box border='1px solid black' padding={2}>
+                <Typography variant='h5'>Casino games</Typography>
+                {props.level.games.map((game, index) => {
+                  return (
+                    <div key={index}>
+                      <Typography variant='body1'>{index + 1}: {game}</Typography>
+                      <br />
+                    </div>
+                  )
+                })}
+              </Box>
+            </>
+          }
+          {props.level.shop !== undefined ? 
+            <>
+              <br />
+              <Typography variant='h5'>Shop</Typography>
+              <img src={CasinoShop} />
+            </> 
+          : 
+            ""
+          }
+          {props.level.playerLocation !== undefined ?
+            <Stack direction='row' spacing={2}>
+              {/*The inputs don't do anything yet. For now manual updating is fine.*/}
+              <Stack>
+                <Typography variant='body1'>North: {props.level.playerLocation[0]}</Typography>
+                <Input type='number' placeholder='Update North'></Input>
+              </Stack>
+              <Stack>
+                <Typography variant='body1'>South: {props.level.playerLocation[1]}</Typography>
+                <Input type='number' placeholder='Update South'></Input>
+              </Stack>
+              <Stack>
+                <Typography variant='body1'>East: {props.level.playerLocation[2]}</Typography>
+                <Input type='number' placeholder='Update East'></Input>
+              </Stack>
+              <Stack>
+                <Typography variant='body1'>West: {props.level.playerLocation[3]}</Typography>
+                <Input type='number' placeholder='Update West'></Input>
+              </Stack>
+            </Stack>
+          :
+            ""
+          }
+          {props.level.cityMap !== undefined ?
+            "Display city map here."
+          :
+            ""
+          }
+          {props.level.name === 'The Endless City' ? <CheckSpawnItem altDisplay='true' /> : ""}
+        </>
+      )
     }
 
     return (
       <>
         <Button variant='outlined' onClick={handleHideMap}>Hide Content</Button>
-        <Button onClick={() => setSpawn(Math.round(Math.random() * 100) + 1)} variant='outlined'>Generate new map</Button>
-        {spawnType !== null ? <CreateMap /> : ""}
-        {spawnType === "Item" || spawnType === 'Item1' ? <CheckSpawnItem altDisplay='false' /> : ""}
-        {spawnType === "Entity" || spawnType === "Entity1" ? <CheckSpawnEntity altDisplay='false' /> : ""}
-        {spawnType === "Special" || spawnType === "Special1" ? <CheckSpawnSpecial altDisplay='false'/> : ""}
-        {spawnType === 'Nothing' || spawnType === 'Nothing1' ? <CheckSpawnNothing altDisplay='false' /> : ""}
+        <Button onClick={() => {setSpawn(Math.round(Math.random() * 100) + 1); setMapRendered(false);}} variant='outlined'>Generate new map</Button>
+        {spawnType !== null ?
+        <>
+          {!mapRendered ?
+            createMap()
+          :
+            <>
+              {currMap}
+            </>
+          }
+        </>
+        : 
+          ""
+        }
       </>
     )
   }
 
-  const determineNoGenLevel = (name) => {
-    //Idk how to yet lemme cook hold up.
-  }
-
   return (
     <>
-      <Typography variant='h2'>Level {props.levelNum}, {props.name}</Typography>
+      <Typography variant='h2'>Level {props.level.levelNum}, {props.level.name}</Typography>
       <Typography variant='h5'>Description:</Typography>
-      <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
+      <Typography variant='body1' sx={{textIndent: 25}}>{props.level.description}</Typography>
       {!showMap ? 
         <Button variant='outlined' onClick={handleShowMap}>Show Content</Button>: 
         <>

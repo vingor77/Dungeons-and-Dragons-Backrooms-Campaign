@@ -186,17 +186,9 @@ export default function Levels() {
           level.name === currLevel ? 
           <BackroomsLevel 
             key={index}
-            name={level.name}
-            levelNum={level.levelNum}
-            description={level.description}
-            noEntities={level.noEntities}
-            spawns={level.spawns}
             items={filteredItems}
             entities={filteredEntities}
-            specials={level.specials}
-            regSpawnCount={level.regSpawns}
-            genType={level.genType}
-            noGens={filteredLevels}
+            level={level}
           />: ""
         )
       })}
