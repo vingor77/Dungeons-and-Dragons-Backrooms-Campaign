@@ -87,10 +87,214 @@ export default function BackroomsLevel(props) {
         createRoomMap();
         break;
       case 'Hall':
-        createRoomMap(); //Swap this to be CreateHallMap later.
+        createHallMap();
         break;
     }
   };
+
+  const createHallMap = () => {
+    let size = Math.floor(Math.random() * 10) + 15; //Size of 15 to 24
+    if(size % 2 == 0) {
+      size++;
+    }
+    const center = Math.ceil(size / 2) - 1;
+
+    const grid = [];
+    for(let i = 0; i < size; i++) {
+      let tempArr = [];
+      for(let j = 0; j < size; j++) {
+        if(i >= (center - 2) && i <= (center + 2) && (j === 0 || j === (size - 1))) {
+          tempArr[j] = -1;
+        }
+        else if((i === 0 || i === (size - 1)) && j >= (center - 2) && j <= (center + 2)) {
+          tempArr[j] = -1;
+        }
+        else {
+          tempArr[j] = 1;
+        }
+      }
+      grid.push(tempArr);
+    }
+
+    const quadrants = [];
+    for(let i = 0; i < 4; i++) {
+      quadrants[i] = Math.floor(Math.random() * 2); //0 for fail, 1 for success
+    }
+
+    let fails = 0;
+    for(let i = 0; i < quadrants.length; i++) {
+      if(quadrants[0] === 0) {
+        fails++;
+      }
+    }
+
+    if(fails === 4) {
+      switch(Math.floor(Math.random() * 4)) {
+        case 0:
+          quadrants[0] = 1;
+          break;
+        case 1:
+          quadrants[1] = 1;
+          break;
+        case 2:
+          quadrants[2] = 1;
+          break;
+        default:
+          quadrants[3] = 1;
+          break;
+      }
+    }
+
+    //Left
+    if(quadrants[0] === 1) {
+      for(let i = 0; i < grid.length; i++) {
+        for(let j = 0; j < grid[i].length; j++) {
+          if(j !== 0 && i <= center + 2 && i >= center - 2 && j <= center + 2) {
+            grid[i][j] = 0;
+          } 
+        }
+      }
+    }
+
+    //Right
+    if(quadrants[1] === 1) {
+      for(let i = 0; i < grid.length; i++) {
+        for(let j = 0; j < grid[i].length; j++) {
+          if(j !== size - 1 && i <= center + 2 && i >= center - 2 && j >= center - 2) {
+            grid[i][j] = 0;
+          } 
+        }
+      }
+    }
+
+    //Bottom
+    if(quadrants[2] === 1) {
+      for(let i = 0; i < grid.length; i++) {
+        for(let j = 0; j < grid[i].length; j++) {
+          if(i !== size - 1 && j <= center + 2 && j >= center - 2 && i >= center - 2) {
+            grid[i][j] = 0;
+          } 
+        }
+      }
+    }
+
+    //Top
+    if(quadrants[3] === 1) {
+      for(let i = 0; i < grid.length; i++) {
+        for(let j = 0; j < grid[i].length; j++) {
+          if(i !== 0 && j <= center + 2 && j >= center - 2 && i <= center + 2) {
+            grid[i][j] = 0;
+          } 
+        }
+      }
+    }
+
+        //Add in regular spawns and items/entities.
+        if(spawn !== -1 && showMap) {
+          const spawnLocation = () => {
+            let xSpawn = Math.floor(Math.random() * size);
+            let ySpawn = Math.floor(Math.random() * size);
+          
+            while(grid[xSpawn][ySpawn] === 1) {
+              xSpawn = Math.floor(Math.random() * size);
+              ySpawn = Math.floor(Math.random() * size);
+            }
+          
+            switch(spawnType) {
+              case "Item":
+                grid[xSpawn][ySpawn] = 2;
+                break;
+              case "Item1":
+                grid[xSpawn][ySpawn] = 2;
+                break;
+              case "Entity":
+                grid[xSpawn][ySpawn] = 3;
+                break;
+              case "Entity1":
+                grid[xSpawn][ySpawn] = 3;
+                break;
+              case "Special":
+                grid[xSpawn][ySpawn] = 4;
+                break;
+              case "Special1":
+                grid[xSpawn][ySpawn] = 4;
+                break;
+            }
+      
+            let regSpawnNum = 5;
+            for(let i = 0; i < regSpawns.length; i++) {
+              while(grid[xSpawn][ySpawn] !== 0 && grid[xSpawn][ySpawn] !== -1) {
+                xSpawn = Math.floor(Math.random() * size);
+                ySpawn = Math.floor(Math.random() * size);
+              }
+              grid[xSpawn][ySpawn] = regSpawnNum;
+              regSpawnNum++;
+            }
+          }
+        
+          spawnLocation();
+        }
+    
+        //Change the placeholder end values
+        for(let i = 0; i < grid.length; i++) {
+          for(let j = 0; j < grid[i].length; j++) {
+            if(grid[i][j] === -1) {
+              grid[i][j] = 0;
+            }
+          }
+        }
+
+    setCurrMap(
+      <>
+        <Table sx={{border: '1px solid black'}}>
+          <TableBody color='inherit'>
+            {grid.map((row, index) => {
+              return (
+                <TableRow sx={{border: '1px solid black'}} key={index}>
+                  {row.map((cell, index) => {
+                    switch(cell) {
+                      case 0:
+                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index} onClick={toggleWalked}>{cell}</TableCell>
+                      case 1:
+                        return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index}>{cell}</TableCell>
+                      case 2:
+                        return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index}>{cell}</TableCell>
+                      case 3:
+                        return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index}>{cell}</TableCell>
+                      case 4:
+                        return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index}>{cell}</TableCell>
+                      default:
+                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index}>{cell - 4}</TableCell>
+                    }
+                  })}
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+        {spawnType === "Item" || spawnType === 'Item1' ? <CheckSpawnItem altDisplay='false' /> : ""}
+        {spawnType === "Entity" || spawnType === "Entity1" ? <CheckSpawnEntity altDisplay='false' /> : ""}
+        {spawnType === "Special" || spawnType === "Special1" ? <CheckSpawnSpecial altDisplay='false'/> : ""}
+        {spawnType === 'Nothing' || spawnType === 'Nothing1' ? <CheckSpawnNothing altDisplay='false' /> : ""}
+      </>
+    )
+  }
+
+  const toggleWalked = (e) => {
+    //White to Teal to Pink to White
+    if(e.target.style.backgroundColor === 'white') {
+      e.target.style.backgroundColor = 'teal';
+      e.target.style.color = 'teal';
+    }
+    else if(e.target.style.backgroundColor === 'teal') {
+      e.target.style.backgroundColor = 'pink';
+      e.target.style.color = 'pink';
+    }
+    else {
+      e.target.style.backgroundColor = 'white';
+      e.target.style.color = 'white';
+    }
+  }
 
   const createRoomMap = () => {
     let size = Math.floor(Math.random() * 10) + 15; //Size of 15 to 24
@@ -301,12 +505,14 @@ export default function BackroomsLevel(props) {
             break;
         }
   
+        let regSpawnNum = 5;
         for(let i = 0; i < regSpawns.length; i++) {
           while(grid[xSpawn][ySpawn] !== 0 && grid[xSpawn][ySpawn] !== -1) {
             xSpawn = Math.floor(Math.random() * size);
             ySpawn = Math.floor(Math.random() * size);
           }
-          grid[xSpawn][ySpawn] = 5;
+          grid[xSpawn][ySpawn] = regSpawnNum;
+          regSpawnNum++;
         }
       }
     
@@ -332,17 +538,17 @@ export default function BackroomsLevel(props) {
                   {row.map((cell, index) => {
                     switch(cell) {
                       case 0:
-                        return <TableCell sx={{color: 'white', border: '1px solid black', bgcolor: 'white'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index} onClick={toggleWalked}>{cell}</TableCell>
                       case 1:
-                        return <TableCell sx={{color: 'black', border: '1px solid black', bgcolor: 'black'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index}>{cell}</TableCell>
                       case 2:
-                        return <TableCell sx={{color: 'green', border: '1px solid black', bgcolor: 'green'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index}>{cell}</TableCell>
                       case 3:
-                        return <TableCell sx={{color: 'red', border: '1px solid black', bgcolor: 'red'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index}>{cell}</TableCell>
                       case 4:
-                        return <TableCell sx={{color: 'orange', border: '1px solid black', bgcolor: 'orange'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index}>{cell}</TableCell>
                       default:
-                        return <TableCell sx={{color: 'blue', border: '1px solid black', bgcolor: 'blue'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index}>{cell - 4}</TableCell>
                     }
                   })}
                 </TableRow>
@@ -422,11 +628,11 @@ export default function BackroomsLevel(props) {
             <Typography variant='h5'>Regular spawns(blue):</Typography>
             <Box border='1px solid black'>
               <br />
-              <ul>
+              <ol type='1'>
                 {regSpawns.map((spawn, index) => {
                   return <li key={index}>{spawn} </li>
                 })}
-              </ul>
+              </ol>
             </Box>
           </>
         :
@@ -436,19 +642,114 @@ export default function BackroomsLevel(props) {
     )
   }
 
+  const getMaxCR = (tier, encounterDifficulty) => {
+    switch(tier) {
+      case 1:
+        if(encounterDifficulty > 0 && encounterDifficulty <= 50) {
+          return Math.floor(Math.random() * 5) + 1;
+        }
+        else if(encounterDifficulty > 50 && encounterDifficulty <= 62) {
+          return Math.floor(Math.random() * 5) + 6;
+        }
+        else if(encounterDifficulty > 62 && encounterDifficulty <= 74) {
+          return Math.floor(Math.random() * 5) + 11;
+        }
+        else if(encounterDifficulty > 74 && encounterDifficulty <= 86) {
+          return Math.floor(Math.random() * 5) + 16;
+        }
+        else {
+          return Math.floor(Math.random() * 14) + 17;
+        }
+      case 2:
+        if(encounterDifficulty > 0 && encounterDifficulty <= 50) {
+          return Math.floor(Math.random() * 5) + 6;
+        }
+        else if(encounterDifficulty > 50 && encounterDifficulty <= 62) {
+          return Math.floor(Math.random() * 5) + 1;
+        }
+        else if(encounterDifficulty > 62 && encounterDifficulty <= 74) {
+          return Math.floor(Math.random() * 5) + 11;
+        }
+        else if(encounterDifficulty > 74 && encounterDifficulty <= 86) {
+          return Math.floor(Math.random() * 5) + 16;
+        }
+        else {
+          return Math.floor(Math.random() * 14) + 17;
+        }
+      case 3:
+        if(encounterDifficulty > 0 && encounterDifficulty <= 50) {
+          return Math.floor(Math.random() * 5) + 11;
+        }
+        else if(encounterDifficulty > 50 && encounterDifficulty <= 62) {
+          return Math.floor(Math.random() * 5) + 6;
+        }
+        else if(encounterDifficulty > 62 && encounterDifficulty <= 74) {
+          return Math.floor(Math.random() * 5) + 1;
+        }
+        else if(encounterDifficulty > 74 && encounterDifficulty <= 86) {
+          return Math.floor(Math.random() * 5) + 16;
+        }
+        else {
+          return Math.floor(Math.random() * 14) + 17;
+        }
+      case 4:
+        if(encounterDifficulty > 0 && encounterDifficulty <= 50) {
+          return Math.floor(Math.random() * 5) + 16;
+        }
+        else if(encounterDifficulty > 50 && encounterDifficulty <= 62) {
+          return Math.floor(Math.random() * 5) + 6;
+        }
+        else if(encounterDifficulty > 62 && encounterDifficulty <= 74) {
+          return Math.floor(Math.random() * 5) + 11;
+        }
+        else if(encounterDifficulty > 74 && encounterDifficulty <= 86) {
+          return Math.floor(Math.random() * 5) + 1;
+        }
+        else {
+          return Math.floor(Math.random() * 14) + 17;
+        }
+      case 5:
+        if(encounterDifficulty > 0 && encounterDifficulty <= 50) {
+          return Math.floor(Math.random() * 5) + 17;
+        }
+        else if(encounterDifficulty > 50 && encounterDifficulty <= 62) {
+          return Math.floor(Math.random() * 5) + 6;
+        }
+        else if(encounterDifficulty > 62 && encounterDifficulty <= 74) {
+          return Math.floor(Math.random() * 5) + 11;
+        }
+        else if(encounterDifficulty > 74 && encounterDifficulty <= 86) {
+          return Math.floor(Math.random() * 5) + 16;
+        }
+        else {
+          return Math.floor(Math.random() * 14) + 1;
+        }
+      default:
+        break;
+    }
+  }
+
   const CheckSpawnEntity = (properties) => {
-    //Determine maximum cr for the encounter then choose randomly until it is equal to the total. Stretch: Add a limit of entities in the encounter.
+    //Determine maximum cr based on player tier for the encounter then choose randomly until it is equal to the total. Stretch: Add a limit of entities in the encounter.
     //TODO: Find a way to display the statblocks nicer.
-    const maxCR = (Math.floor(Math.random() * 11)) * 3;
+    const tier = 1;
+    const maxPlayers = 5;
+    const encounterDifficulty = Math.floor(Math.random() * 100) + 1;
+    let maxCR = getMaxCR(tier, encounterDifficulty);
+
     const chosenEntities = [];
-    let cutOff = 100;
+    let cutOff = 1000;
     let currCR = maxCR;
 
     if(maxCR > 0) {
-      while(chosenEntities.length < 5 && cutOff > 0) {
+      while(chosenEntities.length < maxPlayers && cutOff > 0) {
         const entity = props.entities[Math.floor(Math.random() * props.entities.length)];
   
-        if(entity.challengeRating <= currCR && entity.challengeRating > 0 && entity.entityNum > 0 && entity.entityNum < 16) { //entity num checks are for testing purposes. remove later
+        if(entity.challengeRating <= currCR && entity.challengeRating > 0
+
+          && entity.entityNum > 0 && entity.entityNum < 32 && entity.entityNum !== 18 && entity.entityNum !== 26 //entity num checks are in place since not all stat blocks are finished. Remove this line later.
+
+        ) {
           currCR -= entity.challengeRating;
           chosenEntities.push(entity);
         }
@@ -481,6 +782,7 @@ export default function BackroomsLevel(props) {
               statBlock={entity.statBlock}
               challengeRating={entity.challengeRating}
               entityNum={entity.entityNum}
+              displayType="Level"
             />
           )
         })}
@@ -490,11 +792,11 @@ export default function BackroomsLevel(props) {
             <Typography variant='h5'>Regular spawns(blue):</Typography>
             <Box border='1px solid black'>
               <br />
-              <ul>
+              <ol type='1'>
                 {regSpawns.map((spawn, index) => {
                   return <li key={index}>{spawn} </li>
                 })}
-              </ul>
+              </ol>
             </Box>
           </>
         :
@@ -511,11 +813,11 @@ export default function BackroomsLevel(props) {
           <>
             <Typography variant='h5'>Possible specials:</Typography>
             <Box border='1px solid black'>
-              <ul>
+              <ol type='1'>
                 {props.level.specials.map((special, index) => {
                   return <li key={index}>{special}</li>
                 })}
-              </ul>
+              </ol>
             </Box>
             {regSpawns.length !== 0 ?
               <>
@@ -523,11 +825,11 @@ export default function BackroomsLevel(props) {
                 <Typography variant='h5'>Regular spawns(blue):</Typography>
                 <Box border='1px solid black'>
                   <br />
-                  <ul>
+                  <ol type='1'>
                     {regSpawns.map((spawn, index) => {
-                      return <li key={index}>{spawn} </li>
+                      return <li key={index}>{spawn}</li>
                     })}
-                  </ul>
+                  </ol>
                 </Box>
               </>
             :
@@ -561,11 +863,11 @@ export default function BackroomsLevel(props) {
               <Typography variant='h5'>Regular spawns(blue):</Typography>
               <Box border='1px solid black'>
                 <br />
-                <ul>
+                <ol type='1'>
                   {regSpawns.map((spawn, index) => {
                     return <li key={index}>{spawn} </li>
                   })}
-                </ul>
+                </ol>
               </Box>
             </>
           :

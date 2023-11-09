@@ -16,7 +16,24 @@ export default function GeneralInfo() {
               <li>Maximum carry limit of 100 Backrooms specific items. This does not include magic items, armor, shields, weapons, or ammo.</li>
               <li>Fully implemented fleeing system for fights too difficult to win.</li>
               <li>Any effects that recharge after 24 hours also resets on a long rest.</li>
-              <li>Armor/Gear is slot based, similar to a video game. The slots are Helmet, Chest, Arms/Hands, Belts, Legs/Feet, Rings, Necklace, Cloak, Main hand, Off hand, and Misc. All slots can only have 1 item in it except rings and misc.</li>
+              <li>Armor/Gear is slot based, similar to a video game. The slots are:
+                <ul>
+                  <li>Helmet</li>
+                  <li>Chest</li>
+                  <li>Arms</li>
+                  <li>Belt</li>
+                  <li>Leg</li>
+                  <li>Ring x10</li>
+                  <li>Necklace</li>
+                  <li>Cloak</li>
+                  <li>Main hand</li>
+                  <li>Off hand</li>
+                  <li>miscellaneous</li>
+                </ul>
+              </li>
+              <li>Darkvision is removed from races who naturally have it, but instead recieve a AA powered flashlight with 4 extra batteries OR a C powered lantern. This is caused by anomalous darkness.</li>
+              <li>There are 4 battery types, AA (8 hours), AAA(10 hours), C(30 hours), and D(40 hours).</li>
+              <li>Flashlights have a range of 60 ft. in a cone while lanterns have a 30 ft. range in a radius.</li>
             </ul>
           </div>
           <div className='fleeing'>

@@ -36,6 +36,15 @@ export default function BackroomsEntities(props) {
     else if(props.name.includes("Pink")) {
       entity = "Creatures.Pink-Faceling";
     }
+    else if(props.name === "Death Rat") {
+      entity = "Creatures.Death-Rat";
+    }
+    else if(props.name === "Plague Goblin") {
+      entity = "Creatures.Plague-Goblin";
+    }
+    else if(props.name === "Camo Crawler") {
+      entity = "Creatures.Camo-Crawler";
+    }
     else {
       entity = "Creatures." + props.name;
     }
@@ -241,42 +250,58 @@ export default function BackroomsEntities(props) {
     );
   }
 
-  return (
-    <Card>
-      <CardContent>
-        {creatures === null ? getCreatures() : ""}
-        {props.challengeRating !== 0 && creatures !== null ?
-          <>
-            <Typography variant='h5'>Spawn locations:</Typography>
-            <ul>
-              {props.locations.map((element, index) => {
-                return (
-                  <li key={index}>{element}</li>
-                );
-              })}
-            </ul>
-            <Typography variant='h5'>Description:</Typography>
-            <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
+  if(props.displayType === 'Level') {
+    return (
+      <Card>
+        <CardContent>
+          {creatures === null ? getCreatures() : ""}
+          {props.challengeRating !== 0 && creatures !== null ?
             <StatBlock />
-          </>
-        :
-          <>
-            <Typography variant='h2'>{props.name}</Typography>
-            <Typography variant='h5'>Spawn locations:</Typography>
-            <ul>
-              {props.locations.map((element, index) => {
-                return (
-                  <li key={index}>{element}</li>
-                );
-              })}
-            </ul>
-            <Typography variant='h5'>Description:</Typography>
-            <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
-          </>
-        }
-      </CardContent>
-    </Card>
-  )
+          :
+            ""
+          }
+        </CardContent>
+      </Card>
+    )
+  }
+  else {
+    return (
+      <Card>
+        <CardContent>
+          {creatures === null ? getCreatures() : ""}
+          {props.challengeRating !== 0 && creatures !== null ?
+            <>
+              <Typography variant='h5'>Spawn locations:</Typography>
+              <ul>
+                {props.locations.map((element, index) => {
+                  return (
+                    <li key={index}>{element}</li>
+                  );
+                })}
+              </ul>
+              <Typography variant='h5'>Description:</Typography>
+              <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
+              <StatBlock />
+            </>
+          :
+            <>
+              <Typography variant='h2'>{props.name}</Typography>
+              <Typography variant='h5'>Spawn locations:</Typography>
+              <ul>
+                {props.locations.map((element, index) => {
+                  return (
+                    <li key={index}>{element}</li>
+                  );
+                })}
+              </ul>
+              <Typography variant='h5'>Description:</Typography>
+              <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
+            </>
+          }
+        </CardContent>
+      </Card>
+    )
+  }
 }
 
 
@@ -294,6 +319,10 @@ export default function BackroomsEntities(props) {
   "Creatures.Pink-Faceling":{"Id":"Pink-Faceling","Name":"Pink Faceling","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Pink Faceling\nhumanoid\n","FilterDimensions":{"Level":"12","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, "},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, ","HP":{"Value":247,"Notes":"(38d8+76)"},"InitiativeModifier":0,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":17,"Notes":""},"Abilities":{"Str":8,"Dex":10,"Con":14,"Int":20,"Wis":12,"Cha":10},"Saves":[{"Name":"Int","Modifier":9}],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":[],"Skills":[],"Senses":["passive Perception 11"],"Languages":[""],"Challenge":"12","Traits":[],"Actions":[{"Name":"Class Spellcasting","Content":"Spellcasting. Pink Faceling is a 15th-level spellcaster. Its spellcasting ability is Intelligence (spell save DC 17, +9 to hit with spell attacks).  Pink Faceling has the following Wizard spells prepared:\n Cantrips (at will) Eldritch Blast \n 1st level (4 slots):  Charm Person\n 2nd level (3 slots):  Darkness, Invisibility\n 4th level (3 slots):  Hallucinatory Terrain\n 6th level (1 slot):  Circle of Death, Disintegrate\n 8th level (1 slot):  Feeblemind"}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
   "Creatures.Burster":{"Id":"Burster","Name":"Burster","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Burster\nhumanoid\nunaligned","FilterDimensions":{"Level":"5","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, unaligned"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, unaligned","HP":{"Value":143,"Notes":"(22d8+44)"},"InitiativeModifier":-2,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":15,"Notes":""},"Abilities":{"Str":6,"Dex":7,"Con":14,"Int":12,"Wis":20,"Cha":10},"Saves":[],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":["acid","poison"],"ConditionImmunities":["blinded"],"Skills":[{"Name":"Perception","Modifier":8}],"Senses":["truesight 30 ft.","passive Perception 18"],"Languages":[""],"Challenge":"5","Traits":[],"Actions":[{"Name":"Multiattack","Content":"Burster makes two Poison Spray attacks. "},{"Name":"Poison Spray","Content":"Ranged Weapon Attack: +6 to hit, range 10/30 ft., one target. Hit: 18 (3d8+5) poison damage. The target must make a DC 15 Constitution saving throw or be poisoned for 1 minute."},{"Name":"Acid Spray (Recharge 5-6)","Content":"The spores on the Burster explode outwards shooting acid in a 30 ft. cone. Any creature within the radius must make a DC 15 Dexterity Saving throw or be coated in acid, taking 18 (4d8) acid damage and becoming blinded for 1 minute."}],"LegendaryActions":[],"Reactions":[{"Name":"Spray","Content":"Whenever a creature comes within 30 ft. of the Burster, it will use either the poison or acid spray action."}],"Description":"","Player":"","ImageURL":""},
   "Creatures.Reviook":{"Id":"Reviook","Name":"Reviook","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Reviook\nmonstrosity\nunaligned","FilterDimensions":{"Level":"2","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Large monstrosity, unaligned"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Large monstrosity, unaligned","HP":{"Value":93,"Notes":"(11d10+33)"},"InitiativeModifier":0,"InitiativeAdvantage":false,"Speed":["burrow 30 ft.","walk 30 ft."],"AC":{"Value":13,"Notes":""},"Abilities":{"Str":22,"Dex":10,"Con":16,"Int":7,"Wis":5,"Cha":6},"Saves":[],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":[],"Skills":[],"Senses":["tremorsense 30 ft.","passive Perception 7"],"Languages":[""],"Challenge":"2","Traits":[],"Actions":[{"Name":"Multiattack","Content":"Reviook makes two Punch attacks. "},{"Name":"Punch","Content":"Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 13 (2d6+6) bludgeoning damage. "},{"Name":"Burrow","Content":"The Reviook burrows into the ground up to it's movement speed."},{"Name":"Burst","Content":"The Reviook breaks open a 15 ft. radius and 30 ft. deep circle centered on itself in the floor. Any creature within the range must succeed on a DC 13 Dexterity saving throw or fall into the hole, taking 10 (3d6) bludgeoning damage. The Reviook also makes a punch attack against any creatures who failed."}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
-  "Creatures.Wretch":{"Id":"Wretch","Name":"Wretch","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Wretch\nhumanoid\n","FilterDimensions":{"Level":"8","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, "},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, ","HP":{"Value":93,"Notes":"(11d8+44)"},"InitiativeModifier":-1,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":16,"Notes":""},"Abilities":{"Str":20,"Dex":8,"Con":18,"Int":4,"Wis":5,"Cha":10},"Saves":[],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":["poison","acid"],"ConditionImmunities":["poisoned","exhaustion","frightened","diseased"],"Skills":[],"Senses":["passive Perception 7"],"Languages":[""],"Challenge":"8","Traits":[{"Name":"Infect","Content":"The Wretch infects any living thing it touches. Whenever a creature is hit by an attack other than the crowbar, it must succeed on a DC 13 Constitution saving throw or progress 1 stage of the Wretched Cycle."},{"Name":"Wretched Cycle","Content":"The Wretch is an infected being that spreads it's infection easily. The Cycle is a 3 stage disease. At stage 1, the infected becomes itchy and uncomfortable. At stage 2, the infected begins to lose skin, hair, nails, etc. and becomes unable to speak. During stage 2, the infected loses 10 health per minute and cannot be healed. Almond Water consumption will pause the effect for 1 minute unless it is Green Almond Water. At stage 3, the infected lose entire nails and teeth or they shift to unnatural positions, the skin around the eyes dissolve to never allow blinking again. Once in this stage, only Green Almond Water may reverse the effect, to a certain degree. The malformations revert but the infected's maximum health is reduced by 10 permanently."},{"Name":"Weapons","Content":"Wretches are capable of wielding weapons, most notably crowbars."}],"Actions":[{"Name":"Multiattack","Content":"Wretch makes two Crowbar attacks or makes one Crowbar attack, and one Whip attack or makes two Whip attacks. "},{"Name":"Crowbar","Content":"Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 27 (4d10+5) bludgeoning damage. "},{"Name":"Whip","Content":"Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 27 (4d10+5) slashing damage. "},{"Name":"Bite","Content":"Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 41 (8d8+5) piercing damage plus 11 (2d10) poison damage. "}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""}
+  "Creatures.Wretch":{"Id":"Wretch","Name":"Wretch","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Wretch\nhumanoid\n","FilterDimensions":{"Level":"8","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, "},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, ","HP":{"Value":93,"Notes":"(11d8+44)"},"InitiativeModifier":-1,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":16,"Notes":""},"Abilities":{"Str":20,"Dex":8,"Con":18,"Int":4,"Wis":5,"Cha":10},"Saves":[],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":["poison","acid"],"ConditionImmunities":["poisoned","exhaustion","frightened","diseased"],"Skills":[],"Senses":["passive Perception 7"],"Languages":[""],"Challenge":"8","Traits":[{"Name":"Infect","Content":"The Wretch infects any living thing it touches. Whenever a creature is hit by an attack other than the crowbar, it must succeed on a DC 13 Constitution saving throw or progress 1 stage of the Wretched Cycle."},{"Name":"Wretched Cycle","Content":"The Wretch is an infected being that spreads it's infection easily. The Cycle is a 3 stage disease. At stage 1, the infected becomes itchy and uncomfortable. At stage 2, the infected begins to lose skin, hair, nails, etc. and becomes unable to speak. During stage 2, the infected loses 10 health per minute and cannot be healed. Almond Water consumption will pause the effect for 1 minute unless it is Green Almond Water. At stage 3, the infected lose entire nails and teeth or they shift to unnatural positions, the skin around the eyes dissolve to never allow blinking again. Once in this stage, only Green Almond Water may reverse the effect, to a certain degree. The malformations revert but the infected's maximum health is reduced by 10 permanently."},{"Name":"Weapons","Content":"Wretches are capable of wielding weapons, most notably crowbars."}],"Actions":[{"Name":"Multiattack","Content":"Wretch makes two Crowbar attacks or makes one Crowbar attack, and one Whip attack or makes two Whip attacks. "},{"Name":"Crowbar","Content":"Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 27 (4d10+5) bludgeoning damage. "},{"Name":"Whip","Content":"Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 27 (4d10+5) slashing damage. "},{"Name":"Bite","Content":"Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 41 (8d8+5) piercing damage plus 11 (2d10) poison damage. "}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
+  "Creatures.Death-Rat":{"Id":"Death-Rat","Name":"Death Rat","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Death Rat\nbeast\nAny Neutral","FilterDimensions":{"Level":"1/4","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Small beast, Any Neutral"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Small beast, Any Neutral","HP":{"Value":49,"Notes":"(14d6+0)"},"InitiativeModifier":2,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":13,"Notes":""},"Abilities":{"Str":4,"Dex":14,"Con":10,"Int":7,"Wis":8,"Cha":10},"Saves":[],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":[],"Skills":[{"Name":"Stealth","Modifier":4}],"Senses":["passive Perception 9"],"Languages":[""],"Challenge":"1/4","Traits":[{"Name":"Adaptive","Content":"The Death Rat evolves rapidly to fit into any environment almost immediately. This allows the Death Rat to live anywhere and has different abilities based on the environment."}],"Actions":[{"Name":"Bite","Content":"Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 5 (1d6+2) piercing damage. "},{"Name":"Scratch","Content":"Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (2d4) slashing damage. "}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
+  "Creatures.Plague-Goblin":{"Id":"Plague-Goblin","Name":"Plague Goblin","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Plague Goblin\nhumanoid\n","FilterDimensions":{"Level":"1","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, "},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, ","HP":{"Value":82,"Notes":"(15d8+15)"},"InitiativeModifier":4,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":13,"Notes":""},"Abilities":{"Str":9,"Dex":18,"Con":12,"Int":16,"Wis":6,"Cha":8},"Saves":[{"Name":"Dex","Modifier":6}],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":[],"Skills":[{"Name":"Stealth","Modifier":6},{"Name":"Sleight of Hand","Modifier":6}],"Senses":["passive Perception 8"],"Languages":[""],"Challenge":"1","Traits":[{"Name":"Cloak","Content":"The Plague Goblin's cloak-like skin can render itself and anything it carries invisible at will."},{"Name":"Iron Stomach","Content":"The Plague Goblin can consume any material."}],"Actions":[{"Name":"Scratch","Content":"Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 13 (2d8+4) slashing damage. "},{"Name":"Poison (Recharge 5-6)","Content":"The Plague Goblin unleashes a thick green smoke from it's mask out to 30 ft. Any creature it touches must succeed on a DC 13 Constitution Saving Throw or become poisoned for 1 minute and take 3 (1d6) poison damage at the start of each of its turns. The creature may remake the saving throw at the end of each of its turns."}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
+  "Creatures.Camo-Crawler":{"Id":"Camo-Crawler","Name":"Camo Crawler","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Camo Crawler\nhumanoid\nchaotic evil","FilterDimensions":{"Level":"6","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, chaotic evil"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, chaotic evil","HP":{"Value":156,"Notes":"(24d8+48)"},"InitiativeModifier":0,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":15,"Notes":""},"Abilities":{"Str":20,"Dex":10,"Con":14,"Int":18,"Wis":18,"Cha":10},"Saves":[],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":[],"Skills":[{"Name":"Perception","Modifier":7},{"Name":"Stealth","Modifier":6}],"Senses":["blindsight 60 ft.","passive Perception 17"],"Languages":[""],"Challenge":"6","Traits":[{"Name":"Blind","Content":"The Camo Crawler is blind, increasing its hearing capabilities."},{"Name":"Environmental Stealth","Content":"The Camo Crawler can alter the surface of its skin to fit into any of its surroundings, similar to a chameleon."},{"Name":"Easily Distracted","Content":"The Camo Crawler may be distracted by other noises easily."},{"Name":"Sneak Attack","Content":"Whenever a Camo Crawler attacks while being hidden, it deals an additional 14 (4d6) piercing damage. This is already calculated in the actions."}],"Actions":[{"Name":"Pinch","Content":"Melee Weapon Attack: +6 to hit, reach 5 ft., one target. Hit: 27 (4d10+5) piercing damage plus 14 (4d6) piercing damage. "}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
+  "Creatures.Animation":{"Id":"Animation","Name":"Animation","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Animation\nhumanoid\nlawful evil","FilterDimensions":{"Level":"4","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, lawful evil"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, lawful evil","HP":{"Value":129,"Notes":"(37d8-37)"},"InitiativeModifier":1,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":14,"Notes":""},"Abilities":{"Str":22,"Dex":12,"Con":8,"Int":6,"Wis":12,"Cha":12},"Saves":[],"DamageVulnerabilities":["slashing (Wood)","bludgeoning (Plastic)","piercing (Clay)"],"DamageResistances":[],"DamageImmunities":["acid","poison","thunder","lightning"],"ConditionImmunities":["sleep","exhaustion","unconscious","poisoned","paralyzed","frightened","charmed"],"Skills":[],"Senses":["passive Perception 11"],"Languages":[""],"Challenge":"4","Traits":[{"Name":"Variety","Content":"The Animation comes in many different varieties and have a different set of abilities for each. The main varieties are wooden, plastic, and clay."}],"Actions":[{"Name":"Multiattack","Content":"Animation makes two Splinter (Wood) attacks or makes two Touch (Clay) attacks. "},{"Name":"Splinter (Wood)","Content":"Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 16 (3d6+6) piercing damage. "},{"Name":"Crush (Plastic)","Content":"Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 28 (4d10+6) bludgeoning damage. "},{"Name":"Touch (Clay)","Content":"Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 15 (2d8+6) acid damage. "},{"Name":"Absorb (Clay) (1/Day)","Content":"The Animation attempts to grab and restrain a target. The target must succeed on a DC 14 Strength Saving Throw or be submerged into the Animation, begin suffocating, and become poisoned for 1 minute. The target may remake the Saving Throw at the end of each of its turns to escape the Animation."}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""}
 }
 */

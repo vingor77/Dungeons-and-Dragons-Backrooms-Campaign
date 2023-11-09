@@ -1,4 +1,4 @@
-import { Button, Typography } from '@mui/material';
+import { Box, Button, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
 import BackroomsQuests from './BackroomsQuests';
@@ -61,13 +61,31 @@ export default function BackroomsOutposts(props) {
           <Button onClick={() => setShowShops(!showShops)}>Show/Hide shops</Button>
           {showShops ? 
           <>
-            <Typography variant='h5'>Shops:</Typography>
-            {props.shopImages.map((image, index) => {
+            {props.outpost.shops.map((mapContent, index) => {
+              const pairs = JSON.parse(mapContent);
               return (
-                <div key={index}>
-                  <Typography variant='body1'>Shop {index + 1}</Typography>
-                  <img src={image} key={index} />
-                </div>
+                <>
+                  <Typography variant='h5'>{props.outpost.shopNames[index]}</Typography>
+                  <Table sx={{maxWidth: '50%'}}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{width: '90%'}}>Name</TableCell>
+                        <TableCell sx={{textAlign: 'center'}}>Quantity</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {pairs.map((pair, index) => {
+                        return (
+                          <TableRow key={index}>
+                            <TableCell>{pair[0]}</TableCell>
+                            <TableCell sx={{textAlign: 'center'}}>{pair[1]}</TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                  <br />
+                </>
               )
             })}
           </> 
