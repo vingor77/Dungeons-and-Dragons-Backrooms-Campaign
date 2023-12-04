@@ -11,7 +11,7 @@ export default function BackroomsQuests(props) {
       { 
         field: 'name', 
         headerName: 'Quest Name', 
-        width: 400
+        width: 200
       },
       {
         field: 'outpost',
@@ -22,6 +22,11 @@ export default function BackroomsQuests(props) {
         field: 'questGiver',
         headerName: 'Quest giver',
         width: 200,
+      },
+      {
+        field: 'type',
+        headerName: 'Quest Type',
+        width: 200
       },
       {
         field: 'completed',
@@ -40,6 +45,7 @@ export default function BackroomsQuests(props) {
         name : quest.name,
         outpost: quest.outpost,
         questGiver: quest.questGiver,
+        type: quest.type,
         completed: quest.completed ? "Yes": "No",
       }
       dataGridRows.push(row);
@@ -100,7 +106,8 @@ export default function BackroomsQuests(props) {
           }
           )}
         </>
-      :""
+      :
+        <Typography variant='h5' textAlign='center'>No quests unlocked.</Typography>
       }
     </div>
   )

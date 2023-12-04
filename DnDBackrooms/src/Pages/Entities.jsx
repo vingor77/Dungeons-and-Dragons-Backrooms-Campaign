@@ -44,24 +44,40 @@ export default function Entities() {
             field: 'cr',
             headerName: 'Challenge Rating',
             width: 250,
-            editable: true,
           },
+          {
+            field: 'location',
+            headerName: 'Spawn Locations',
+            width: 250,
+          }
       ];
       
       let count = 0;
       let cr = "";
       const dataGridRows = [];
-    
+      let spawnLocations = "";
+
       entities.map(entity => {
         {entity.challengeRating === 0 ? cr = "N/A": cr = entity.challengeRating}
+        {entity.locations.map((location, index) => {
+          if(index === 0) {
+            spawnLocations = location;
+          }
+          else {
+            spawnLocations = spawnLocations + ", " + location;
+          }
+        })}
+
         count++;
         const row = {
           id: count,
           name: entity.name,
           num: entity.entityNum,
           cr: cr,
+          location: spawnLocations
         }
         dataGridRows.push(row);
+        spawnLocations = "";
       })
 
       return (
@@ -103,6 +119,7 @@ export default function Entities() {
               statBlock={entity.statBlock}
               challengeRating={entity.challengeRating}
               entityNum={entity.entityNum}
+              drop={entity.drop}
             />: ""
           )
         })}

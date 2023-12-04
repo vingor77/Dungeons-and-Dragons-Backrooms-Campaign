@@ -56,21 +56,31 @@ export default function BackroomsItem(props) {
   }
 
   return (
-    <Card>
-      <CardContent>
-        <Typography variant='h2'>{props.name}</Typography>
-        <Typography variant='h5'>Spawn locations:</Typography>
-        <ul>
-          {props.locations.map((element, index) => {
-            return (
-              <li key={index}>{element}</li>
-            );
-          })}
-        </ul>
-        <Typography variant='h5'>Description:</Typography>
-        <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
-        <SpecialItem style={{textAlign: 'center'}}/>
-      </CardContent>
-    </Card>
+    props.display === 'level' ?
+      <Card>
+        <CardContent>
+          <Typography variant='h2'>{props.name}</Typography>
+          <Typography variant='h5'>Description:</Typography>
+          <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
+          <SpecialItem style={{textAlign: 'center'}}/>
+        </CardContent>
+      </Card>
+    :
+      <Card>
+        <CardContent>
+          <Typography variant='h2'>{props.name}</Typography>
+          <Typography variant='h5'>Spawn locations:</Typography>
+          <ul>
+            {props.locations.map((element, index) => {
+              return (
+                <li key={index}>{element}</li>
+              );
+            })}
+          </ul>
+          <Typography variant='h5'>Description:</Typography>
+          <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
+          <SpecialItem style={{textAlign: 'center'}}/>
+        </CardContent>
+      </Card>
   )
 }

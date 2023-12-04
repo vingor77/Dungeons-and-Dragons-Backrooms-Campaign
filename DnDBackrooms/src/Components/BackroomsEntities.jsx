@@ -21,32 +21,21 @@ export default function BackroomsEntities(props) {
   const StatBlock = () => {
     if(creatures ===  null) return;
 
-    //Add other problem entities here.
-    
     let entity = "";
-    if(props.name.includes("Deathmoth")) {
-      entity = "Creatures.Deathmoth";
-    }
-    else if(props.name.includes("Shadow")) {
-      entity = "Creatures.Shadow-Faceling";
-    }
-    else if(props.name.includes("Memory")) {
-      entity = "Creatures.Memory-Faceling";
-    }
-    else if(props.name.includes("Pink")) {
-      entity = "Creatures.Pink-Faceling";
-    }
-    else if(props.name === "Death Rat") {
-      entity = "Creatures.Death-Rat";
-    }
-    else if(props.name === "Plague Goblin") {
-      entity = "Creatures.Plague-Goblin";
-    }
-    else if(props.name === "Camo Crawler") {
-      entity = "Creatures.Camo-Crawler";
+    if(props.name.includes(" ")) {
+      const nameParts = props.name.split(" ");
+      for(let i = 0; i < nameParts.length; i++) {
+        entity = nameParts.join("-");
+      }
+      entity = "Creatures." + entity;
     }
     else {
       entity = "Creatures." + props.name;
+    }
+
+    //Special entities that need extra help.
+    if(props.name.includes("Deathmoth")) {
+      entity = "Creatures.Deathmoth";
     }
 
     let list = "";
@@ -256,9 +245,19 @@ export default function BackroomsEntities(props) {
         <CardContent>
           {creatures === null ? getCreatures() : ""}
           {props.challengeRating !== 0 && creatures !== null ?
-            <StatBlock />
+            <>
+              {props.drop !== undefined ? <Typography variant='h5'>Drops: <Typography variant='body1' display='inline'>{props.drop}</Typography></Typography> : ""}
+              <br />
+              <StatBlock />
+            </>
           :
-            ""
+            <>
+              <Typography variant='h2'>{props.name}</Typography>
+              <br />
+              <Typography variant='h5'>Description: <Typography variant='body1' display='inline'>{props.description}</Typography></Typography>
+              <br />
+              {props.drop !== undefined ? <Typography variant='h5'>Drops: <Typography variant='body1' display='inline'>{props.drop}</Typography></Typography> : ""}
+            </>
           }
         </CardContent>
       </Card>
@@ -279,8 +278,9 @@ export default function BackroomsEntities(props) {
                   );
                 })}
               </ul>
-              <Typography variant='h5'>Description:</Typography>
-              <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
+              <Typography variant='h5'>Description: <Typography variant='body1' display='inline'>{props.description}</Typography></Typography>
+              <br />
+              {props.drop !== undefined ? <Typography variant='h5'>Drops: <Typography variant='body1' display='inline'>{props.drop}</Typography></Typography> : ""}
               <StatBlock />
             </>
           :
@@ -294,8 +294,9 @@ export default function BackroomsEntities(props) {
                   );
                 })}
               </ul>
-              <Typography variant='h5'>Description:</Typography>
-              <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
+              <Typography variant='h5'>Description: <Typography variant='body1' display='inline'>{props.description}</Typography></Typography>
+              <br />
+              {props.drop !== undefined ? <Typography variant='h5'>Drops: <Typography variant='body1' display='inline'>{props.drop}</Typography></Typography> : ""}
             </>
           }
         </CardContent>
@@ -323,6 +324,10 @@ export default function BackroomsEntities(props) {
   "Creatures.Death-Rat":{"Id":"Death-Rat","Name":"Death Rat","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Death Rat\nbeast\nAny Neutral","FilterDimensions":{"Level":"1/4","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Small beast, Any Neutral"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Small beast, Any Neutral","HP":{"Value":49,"Notes":"(14d6+0)"},"InitiativeModifier":2,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":13,"Notes":""},"Abilities":{"Str":4,"Dex":14,"Con":10,"Int":7,"Wis":8,"Cha":10},"Saves":[],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":[],"Skills":[{"Name":"Stealth","Modifier":4}],"Senses":["passive Perception 9"],"Languages":[""],"Challenge":"1/4","Traits":[{"Name":"Adaptive","Content":"The Death Rat evolves rapidly to fit into any environment almost immediately. This allows the Death Rat to live anywhere and has different abilities based on the environment."}],"Actions":[{"Name":"Bite","Content":"Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 5 (1d6+2) piercing damage. "},{"Name":"Scratch","Content":"Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (2d4) slashing damage. "}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
   "Creatures.Plague-Goblin":{"Id":"Plague-Goblin","Name":"Plague Goblin","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Plague Goblin\nhumanoid\n","FilterDimensions":{"Level":"1","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, "},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, ","HP":{"Value":82,"Notes":"(15d8+15)"},"InitiativeModifier":4,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":13,"Notes":""},"Abilities":{"Str":9,"Dex":18,"Con":12,"Int":16,"Wis":6,"Cha":8},"Saves":[{"Name":"Dex","Modifier":6}],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":[],"Skills":[{"Name":"Stealth","Modifier":6},{"Name":"Sleight of Hand","Modifier":6}],"Senses":["passive Perception 8"],"Languages":[""],"Challenge":"1","Traits":[{"Name":"Cloak","Content":"The Plague Goblin's cloak-like skin can render itself and anything it carries invisible at will."},{"Name":"Iron Stomach","Content":"The Plague Goblin can consume any material."}],"Actions":[{"Name":"Scratch","Content":"Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 13 (2d8+4) slashing damage. "},{"Name":"Poison (Recharge 5-6)","Content":"The Plague Goblin unleashes a thick green smoke from it's mask out to 30 ft. Any creature it touches must succeed on a DC 13 Constitution Saving Throw or become poisoned for 1 minute and take 3 (1d6) poison damage at the start of each of its turns. The creature may remake the saving throw at the end of each of its turns."}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
   "Creatures.Camo-Crawler":{"Id":"Camo-Crawler","Name":"Camo Crawler","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Camo Crawler\nhumanoid\nchaotic evil","FilterDimensions":{"Level":"6","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, chaotic evil"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, chaotic evil","HP":{"Value":156,"Notes":"(24d8+48)"},"InitiativeModifier":0,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":15,"Notes":""},"Abilities":{"Str":20,"Dex":10,"Con":14,"Int":18,"Wis":18,"Cha":10},"Saves":[],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":[],"Skills":[{"Name":"Perception","Modifier":7},{"Name":"Stealth","Modifier":6}],"Senses":["blindsight 60 ft.","passive Perception 17"],"Languages":[""],"Challenge":"6","Traits":[{"Name":"Blind","Content":"The Camo Crawler is blind, increasing its hearing capabilities."},{"Name":"Environmental Stealth","Content":"The Camo Crawler can alter the surface of its skin to fit into any of its surroundings, similar to a chameleon."},{"Name":"Easily Distracted","Content":"The Camo Crawler may be distracted by other noises easily."},{"Name":"Sneak Attack","Content":"Whenever a Camo Crawler attacks while being hidden, it deals an additional 14 (4d6) piercing damage. This is already calculated in the actions."}],"Actions":[{"Name":"Pinch","Content":"Melee Weapon Attack: +6 to hit, reach 5 ft., one target. Hit: 27 (4d10+5) piercing damage plus 14 (4d6) piercing damage. "}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
-  "Creatures.Animation":{"Id":"Animation","Name":"Animation","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Animation\nhumanoid\nlawful evil","FilterDimensions":{"Level":"4","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, lawful evil"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, lawful evil","HP":{"Value":129,"Notes":"(37d8-37)"},"InitiativeModifier":1,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":14,"Notes":""},"Abilities":{"Str":22,"Dex":12,"Con":8,"Int":6,"Wis":12,"Cha":12},"Saves":[],"DamageVulnerabilities":["slashing (Wood)","bludgeoning (Plastic)","piercing (Clay)"],"DamageResistances":[],"DamageImmunities":["acid","poison","thunder","lightning"],"ConditionImmunities":["sleep","exhaustion","unconscious","poisoned","paralyzed","frightened","charmed"],"Skills":[],"Senses":["passive Perception 11"],"Languages":[""],"Challenge":"4","Traits":[{"Name":"Variety","Content":"The Animation comes in many different varieties and have a different set of abilities for each. The main varieties are wooden, plastic, and clay."}],"Actions":[{"Name":"Multiattack","Content":"Animation makes two Splinter (Wood) attacks or makes two Touch (Clay) attacks. "},{"Name":"Splinter (Wood)","Content":"Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 16 (3d6+6) piercing damage. "},{"Name":"Crush (Plastic)","Content":"Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 28 (4d10+6) bludgeoning damage. "},{"Name":"Touch (Clay)","Content":"Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 15 (2d8+6) acid damage. "},{"Name":"Absorb (Clay) (1/Day)","Content":"The Animation attempts to grab and restrain a target. The target must succeed on a DC 14 Strength Saving Throw or be submerged into the Animation, begin suffocating, and become poisoned for 1 minute. The target may remake the Saving Throw at the end of each of its turns to escape the Animation."}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""}
+  "Creatures.Animation":{"Id":"Animation","Name":"Animation","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Animation\nhumanoid\nlawful evil","FilterDimensions":{"Level":"4","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, lawful evil"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, lawful evil","HP":{"Value":129,"Notes":"(37d8-37)"},"InitiativeModifier":1,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":14,"Notes":""},"Abilities":{"Str":22,"Dex":12,"Con":8,"Int":6,"Wis":12,"Cha":12},"Saves":[],"DamageVulnerabilities":["slashing (Wood)","bludgeoning (Plastic)","piercing (Clay)"],"DamageResistances":[],"DamageImmunities":["acid","poison","thunder","lightning"],"ConditionImmunities":["sleep","exhaustion","unconscious","poisoned","paralyzed","frightened","charmed"],"Skills":[],"Senses":["passive Perception 11"],"Languages":[""],"Challenge":"4","Traits":[{"Name":"Variety","Content":"The Animation comes in many different varieties and have a different set of abilities for each. The main varieties are wooden, plastic, and clay."}],"Actions":[{"Name":"Multiattack","Content":"Animation makes two Splinter (Wood) attacks or makes two Touch (Clay) attacks. "},{"Name":"Splinter (Wood)","Content":"Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 16 (3d6+6) piercing damage. "},{"Name":"Crush (Plastic)","Content":"Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 28 (4d10+6) bludgeoning damage. "},{"Name":"Touch (Clay)","Content":"Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 15 (2d8+6) acid damage. "},{"Name":"Absorb (Clay) (1/Day)","Content":"The Animation attempts to grab and restrain a target. The target must succeed on a DC 14 Strength Saving Throw or be submerged into the Animation, begin suffocating, and become poisoned for 1 minute. The target may remake the Saving Throw at the end of each of its turns to escape the Animation."}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
+  "Creatures.Dollface":{"Id":"Dollface","Name":"Dollface","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Dollface\nhumanoid\nneutral","FilterDimensions":{"Level":"12","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Small humanoid, neutral"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Small humanoid, neutral","HP":{"Value":236,"Notes":"(43d6+86)"},"InitiativeModifier":0,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":14,"Notes":""},"Abilities":{"Str":20,"Dex":10,"Con":14,"Int":13,"Wis":8,"Cha":16},"Saves":[],"DamageVulnerabilities":["slashing","piercing"],"DamageResistances":[],"DamageImmunities":["bludgeoning"],"ConditionImmunities":["charmed","poisoned","unconscious","sleep"],"Skills":[],"Senses":["passive Perception 9"],"Languages":[""],"Challenge":"12","Traits":[],"Actions":[{"Name":"Maul","Content":"Melee Weapon Attack: +9 to hit, reach 5 ft., one target. Hit: 27 (4d10+5) bludgeoning damage plus 18 (4d8) slashing damage. "},{"Name":"Replicate","Content":"Dollface creates a copy of itself, giving half of its remaining health to the new copy. The new Dollface rolls initiative and acts on its own turn."}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
+  "Creatures.The-Artist":{"Id":"The-Artist","Name":"The Artist","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"The Artist\nhumanoid\nneutral good","FilterDimensions":{"Level":"9","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, neutral good"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, neutral good","HP":{"Value":157,"Notes":"(35d8+0)"},"InitiativeModifier":-1,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":15,"Notes":""},"Abilities":{"Str":7,"Dex":8,"Con":10,"Int":18,"Wis":14,"Cha":16},"Saves":[{"Name":"Int","Modifier":8}],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":[],"Skills":[{"Name":"Performance","Modifier":11},{"Name":"Stealth","Modifier":-1}],"Senses":["passive Perception 12"],"Languages":[""],"Challenge":"9","Traits":[{"Name":"Always Ready","Content":"The Artist always has 3 entity paintings on standby to summon immediately upon entering combat as a free action."}],"Actions":[{"Name":"Summon Entity","Content":"The Artist paints an entity onto a blank canvas. The entity painted comes to life and rolls its own initiative. The Artist may maintain up to 5 entities at once, totaling up to 9 CR. The entity cannot be a unique entity. If 5 entities already exist, The Artist may instead change the entity to a brand new one at full health, but in the same spot and with the same initiative."},{"Name":"Spill","Content":"The Artist throws paint onto the ground. Treat this as casting the spell \"Grease\"."}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
+  "Creatures.The-Numbed-Man":{"Id":"The-Numbed-Man","Name":"The Numbed Man","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"The Numbed Man\nhumanoid\nneutral","FilterDimensions":{"Level":"3","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, neutral"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium humanoid, neutral","HP":{"Value":90,"Notes":"(20d8+0)"},"InitiativeModifier":0,"InitiativeAdvantage":false,"Speed":["walk 30 ft."],"AC":{"Value":13,"Notes":""},"Abilities":{"Str":10,"Dex":10,"Con":10,"Int":10,"Wis":10,"Cha":10},"Saves":[],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":[],"Skills":[],"Senses":["truesight 30 ft.","passive Perception 10"],"Languages":[""],"Challenge":"3","Traits":[{"Name":"Senseless","Content":"The Numbed Man is blind and deaf, cannot feel touch, cannot taste, and cannot smell. This causes The Numbed Man to become incapable of being noticed."},{"Name":"Reverse Information","Content":"The Numbed Man knows the same about a creature as the creature knows about him."},{"Name":"Forced Learning","Content":"The Numbed Man may make any creature reading about him to make a DC 13 Wisdom Saving Throw or be forced to read about The Numbed Man for 1 sentence. This save is remade after every sentence until the creature either passes or reads the full document."},{"Name":"Vulnerable Back","Content":"The Numbed Man dies in one strike to the back via any attack."},{"Name":"Forgotten","Content":"Whenever The Numbed Man dies, the creature(s) he was after forget about The Numbed Man and his papers suddenly disappear. The Numbed Man then respawns far away from the target."},{"Name":"Perfect Sight","Content":"The Numbed Man knows the exact location of his target at all times."}],"Actions":[{"Name":"Mangle","Content":"Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 28 (8d6) force damage. During this attack, The Numbed Man flashes into sight for less than a second. A creature may roll a DC 24 perception check as a reaction to see it."}],"LegendaryActions":[],"Reactions":[],"Description":"","Player":"","ImageURL":""},
+  "Creatures.Clinker-Toy":{"Id":"Clinker-Toy","Name":"Clinker Toy","Path":"","Link":"https://ebshimizu.github.io/5emm/","SearchHint":"Clinker Toy\nUndead\nneutral evil","FilterDimensions":{"Level":"1/4","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium Undead, neutral evil"},"LastUpdateMs":0,"Version":"1.0.0","Source":"Homebrew (Falindrith's Monster Maker)","Type":"Medium Undead, neutral evil","HP":{"Value":45,"Notes":"(6d8+18)"},"InitiativeModifier":-2,"InitiativeAdvantage":false,"Speed":["walk 20 ft."],"AC":{"Value":8,"Notes":""},"Abilities":{"Str":13,"Dex":6,"Con":16,"Int":3,"Wis":6,"Cha":5},"Saves":[{"Name":"Wis","Modifier":0}],"DamageVulnerabilities":[],"DamageResistances":[],"DamageImmunities":[],"ConditionImmunities":["poisoned"],"Skills":[],"Senses":["darkvision 60 ft.","passive Perception null"],"Languages":[""],"Challenge":"1/4","Traits":[{"Name":"Auto Repair","Content":"If damage reduces the Clinker Toy to 0 hit points, it must make a Constitution saving throw with a DC of 5 + the damage taken, unless the damage is fire or from a critical hit. On a success, the Clinker Toy drops to 1 hit point instead."}],"Actions":[{"Name":"Slam","Content":"Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 4 (1d6+1) bludgeoning damage.  "}],"LegendaryActions":[],"Reactions":[{"Name":"Panic Slam","Content":"The Clinker Toy makes a Slam attack on a creature who has taken the dash action."}],"Description":"","Player":"","ImageURL":""}
 }
 */

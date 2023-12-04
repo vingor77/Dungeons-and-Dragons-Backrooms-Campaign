@@ -1,4 +1,4 @@
-import { Box, Button, Input, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import { Box, Button, FormControl, Input, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import BackroomsItem from './BackroomsItem';
 import BackroomsEntities from './BackroomsEntities';
@@ -7,14 +7,14 @@ import db from '../Components/firebase';
 import CasinoShop from '../Images/CasinoRoomShop.png';
 
 export default function BackroomsLevel(props) {
-  const [spawn, setSpawn] = useState(-1);
-  const [spawnType, setSpawnType] = useState("");
-  const [regSpawns, setRegSpawns] = useState([]);
   const [possibleRegSpawns, setPossibleRegSpawns] = useState([]);
   const [showMap, setShowMap] = useState(false);
   const [initalize, setInitialize] = useState(true);
-  const [currMap, setCurrMap] = useState(null);
+  const [currMap, setCurrMap] = useState([]);
   const [mapRendered, setMapRendered] = useState(null);
+  const [spawnList, setSpawnList] = useState([]);
+  const [regSpawnList, setRegSpawnList] = useState([]);
+  const [roomDisplay, setRoomDisplay] = useState(-1);
 
   useEffect(() => {
     const collectionRef = collection(db, 'regularSpawns');
@@ -32,90 +32,88 @@ export default function BackroomsLevel(props) {
     }
   }, [])
 
-  useEffect(() => {
-    let currType = spawnType;
-    let nextType;
+  const createRoomPaths = (grid, size, center, gridNum) => {
+    const paths = [];
+    
+    const startPoints = [];
+    for(let i = 0; i < 4; i++) {
+      startPoints.push(Math.floor(Math.random() * 5));
+    }
+    paths[0] = [{i: (center - 2 + startPoints[0]), j: 0}]; //Left
+    paths[1] = [{i: (center - 2 + startPoints[1]), j: (size - 1)}]; //Right
+    paths[2] = [{i: 0, j: (center - 2 + startPoints[2])}]; //Top
+    paths[3] = [{i: (size - 1), j: (center - 2 + startPoints[3])}]; //Bottom
 
-    if(spawn <= props.level.spawns[0]) {
-      setSpawnType("Nothing");
-      nextType = "Nothing"
-    }
-    else if(spawn > props.level.spawns[0] && spawn <= props.level.spawns[1]) {
-      setSpawnType("Item");
-      nextType = "Item"
-    }
-    else if(spawn > props.level.spawns[1] && spawn <= props.level.spawns[2]) {
-      setSpawnType("Entity");
-      nextType = "Entity"
-    }
-    else {
-      setSpawnType("Special");
-      nextType = "Special"
-    }
+    for(let i = 0; i < 4; i++) {
+      let end = false;
+      while(!end) {
+        const direction = Math.floor(Math.random() * 4);
+        switch(direction) {
+          case 0:
+            if(paths[i][paths[i].length - 1].j - 1 < 0) {
+              break;
+            }
 
-    //Change it to force the map to actually update in the useEffect underneath.
-    if(currType === nextType) {
-      setSpawnType(currType + "1");
-    }
+            paths[i].push({i: paths[i][paths[i].length - 1].i, j: paths[i][paths[i].length - 1].j - 1});
+            break;
+          case 1:
+            if(paths[i][paths[i].length - 1].j + 1 > (size - 1)) {
+              break;
+            }
 
-    //Regular spawn locations on the map.
-    let regSpawnCount = Math.floor(Math.random() * (Number(props.level.regSpawns) + 1));
+            paths[i].push({i: paths[i][paths[i].length - 1].i, j: paths[i][paths[i].length - 1].j + 1});
+            break;
+          case 2:
+            if(paths[i][paths[i].length - 1].i - 1 < 0) {
+              break;
+            }
 
-    if(possibleRegSpawns.length > 0) {
-      let tempRegs = [];
-      for(let i = 0; i < regSpawnCount; i++) {
-        let noun = possibleRegSpawns[0].spawns[Math.floor(Math.random() * possibleRegSpawns[0].spawns.length)];
-        for(let j = 0; j < tempRegs.length; j++) {
-          while(noun === tempRegs[j]) {
-            noun = possibleRegSpawns[0].spawns[Math.floor(Math.random() * possibleRegSpawns[0].spawns.length)];
+            paths[i].push({i: paths[i][paths[i].length - 1].i - 1, j: paths[i][paths[i].length - 1].j});
+            break;
+          default:
+            if(paths[i][paths[i].length - 1].i + 1 > (size - 1)) {
+              break;
+            }
+
+            paths[i].push({i: paths[i][paths[i].length - 1].i + 1, j: paths[i][paths[i].length - 1].j})
+            break;
+        }
+
+        if(i === 0) {
+          if(grid[paths[i][paths[i].length - 1].i][paths[i][paths[i].length - 1].j] === -1 && paths[i][paths[i].length - 1].j !== 0) {
+            end = true;
           }
         }
-        tempRegs.push(noun);
-      }
-      setRegSpawns(tempRegs);
-    }
-  }, [spawn])
-
-  const createMap = () => {
-    if(props.level.genType[0] === 'None') return;
-
-    const type = props.level.genType[Math.floor(Math.random() * props.level.genType.length)];
-    setMapRendered(true);
-
-    switch(type) {
-      case 'Room':
-        createRoomMap();
-        break;
-      case 'Hall':
-        createHallMap();
-        break;
-    }
-  };
-
-  const createHallMap = () => {
-    let size = Math.floor(Math.random() * 10) + 15; //Size of 15 to 24
-    if(size % 2 == 0) {
-      size++;
-    }
-    const center = Math.ceil(size / 2) - 1;
-
-    const grid = [];
-    for(let i = 0; i < size; i++) {
-      let tempArr = [];
-      for(let j = 0; j < size; j++) {
-        if(i >= (center - 2) && i <= (center + 2) && (j === 0 || j === (size - 1))) {
-          tempArr[j] = -1;
+        else if(i === 1) {
+          if(grid[paths[i][paths[i].length - 1].i][paths[i][paths[i].length - 1].j] === -1 && paths[i][paths[i].length - 1].j !== (size - 1)) {
+            end = true;
+          }
         }
-        else if((i === 0 || i === (size - 1)) && j >= (center - 2) && j <= (center + 2)) {
-          tempArr[j] = -1;
+        else if(i === 2) {
+          if(grid[paths[i][paths[i].length - 1].i][paths[i][paths[i].length - 1].j] === -1 && paths[i][paths[i].length - 1].i !== 0) {
+            end = true;
+          }
         }
         else {
-          tempArr[j] = 1;
+          if(grid[paths[i][paths[i].length - 1].i][paths[i][paths[i].length - 1].j] === -1 && paths[i][paths[i].length - 1].i !== (size - 1)) {
+            end = true;
+          }
         }
       }
-      grid.push(tempArr);
     }
 
+    for(let i = 0; i < paths.length; i++) {
+      for(let j = 0; j < paths[i].length; j++) {
+        if(grid[paths[i][j].i][paths[i][j].j] !== -1) {
+          grid[paths[i][j].i][paths[i][j].j] = 0;
+        }
+      }
+    }
+
+    return finishMap(grid, size, center, gridNum);
+  }
+
+  const createHallPaths = (grid, size, center, gridNum) => {
     const quadrants = [];
     for(let i = 0; i < 4; i++) {
       quadrants[i] = Math.floor(Math.random() * 2); //0 for fail, 1 for success
@@ -189,356 +187,228 @@ export default function BackroomsLevel(props) {
       }
     }
 
-        //Add in regular spawns and items/entities.
-        if(spawn !== -1 && showMap) {
-          const spawnLocation = () => {
-            let xSpawn = Math.floor(Math.random() * size);
-            let ySpawn = Math.floor(Math.random() * size);
-          
-            while(grid[xSpawn][ySpawn] === 1) {
-              xSpawn = Math.floor(Math.random() * size);
-              ySpawn = Math.floor(Math.random() * size);
-            }
-          
-            switch(spawnType) {
-              case "Item":
-                grid[xSpawn][ySpawn] = 2;
-                break;
-              case "Item1":
-                grid[xSpawn][ySpawn] = 2;
-                break;
-              case "Entity":
-                grid[xSpawn][ySpawn] = 3;
-                break;
-              case "Entity1":
-                grid[xSpawn][ySpawn] = 3;
-                break;
-              case "Special":
-                grid[xSpawn][ySpawn] = 4;
-                break;
-              case "Special1":
-                grid[xSpawn][ySpawn] = 4;
-                break;
-            }
-      
-            let regSpawnNum = 5;
-            for(let i = 0; i < regSpawns.length; i++) {
-              while(grid[xSpawn][ySpawn] !== 0 && grid[xSpawn][ySpawn] !== -1) {
-                xSpawn = Math.floor(Math.random() * size);
-                ySpawn = Math.floor(Math.random() * size);
-              }
-              grid[xSpawn][ySpawn] = regSpawnNum;
-              regSpawnNum++;
-            }
-          }
-        
-          spawnLocation();
-        }
-    
-        //Change the placeholder end values
-        for(let i = 0; i < grid.length; i++) {
-          for(let j = 0; j < grid[i].length; j++) {
-            if(grid[i][j] === -1) {
-              grid[i][j] = 0;
-            }
-          }
-        }
-
-    setCurrMap(
-      <>
-        <Table sx={{border: '1px solid black'}}>
-          <TableBody color='inherit'>
-            {grid.map((row, index) => {
-              return (
-                <TableRow sx={{border: '1px solid black'}} key={index}>
-                  {row.map((cell, index) => {
-                    switch(cell) {
-                      case 0:
-                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index} onClick={toggleWalked}>{cell}</TableCell>
-                      case 1:
-                        return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index}>{cell}</TableCell>
-                      case 2:
-                        return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index}>{cell}</TableCell>
-                      case 3:
-                        return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index}>{cell}</TableCell>
-                      case 4:
-                        return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index}>{cell}</TableCell>
-                      default:
-                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index}>{cell - 4}</TableCell>
-                    }
-                  })}
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-        {spawnType === "Item" || spawnType === 'Item1' ? <CheckSpawnItem altDisplay='false' /> : ""}
-        {spawnType === "Entity" || spawnType === "Entity1" ? <CheckSpawnEntity altDisplay='false' /> : ""}
-        {spawnType === "Special" || spawnType === "Special1" ? <CheckSpawnSpecial altDisplay='false'/> : ""}
-        {spawnType === 'Nothing' || spawnType === 'Nothing1' ? <CheckSpawnNothing altDisplay='false' /> : ""}
-      </>
-    )
+    return finishMap(grid, size, center, gridNum);
   }
 
-  const toggleWalked = (e) => {
-    //White to Teal to Pink to White
-    if(e.target.style.backgroundColor === 'white') {
-      e.target.style.backgroundColor = 'teal';
-      e.target.style.color = 'teal';
-    }
-    else if(e.target.style.backgroundColor === 'teal') {
-      e.target.style.backgroundColor = 'pink';
-      e.target.style.color = 'pink';
-    }
-    else {
-      e.target.style.backgroundColor = 'white';
-      e.target.style.color = 'white';
-    }
-  }
-
-  const createRoomMap = () => {
-    let size = Math.floor(Math.random() * 10) + 15; //Size of 15 to 24
-    if(size % 2 == 0) {
-      size++;
-    }
-    const center = Math.ceil(size / 2) - 1;
-
-    //Create a grid and set any end pieces to -1 since that won't be used later on ever.
-    const grid = [];
-    for(let i = 0; i < size; i++) {
-      let tempArr = [];
-      for(let j = 0; j < size; j++) {
-        if(i >= (center - 2) && i <= (center + 2) && (j === 0 || j === (size - 1))) {
-          tempArr[j] = -1;
-        }
-        else if((i === 0 || i === (size - 1)) && j >= (center - 2) && j <= (center + 2)) {
-          tempArr[j] = -1;
-        }
-        else {
-          tempArr[j] = 1;
-        }
-      }
-      grid.push(tempArr);
-    }
-
-    //Path algorithm
-    const paths = []; //2D array where 0 is path 1, 1 is path 2, etc.
-    
-    //Left
-    let randI = Math.floor(Math.random() * size);
-    while(grid[randI][0] !== -1) {
-      randI = Math.floor(Math.random() * size);
-    }
-    paths[0] = [{i: randI, j: 0}];
-
-    //Right
-    randI = Math.floor(Math.random() * size);
-    while(grid[randI][size - 1] !== -1) {
-      randI = Math.floor(Math.random() * size);
-    }
-    paths[1] = [{i: randI, j: (size - 1)}];
-
-    //Top
-    let randJ = Math.floor(Math.random() * size);
-    while(grid[0][randJ] !== -1) {
-      randJ = Math.floor(Math.random() * size);
-    }
-    paths[2] = [{i: 0, j: randJ}];
-
-    //Bottom
-    randJ = Math.floor(Math.random() * size);
-    while(grid[size - 1][randJ] !== -1) {
-      randJ = Math.floor(Math.random() * size);
-    }
-    paths[3] = [{i: (size - 1), j: randJ}];
-
-    //Go in a random direction with checks for edges of the map and end points. Cannot go backwards nor can it go off the map. If it hits an end point, end the algorithm.
-    for(let i = 0; i < paths.length; i++) {
-      let end = false;
-      while(!end) {
-        const currentTile = paths[i][paths[i].length - 1];
-
-        if(i === 0) {
-          if(((currentTile.i === (center - 2) || currentTile.i === (center - 1) || currentTile.i === (center) || currentTile.i === (center + 1) || currentTile.i === (center + 2)) && (currentTile.j === (size - 1))) && paths[i].length > 1) {
-            end = true;
-          }
-          else if(((currentTile.j === (center - 2) || currentTile.j === (center - 1) || currentTile.j === (center) || currentTile.j === (center + 1) || currentTile.j === (center + 2)) && (currentTile.i === 0 || currentTile.i === (size - 1))) && paths[i].length > 1) {
-            end = true;
-          }
-        }
-        else if(i === 1) {
-          if(((currentTile.i === (center - 2) || currentTile.i === (center - 1) || currentTile.i === (center) || currentTile.i === (center + 1) || currentTile.i === (center + 2)) && (currentTile.j === 0)) && paths[i].length > 1) {
-            end = true;
-          }
-          else if(((currentTile.j === (center - 2) || currentTile.j === (center - 1) || currentTile.j === (center) || currentTile.j === (center + 1) || currentTile.j === (center + 2)) && (currentTile.i === 0) || currentTile.i === (size - 1)) && paths[i].length > 1) {
-            end = true;
-          }
-        }
-        //Top
-        else if(i === 2) {
-          if(((currentTile.i === (center - 2) || currentTile.i === (center - 1) || currentTile.i === (center) || currentTile.i === (center + 1) || currentTile.i === (center + 2)) && (currentTile.j === 0 || currentTile.j === (size - 1))) && paths[i].length > 1) {
-            end = true;
-          }
-          else if(((currentTile.j === (center - 2) || currentTile.j === (center - 1) || currentTile.j === (center) || currentTile.j === (center + 1) || currentTile.j === (center + 2)) && (currentTile.i === (size - 1))) && paths[i].length > 1) {
-            end = true;
-          }
-        }
-        //Bottom
-        else {
-          if(((currentTile.i === (center - 2) || currentTile.i === (center - 1) || currentTile.i === (center) || currentTile.i === (center + 1) || currentTile.i === (center + 2)) && (currentTile.j === (size - 1) || currentTile.j === 0)) && paths[i].length > 1) {
-            end = true;
-          }
-          else if(((currentTile.j === (center - 2) || currentTile.j === (center - 1) || currentTile.j === (center) || currentTile.j === (center + 1) || currentTile.j === (center + 2)) && (currentTile.i === 0)) && paths[i].length > 1) {
-            end = true;
-          }
-        }
-
-        if(!end) {
-          let direction = Math.floor(Math.random() * 4);
-          let success = false;
-          let alreadyChosen = false;
-          while(!success) {
-            switch(direction) {
-              case 0:
-                //Left
-                if(currentTile.j - 1 < 0 || alreadyChosen) {
-                  alreadyChosen = false;
-                  direction = Math.floor(Math.random() * 4);
-                  break;
-                }
-
-                paths[i].push({i: paths[i][paths[i].length - 1].i, j: (paths[i][paths[i].length - 1].j - 1)});
-                success = true;
-                break;
-              case 1:
-                //Right
-                if(currentTile.j + 1 > (size - 1) || alreadyChosen) {
-                  alreadyChosen = false;
-                  direction = Math.floor(Math.random() * 4);
-                  break;
-                }
-
-                paths[i].push({i: paths[i][paths[i].length - 1].i, j: (paths[i][paths[i].length - 1].j + 1)});
-                success = true;
-                break;
-              case 2:
-                //Top
-                if(currentTile.i - 1 < 0 || alreadyChosen) {
-                  alreadyChosen = false;
-                  direction = Math.floor(Math.random() * 4);
-                  break;
-                }
-
-                paths[i].push({i: (paths[i][paths[i].length - 1].i - 1), j: paths[i][paths[i].length - 1].j});
-                success = true;
-                break;
-              case 3:
-                //Bottom
-                if(currentTile.i + 1 > (size - 1) || alreadyChosen) {
-                  alreadyChosen = false;
-                  direction = Math.floor(Math.random() * 4);
-                  break;
-                }
-
-                paths[i].push({i: (paths[i][paths[i].length - 1].i + 1), j: paths[i][paths[i].length - 1].j});
-                success = true;
-                break;
-              default:
-                break;
-            } 
-          }
-        }
-      }
-    }
-
-    for(let i = 0; i < paths.length; i++) {
-      for(let j = 0; j < paths[i].length; j++) {
-        const pathI = paths[i][j].i;
-        const pathJ = paths[i][j].j;
-        if(grid[pathI][pathJ] !== -1 && grid[pathI][pathJ] !== 2 && grid[pathI][pathJ] !== 3 && grid[pathI][pathJ] !== 4) {
-          grid[pathI][pathJ] = 0;
-        }
-      }
-    }
-
-    //Setup room borders
+  const finishMap = (grid, size, center, gridNum) => {
+    //Create map side walls 
     for(let i = 0; i < grid.length; i++) {
       for(let j = 0; j < grid[i].length; j++) {
-        if((i === 0 || i === (size - 1)) && (grid[i][j] !== -1)) {
-          grid[i][j] = 1;
-        }
-        if((j === 0 || j === (size - 1)) && (grid[i][j] !== -1)) {
-          grid[i][j] = 1;
-        }
-      }
-    }
-
-    //Add in regular spawns and items/entities.
-    if(spawn !== -1 && showMap) {
-      const spawnLocation = () => {
-        let xSpawn = Math.floor(Math.random() * size);
-        let ySpawn = Math.floor(Math.random() * size);
-      
-        while(grid[xSpawn][ySpawn] === 1) {
-          xSpawn = Math.floor(Math.random() * size);
-          ySpawn = Math.floor(Math.random() * size);
-        }
-      
-        switch(spawnType) {
-          case "Item":
-            grid[xSpawn][ySpawn] = 2;
-            break;
-          case "Item1":
-            grid[xSpawn][ySpawn] = 2;
-            break;
-          case "Entity":
-            grid[xSpawn][ySpawn] = 3;
-            break;
-          case "Entity1":
-            grid[xSpawn][ySpawn] = 3;
-            break;
-          case "Special":
-            grid[xSpawn][ySpawn] = 4;
-            break;
-          case "Special1":
-            grid[xSpawn][ySpawn] = 4;
-            break;
-        }
-  
-        let regSpawnNum = 5;
-        for(let i = 0; i < regSpawns.length; i++) {
-          while(grid[xSpawn][ySpawn] !== 0 && grid[xSpawn][ySpawn] !== -1) {
-            xSpawn = Math.floor(Math.random() * size);
-            ySpawn = Math.floor(Math.random() * size);
+        if(gridNum !== 4) {
+          if((i < (center - 2) || i > (center + 2)) && (j === 0 || j === (size - 1))) {
+            grid[i][j] = 1;
           }
-          grid[xSpawn][ySpawn] = regSpawnNum;
-          regSpawnNum++;
+          if((j < (center - 2) || j > (center + 2)) && (i === 0 || i === (size - 1))) {
+            grid[i][j] = 1;
+          }
         }
-      }
-    
-      spawnLocation();
-    }
 
-    //Change the placeholder end values
-    for(let i = 0; i < grid.length; i++) {
-      for(let j = 0; j < grid[i].length; j++) {
         if(grid[i][j] === -1) {
           grid[i][j] = 0;
         }
       }
     }
 
-    setCurrMap(
-      <>
-        <Table sx={{border: '1px solid black'}}>
+    return grid;
+  }
+
+  const getEntities = (maxCR) => {
+    const chosenEntities = [];
+    let cutOff = 1000;
+    let currCR = maxCR;
+    const maxPlayers = 5;
+
+    if(maxCR > 0) {
+      while(chosenEntities.length < maxPlayers && cutOff > 0) {
+        const entity = props.entities[Math.floor(Math.random() * props.entities.length)];
+  
+        if(entity.challengeRating <= currCR && entity.challengeRating > 0
+
+          && entity.entityNum > 0 && entity.entityNum < 62 && entity.entityNum !== 1 && entity.entityNum !== 18 && entity.entityNum !== 26 //entity num checks are in place since not all stat blocks are finished. Remove this line later.
+
+        ) {
+          currCR -= entity.challengeRating;
+          chosenEntities.push(entity);
+        }
+  
+        if(currCR <= 0 && chosenEntities.length > 0) {
+          break;
+        }
+        cutOff--;
+      }
+    }
+    else {
+      let entity = props.entities[Math.floor(Math.random() * props.entities.length)];
+
+      while(entity.challengeRating !== 0) {
+        entity = props.entities[Math.floor(Math.random() * props.entities.length)];
+      }
+
+      chosenEntities.push(entity);
+    }
+
+    return chosenEntities;
+  }
+
+  const getSpecials = () => {
+    const special = Math.floor(Math.random() * props.level.specials.length);
+    return [props.level.specials[special]];
+  }
+
+  const createSpawn = (grid, size) => {
+    const whatSpawns = Math.floor(Math.random() * 101) + 1;
+    let spawn = "";
+    if(whatSpawns <= props.level.spawns[0]) {
+      spawn = 'nothing';
+    }
+    else if(whatSpawns > props.level.spawns[0] && whatSpawns <= props.level.spawns[1]) {
+      spawn = "item"
+    }
+    else if(whatSpawns > props.level.spawns[1] && whatSpawns <= props.level.spawns[2]) {
+      spawn = "entity"
+    }
+    else {
+      spawn = "special"
+    }
+
+    //Find location of the spawn, rerolling walls
+    let x = Math.floor(Math.random() * size);
+    let y = Math.floor(Math.random() * size);
+
+    while(grid[x][y] === 1) {
+      x = Math.floor(Math.random() * size);
+      y = Math.floor(Math.random() * size);
+    }
+
+    switch(spawn) {
+      case "item":
+        grid[x][y] = 2;
+        let selectedItem = getItemRarity();
+        return (
+          [grid, selectedItem]
+        )
+      case "entity":
+        grid[x][y] = 3;
+        let maxCR = getMaxCR([10, 60, 70, 80, 90]); //Tier 2 chars = [10, 20, 70, 80, 90]. Tier 3 = [10, 20, 30, 80, 90]. Tier 4 = [10, 20, 30, 80, 90]. Tier 5 = [10, 20, 30, 40, 90]. Tier 6 = [10, 20, 30, 40, 50].
+        let entityList = getEntities(maxCR);
+        return (
+          [grid, entityList]
+        );
+      case "special":
+        grid[x][y] = 4;
+        let specials = getSpecials();
+        return [grid, specials];
+      default:
+        return [grid, null];
+    }
+  }
+
+  const createRegSpawns = (grid, size) => {
+    let regSpawnCount = Math.floor(Math.random() * (Number(props.level.regSpawns) + 1));
+    let tempRegs = [];
+
+    if(possibleRegSpawns.length > 0) {
+      for(let i = 0; i < regSpawnCount; i++) {
+        let noun = possibleRegSpawns[0].spawns[Math.floor(Math.random() * possibleRegSpawns[0].spawns.length)];
+        for(let j = 0; j < tempRegs.length; j++) {
+          while(noun === tempRegs[j]) {
+            noun = possibleRegSpawns[0].spawns[Math.floor(Math.random() * possibleRegSpawns[0].spawns.length)];
+          }
+        }
+        tempRegs.push(noun);
+      }
+    }
+
+    for(let i = 0; i < regSpawnCount; i++) {
+      let x = Math.floor(Math.random() * size);
+      let y = Math.floor(Math.random() * size);
+  
+      while(grid[x][y] === 1 || grid[x][y] === 2 || grid[x][y] === 3 || grid[x][y] === 4 || grid[x][y] === 5) {
+        x = Math.floor(Math.random() * size);
+        y = Math.floor(Math.random() * size);
+      }
+
+      grid[x][y] = 5 + i;
+    }
+
+    return [grid, tempRegs];
+  }
+
+  const createMap = () => {
+    if(props.level.genType[0] === 'None') return;
+
+    const size = 17; //Arbitrary number I like.
+    const center = 8;
+    const mapPieces = [];
+    const spawnedThings = [];
+    const regSpawnedThings = [];
+    for(let i = 0; i < 9; i++) {
+      //Make the grid with the openings being set to -1.
+      let grid = [];
+      for(let i = 0; i < size; i++) {
+        let tempArr = [];
+        for(let j = 0; j < size; j++) {
+          if(i >= (center - 2) && i <= (center + 2) && (j === 0 || j === (size - 1))) {
+            tempArr[j] = -1;
+          }
+          else if((i === 0 || i === (size - 1)) && j >= (center - 2) && j <= (center + 2)) {
+            tempArr[j] = -1;
+          }
+          else {
+            tempArr[j] = 1;
+          }
+        }
+        grid.push(tempArr);
+      }
+
+      //Set up the map, then find what spawns, then add regular spawns. Also, check spawn type.
+      const type = props.level.genType[Math.floor(Math.random() * props.level.genType.length)];
+      setMapRendered(true);
+  
+      switch(type) {
+        case 'Room':
+          grid = createRoomPaths(grid, size, center, i);
+          break;
+        case 'Hall':
+          grid = createHallPaths(grid, size, center, i);
+          break;
+      }
+
+      const spawnedItems = createSpawn(grid, size);
+      const regSpawns = createRegSpawns(spawnedItems[0], size);
+      grid = regSpawns[0];
+
+      mapPieces.push(grid);
+      if(spawnedItems[1] !== null) {
+        spawnedThings.push(spawnedItems[1]);
+      }
+      else {
+        spawnedThings.push(null);
+      }
+
+      if(regSpawns[1].length !== 0) {
+        regSpawnedThings.push(regSpawns[1]);
+      }
+      else {
+        regSpawnedThings.push(null);
+      }
+    }
+
+    //Finally, set the map to the mapPieces.
+    //setCurrMap(mapPieces);
+    const tables = [];
+
+    mapPieces.map((mapPiece, index) => {
+      tables.push (
+        <Table sx={{border: '1px solid black'}} key={index}>
           <TableBody color='inherit'>
-            {grid.map((row, index) => {
+            {mapPiece.map((row, index) => {
               return (
                 <TableRow sx={{border: '1px solid black'}} key={index}>
                   {row.map((cell, index) => {
                     switch(cell) {
                       case 0:
-                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index} onClick={toggleWalked}>{cell}</TableCell>
+                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index}>{cell}</TableCell>
                       case 1:
                         return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index}>{cell}</TableCell>
                       case 2:
@@ -556,24 +426,13 @@ export default function BackroomsLevel(props) {
             })}
           </TableBody>
         </Table>
-        {spawnType === "Item" || spawnType === 'Item1' ? <CheckSpawnItem altDisplay='false' /> : ""}
-        {spawnType === "Entity" || spawnType === "Entity1" ? <CheckSpawnEntity altDisplay='false' /> : ""}
-        {spawnType === "Special" || spawnType === "Special1" ? <CheckSpawnSpecial altDisplay='false'/> : ""}
-        {spawnType === 'Nothing' || spawnType === 'Nothing1' ? <CheckSpawnNothing altDisplay='false' /> : ""}
-      </>
-    )
-  }
-
-  const handleShowMap = () => {
-    if(initalize) {
-      setSpawn(Math.round(Math.random() * 100) + 1);
-      setInitialize(false);
-    }
-    setShowMap(true);
-  }
-
-  const handleHideMap = () => {
-    setShowMap(false);
+      )
+    })
+    
+    //TODO: Add a list for the things that spawned in a dropdown.
+    setSpawnList(spawnedThings);
+    setRegSpawnList(regSpawnedThings);
+    setCurrMap(tables);
   }
 
   const getItemRarity = () => {
@@ -606,371 +465,139 @@ export default function BackroomsLevel(props) {
       }
     })
 
-    return filteredItems[Math.floor(Math.random() * filteredItems.length)];
+    const item = [];
+    const selectedItem = filteredItems[Math.floor(Math.random() * filteredItems.length)];
+    item.push(selectedItem);
+    return item;
   }
 
-  const CheckSpawnItem = (properties) => {
-    const selectedItem = getItemRarity();
-
-    return (
-      <>
-        <BackroomsItem 
-          name={selectedItem.name}
-          itemNum={selectedItem.itemNum}
-          locations={selectedItem.locations}
-          description={selectedItem.description}
-          table={selectedItem.table}
-        />
-        <br />
-        {regSpawns.length !== 0 && properties.altDisplay === 'false' ?
-          <>
-            <br />
-            <Typography variant='h5'>Regular spawns(blue):</Typography>
-            <Box border='1px solid black'>
-              <br />
-              <ol type='1'>
-                {regSpawns.map((spawn, index) => {
-                  return <li key={index}>{spawn} </li>
-                })}
-              </ol>
-            </Box>
-          </>
-        :
-          ""
-        }
-      </>
-    )
-  }
-
-  const getMaxCR = (tier, encounterDifficulty) => {
-    switch(tier) {
-      case 1:
-        if(encounterDifficulty > 0 && encounterDifficulty <= 50) {
-          return Math.floor(Math.random() * 5) + 1;
-        }
-        else if(encounterDifficulty > 50 && encounterDifficulty <= 62) {
-          return Math.floor(Math.random() * 5) + 6;
-        }
-        else if(encounterDifficulty > 62 && encounterDifficulty <= 74) {
-          return Math.floor(Math.random() * 5) + 11;
-        }
-        else if(encounterDifficulty > 74 && encounterDifficulty <= 86) {
-          return Math.floor(Math.random() * 5) + 16;
-        }
-        else {
-          return Math.floor(Math.random() * 14) + 17;
-        }
-      case 2:
-        if(encounterDifficulty > 0 && encounterDifficulty <= 50) {
-          return Math.floor(Math.random() * 5) + 6;
-        }
-        else if(encounterDifficulty > 50 && encounterDifficulty <= 62) {
-          return Math.floor(Math.random() * 5) + 1;
-        }
-        else if(encounterDifficulty > 62 && encounterDifficulty <= 74) {
-          return Math.floor(Math.random() * 5) + 11;
-        }
-        else if(encounterDifficulty > 74 && encounterDifficulty <= 86) {
-          return Math.floor(Math.random() * 5) + 16;
-        }
-        else {
-          return Math.floor(Math.random() * 14) + 17;
-        }
-      case 3:
-        if(encounterDifficulty > 0 && encounterDifficulty <= 50) {
-          return Math.floor(Math.random() * 5) + 11;
-        }
-        else if(encounterDifficulty > 50 && encounterDifficulty <= 62) {
-          return Math.floor(Math.random() * 5) + 6;
-        }
-        else if(encounterDifficulty > 62 && encounterDifficulty <= 74) {
-          return Math.floor(Math.random() * 5) + 1;
-        }
-        else if(encounterDifficulty > 74 && encounterDifficulty <= 86) {
-          return Math.floor(Math.random() * 5) + 16;
-        }
-        else {
-          return Math.floor(Math.random() * 14) + 17;
-        }
-      case 4:
-        if(encounterDifficulty > 0 && encounterDifficulty <= 50) {
-          return Math.floor(Math.random() * 5) + 16;
-        }
-        else if(encounterDifficulty > 50 && encounterDifficulty <= 62) {
-          return Math.floor(Math.random() * 5) + 6;
-        }
-        else if(encounterDifficulty > 62 && encounterDifficulty <= 74) {
-          return Math.floor(Math.random() * 5) + 11;
-        }
-        else if(encounterDifficulty > 74 && encounterDifficulty <= 86) {
-          return Math.floor(Math.random() * 5) + 1;
-        }
-        else {
-          return Math.floor(Math.random() * 14) + 17;
-        }
-      case 5:
-        if(encounterDifficulty > 0 && encounterDifficulty <= 50) {
-          return Math.floor(Math.random() * 5) + 17;
-        }
-        else if(encounterDifficulty > 50 && encounterDifficulty <= 62) {
-          return Math.floor(Math.random() * 5) + 6;
-        }
-        else if(encounterDifficulty > 62 && encounterDifficulty <= 74) {
-          return Math.floor(Math.random() * 5) + 11;
-        }
-        else if(encounterDifficulty > 74 && encounterDifficulty <= 86) {
-          return Math.floor(Math.random() * 5) + 16;
-        }
-        else {
-          return Math.floor(Math.random() * 14) + 1;
-        }
-      default:
-        break;
-    }
-  }
-
-  const CheckSpawnEntity = (properties) => {
-    //Determine maximum cr based on player tier for the encounter then choose randomly until it is equal to the total. Stretch: Add a limit of entities in the encounter.
-    //TODO: Find a way to display the statblocks nicer.
-    const tier = 1;
-    const maxPlayers = 5;
+  const getMaxCR = (tier) => {
+    //10% chance for CR 0. 50% chance for tier main. 10% each for each other tier
     const encounterDifficulty = Math.floor(Math.random() * 100) + 1;
-    let maxCR = getMaxCR(tier, encounterDifficulty);
 
-    const chosenEntities = [];
-    let cutOff = 1000;
-    let currCR = maxCR;
-
-    if(maxCR > 0) {
-      while(chosenEntities.length < maxPlayers && cutOff > 0) {
-        const entity = props.entities[Math.floor(Math.random() * props.entities.length)];
-  
-        if(entity.challengeRating <= currCR && entity.challengeRating > 0
-
-          && entity.entityNum > 0 && entity.entityNum < 32 && entity.entityNum !== 18 && entity.entityNum !== 26 //entity num checks are in place since not all stat blocks are finished. Remove this line later.
-
-        ) {
-          currCR -= entity.challengeRating;
-          chosenEntities.push(entity);
-        }
-  
-        if(currCR <= 0 && chosenEntities.length > 0) {
-          break;
-        }
-        cutOff--;
-      }
+    if(encounterDifficulty >= 0 && encounterDifficulty <= tier[0]) {
+      return 0;
+    }
+    else if(encounterDifficulty > tier[0] && encounterDifficulty <= tier[1]) {
+      return Math.floor(Math.random() * 6) + 1; //1-6
+    }
+    else if(encounterDifficulty > tier[1] && encounterDifficulty <= tier[2]) {
+      return Math.floor(Math.random() * 6) + 7; //7-12
+    }
+    else if(encounterDifficulty > tier[2] && encounterDifficulty <= tier[3]) {
+      return Math.floor(Math.random() * 6) + 13; //13-18
+    }
+    else if(encounterDifficulty > tier[3] && encounterDifficulty <= tier[4]) {
+      return Math.floor(Math.random() * 6) + 19; //19-24
     }
     else {
-      let entity = props.entities[Math.floor(Math.random() * props.entities.length)];
-
-      while(entity.challengeRating !== 0) {
-        entity = props.entities[Math.floor(Math.random() * props.entities.length)];
-      }
-
-      chosenEntities.push(entity);
+      return Math.floor(Math.random() * 6) + 25; //25-30
     }
+  }
+
+  const DisplaySpawns = () => {
+    if(roomDisplay === -1) return;
+    if(spawnList[roomDisplay] === null && regSpawnList[roomDisplay] === null) return
 
     return (
       <>
-        {chosenEntities.map((entity, index) => {
-          return (
-            <BackroomsEntities 
-              key={index}
-              name={entity.name}
-              locations={entity.locations}
-              description={entity.description}
-              statBlock={entity.statBlock}
-              challengeRating={entity.challengeRating}
-              entityNum={entity.entityNum}
-              displayType="Level"
-            />
-          )
-        })}
-        {regSpawns.length !== 0 && properties.altDisplay === 'false' ?
-          <>
-            <br />
-            <Typography variant='h5'>Regular spawns(blue):</Typography>
-            <Box border='1px solid black'>
-              <br />
-              <ol type='1'>
-                {regSpawns.map((spawn, index) => {
-                  return <li key={index}>{spawn} </li>
-                })}
-              </ol>
-            </Box>
-          </>
+        {spawnList[roomDisplay] !== null ?
+          spawnList[roomDisplay].map((thing, index) => {
+            if(thing.itemNum !== undefined) {
+              return (
+                <BackroomsItem
+                  key={index}
+                  name={thing.name}
+                  itemNum={thing.itemNum}
+                  locations={thing.locations}
+                  description={thing.description}
+                  table={thing.table}
+                  display='level'
+                />
+              )
+            }
+            else if(thing.entityNum !== undefined) {
+              return (
+                <BackroomsEntities 
+                  key={index}
+                  name={thing.name}
+                  locations={thing.locations}
+                  description={thing.description}
+                  statBlock={thing.statBlock}
+                  challengeRating={thing.challengeRating}
+                  entityNum={thing.entityNum}
+                  displayType="Level"
+                />
+              )
+            }
+            else {
+              return (
+                <>
+                  <Typography variant='h5'>{thing}</Typography>
+                </>
+              )
+            }
+          })
         :
           ""
         }
-      </>
-    )
-  }
 
-  const CheckSpawnSpecial = (properties) => {
-    return (
-      <>
-        {properties.altDisplay === 'false' ? 
-          <>
-            <Typography variant='h5'>Possible specials:</Typography>
-            <Box border='1px solid black'>
-              <ol type='1'>
-                {props.level.specials.map((special, index) => {
-                  return <li key={index}>{special}</li>
-                })}
-              </ol>
-            </Box>
-            {regSpawns.length !== 0 ?
-              <>
-                <br />
-                <Typography variant='h5'>Regular spawns(blue):</Typography>
-                <Box border='1px solid black'>
-                  <br />
-                  <ol type='1'>
-                    {regSpawns.map((spawn, index) => {
-                      return <li key={index}>{spawn}</li>
-                    })}
-                  </ol>
-                </Box>
-              </>
-            :
-              ""
-            }
-          </>
+        {regSpawnList[roomDisplay] !== null ?
+          <ol type='number'>
+            {regSpawnList[roomDisplay].map((spawn, index) => {
+              return <li key={index}>{spawn}</li>
+            })}
+          </ol>
         :
-          <>
-            <Typography variant='h5'>Main Options</Typography>
-            <Box border='1px solid black'>
-              <Stack spacing={1} padding={2}>
-                {props.level.specials.map((special, index) => {
-                  return <Typography variant='body1' key={index}>{special}</Typography>
-                })}
-              </Stack>
-            </Box>
-          </>
+          ""
         }
-      </>
-    )
-  }
-
-  const CheckSpawnNothing = (properties) => {
-    return (
-      <>
-        {properties.altDisplay === 'false' ?
-        <>
-          {regSpawns.length !== 0 ?
-            <>
-              <br />
-              <Typography variant='h5'>Regular spawns(blue):</Typography>
-              <Box border='1px solid black'>
-                <br />
-                <ol type='1'>
-                  {regSpawns.map((spawn, index) => {
-                    return <li key={index}>{spawn} </li>
-                  })}
-                </ol>
-              </Box>
-            </>
-          :
-            ""
-          }
-        </>
-      :
-        <>
-          <Typography variant='h1'>Ain't shit here</Typography>
-        </>
-      }
       </>
     )
   }
 
   const DisplayContent = () => {
-    if(props.level.genType[0] === 'None') {
-      //Put all content here.
-      //Check for each specialty
-      //games, shop, playerLocation, map, items(for inside building. This doesn't need to be pulled or anything, we have it.)
-      return (
-        <>
-          <Button variant='outlined' onClick={handleHideMap}>Hide Content</Button>
-          <CheckSpawnSpecial altDisplay='true' />
-          {props.level.games === undefined ? 
-            ""
-          :
-            <>
-              <br />
-              <Box border='1px solid black' padding={2}>
-                <Typography variant='h5'>Casino games</Typography>
-                {props.level.games.map((game, index) => {
-                  return (
-                    <div key={index}>
-                      <Typography variant='body1'>{index + 1}: {game}</Typography>
-                      <br />
-                    </div>
-                  )
-                })}
-              </Box>
-            </>
-          }
-          {props.level.shop !== undefined ? 
-            <>
-              <br />
-              <Typography variant='h5'>Shop</Typography>
-              <img src={CasinoShop} />
-            </> 
-          : 
-            ""
-          }
-          {props.level.playerLocation !== undefined ?
-            <Stack direction='row' spacing={2}>
-              {/*The inputs don't do anything yet. For now manual updating is fine.*/}
-              <Stack>
-                <Typography variant='body1'>North: {props.level.playerLocation[0]}</Typography>
-                <Input type='number' placeholder='Update North'></Input>
-              </Stack>
-              <Stack>
-                <Typography variant='body1'>South: {props.level.playerLocation[1]}</Typography>
-                <Input type='number' placeholder='Update South'></Input>
-              </Stack>
-              <Stack>
-                <Typography variant='body1'>East: {props.level.playerLocation[2]}</Typography>
-                <Input type='number' placeholder='Update East'></Input>
-              </Stack>
-              <Stack>
-                <Typography variant='body1'>West: {props.level.playerLocation[3]}</Typography>
-                <Input type='number' placeholder='Update West'></Input>
-              </Stack>
-            </Stack>
-          :
-            ""
-          }
-          {props.level.cityMap !== undefined ?
-            "Display city map here."
-          :
-            ""
-          }
-          {props.level.name === 'The Endless City' ? <CheckSpawnItem altDisplay='true' /> : ""}
-        </>
-      )
-    }
-
     return (
       <>
-        <Button variant='outlined' onClick={handleHideMap}>Hide Content</Button>
-        <Button onClick={() => {setSpawn(Math.round(Math.random() * 100) + 1); setMapRendered(false);}} variant='outlined'>Generate new map</Button>
-        {spawnType !== null ?
-        <>
-          {!mapRendered ?
+        <Button variant='outlined' onClick={() => {setShowMap(false);}}>Hide Content</Button>
+        <Button onClick={() => {setMapRendered(false);}} variant='outlined'>Generate new map</Button>
+          {!mapRendered || currMap.length === 0 ?
             createMap()
           :
             <>
-              {currMap}
+              {currMap /* Change the map printing to be a 3x3 grid. */}
+              <FormControl fullWidth>
+                <InputLabel id="room">Room</InputLabel>
+                <Select
+                  labelId="room"
+                  id="roomSelect"
+                  value={roomDisplay}
+                  label="Room #"
+                  onChange={(e) => {setRoomDisplay(e.target.value)}}
+                >
+                  <MenuItem value={0}>Room 1</MenuItem>
+                  <MenuItem value={1}>Room 2</MenuItem>
+                  <MenuItem value={2}>Room 3</MenuItem>
+                  <MenuItem value={3}>Room 4</MenuItem>
+                  <MenuItem value={4}>Room 5</MenuItem>
+                  <MenuItem value={5}>Room 6</MenuItem>
+                  <MenuItem value={6}>Room 7</MenuItem>
+                  <MenuItem value={7}>Room 8</MenuItem>
+                  <MenuItem value={8}>Room 9</MenuItem>
+                </Select>
+              </FormControl>
+
+              <DisplaySpawns />
             </>
           }
-        </>
-        : 
-          ""
-        }
       </>
     )
+  }
+
+  const handleShowMap = () => {
+    if(initalize) {
+      setInitialize(false);
+    }
+    setShowMap(true);
   }
 
   return (

@@ -135,6 +135,7 @@ export default function Items() {
               locations={item.locations}
               description={item.description}
               table={item.table}
+              display="normal"
             />: ""
           )
         })}
