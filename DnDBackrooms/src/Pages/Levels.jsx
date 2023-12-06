@@ -3,7 +3,7 @@ import db from '../Components/firebase';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { DataGrid } from '@mui/x-data-grid';
 import BackroomsLevel from '../Components/BackroomsLevel';
-import { Container } from '@mui/material';
+import { Box, Container } from '@mui/material';
 
 export default function Levels() {
   const [levels, setLevels] = useState([]);
@@ -96,66 +96,66 @@ export default function Levels() {
     }
   }, [currLevel])
 
-  //Data Grids
-  const CreateLevelsGrid = () => {
-    const dataGridCols = [
-        { field: 'id', headerName: 'ID', width: 90},
-        { 
-          field: 'name', 
-          headerName: 'Level Name', 
-          width: 250 
-        },
-        {
-          field: 'levelNum',
-          headerName: 'Level number',
-          width: 250,
-        },
-        {
-          field: 'time',
-          headerName: 'Time flow',
-          width: 250,
-        },
-        {
-          field: 'wifi',
-          headerName: 'Wi-Fi strength',
-          width: 250,
-        },
-        {
-          field: 'sanityDrainClass',
-          headerName: 'Sanity Drain Class',
-          width: 250,
-        },
-        {
-          field: 'sanityDrainType',
-          headerName: 'Sanity Drain Type',
-          width: 250,
-        },
-        {
-          field: 'survivalDifficultyClass',
-          headerName: 'Survival Difficulty Class',
-          width: 250,
-        },
-    ];
-    
-    let count = 0;
-    const dataGridRows = [];
-  
-    levels.map(level => {
-      count++;
-      const row = {
-        id: count,
-        name: level.name,
-        levelNum: level.levelNum,
-        time: level.time,
-        wifi: level.wifi,
-        sanityDrainClass: level.sanityDrainClass,
-        sanityDrainType: level.sanityDrainType,
-        survivalDifficultyClass: level.survivalDifficultyClass,
-      }
-      dataGridRows.push(row);
-    })
+  const dataGridCols = [
+    { field: 'id', headerName: 'ID', flex: 0},
+    { 
+      field: 'name', 
+      headerName: 'Level Name', 
+      flex: 1
+    },
+    {
+      field: 'levelNum',
+      headerName: 'Level number',
+      flex: 1
+    },
+    {
+      field: 'time',
+      headerName: 'Time flow',
+      flex: 1
+    },
+    {
+      field: 'wifi',
+      headerName: 'Wi-Fi strength',
+      flex: 1
+    },
+    {
+      field: 'sanityDrainClass',
+      headerName: 'Sanity Drain Class',
+      flex: 1
+    },
+    {
+      field: 'sanityDrainType',
+      headerName: 'Sanity Drain Type',
+      flex: 1
+    },
+    {
+      field: 'survivalDifficultyClass',
+      headerName: 'Survival Difficulty Class',
+      flex: 1
+    },
+  ];
 
-    return (
+  let count = 0;
+  const dataGridRows = [];
+
+  levels.map(level => {
+    count++;
+    const row = {
+      id: count,
+      name: level.name,
+      levelNum: level.levelNum,
+      time: level.time,
+      wifi: level.wifi,
+      sanityDrainClass: level.sanityDrainClass,
+      sanityDrainType: level.sanityDrainType,
+      survivalDifficultyClass: level.survivalDifficultyClass,
+    }
+    dataGridRows.push(row);
+  })
+
+  return (
+    <>
+      <Box paddingLeft={5} paddingRight={5}>
         <DataGrid
           onRowClick={(dataGridRows) => {setCurrLevel(dataGridRows.row.name)}}
           rows={dataGridRows}
@@ -175,23 +175,19 @@ export default function Levels() {
           pageSizeOptions={[10]}
           disableRowSelectionOnClick
         />
-    );
-  }
 
-  return (
-    <Container>
-      <CreateLevelsGrid />
-      {levels.map((level, index) => {
-        return (
-          level.name === currLevel ? 
-          <BackroomsLevel 
-            key={index}
-            items={filteredItems}
-            entities={filteredEntities}
-            level={level}
-          />: ""
-        )
-      })}
-    </Container>
+        {levels.map((level, index) => {
+          return (
+            level.name === currLevel ? 
+            <BackroomsLevel 
+              key={index}
+              items={filteredItems}
+              entities={filteredEntities}
+              level={level}
+            />: ""
+          )
+        })}
+      </Box>
+    </>
   )
 }

@@ -2,7 +2,7 @@ import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import db from '../Components/firebase'
 import React, { useEffect, useState } from 'react'
 import Item from '../Components/BackroomsItem';
-import { Container, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Container, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
 export default function Items() {
@@ -37,94 +37,87 @@ export default function Items() {
     ["One-of-a-kind", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"],
   ]
 
-  const CreateDataGrid = () => {
-    const dataGridCols = [
-      { field: 'id', headerName: 'ID', width: 90},
-      { 
-        field: 'name', 
-        headerName: 'Item Name', 
-        width: 250 
-      },
-      {
-        field: 'num',
-        headerName: 'Item number',
-        width: 250,
-      },
-      {
-        field: 'rarity',
-        headerName: 'Rarity',
-        width: 250,
-        editable: true,
-      },
-      {
-        field: 'price',
-        headerName: 'Artifact Price',
-        width: 250,
-        editable: true,
-      },
-    ];
+  const dataGridCols = [
+    { field: 'id', headerName: 'ID', flex: 0},
+    { 
+      field: 'name', 
+      headerName: 'Item Name', 
+      flex: 1
+    },
+    {
+      field: 'num',
+      headerName: 'Item number',
+      flex: 1
+    },
+    {
+      field: 'rarity',
+      headerName: 'Rarity',
+      flex: 1
+    },
+    {
+      field: 'price',
+      headerName: 'Artifact Price',
+      flex: 1
+    },
+  ];
 
-    let count = 0;
-    let arPrice = 0;
-    const dataGridRows = [];
+  let count = 0;
+  let arPrice = 0;
+  const dataGridRows = [];
 
-    items.map(item => {
-      {item.artifactPrice === -1 ? arPrice = "N/A": arPrice = item.artifactPrice}
-      count++;
-      const row = {
-        id: count,
-        name: item.name,
-        num: item.itemNum,
-        rarity: item.rarity,
-        price: arPrice,
-      }
-      dataGridRows.push(row);
-    })
-
-    return (
-      <DataGrid
-        onRowClick={(dataGridRows, event) => {
-          setCurrItem(dataGridRows.row.name);
-        }}
-        rows={dataGridRows}
-        columns={dataGridCols}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 10,
-            }
-          },
-          columns: {
-            columnVisibilityModel: {
-              id: false
-            }
-          }
-        }}
-        pageSizeOptions={[10]}
-        disableRowSelectionOnClick
-      />
-    );
-  }
+  items.map(item => {
+    {item.artifactPrice === -1 ? arPrice = "N/A": arPrice = item.artifactPrice}
+    count++;
+    const row = {
+      id: count,
+      name: item.name,
+      num: item.itemNum,
+      rarity: item.rarity,
+      price: arPrice,
+    }
+    dataGridRows.push(row);
+  })
 
   return (
-    <Container className='items'>
-      <div className='generaliteminfo'>
-        <Typography variant='h1'>Item Info and Pricing</Typography>
-        <ul>
-          <li>Almond water is worth the equivalent of 500 gold in D&D.</li>
-          <li>Magic item prices work per regular D&D rules such as a rare is 2,000 to 20,000 gold, which translates to 4 to 40 almond water.</li>
-          <li>Almond water is the only unbuyable resource within the game.</li>
-        </ul>
-        <ItemPrices rows={rows}/>
-        <br />
-        <Typography variant='caption' fontWeight='bold'>Prices may vary.</Typography>
-        <Divider />
-      </div>
+    <Box paddingLeft={5} paddingRight={5}>
+      <Typography variant='h1'>Item Info and Pricing</Typography>
+      <ul>
+        <li>Almond water is worth the equivalent of 500 gold in D&D.</li>
+        <li>Magic item prices work per regular D&D rules such as a rare is 2,000 to 20,000 gold, which translates to 4 to 40 almond water.</li>
+        <li>Almond water is the only unbuyable resource within the game.</li>
+      </ul>
+      <ItemPrices rows={rows}/>
       <br />
-      <div className='iteminfo'>
+      <Typography variant='caption' fontWeight='bold'>Prices may vary.</Typography>
+      <Divider />
+
+      <br />
+      <Box>
         <Typography variant='h2'>Items:</Typography>
         <Typography variant='body1'>Items of item number 0 are custom and/or magical.</Typography>
-        <CreateDataGrid />
+
+        <DataGrid
+          onRowClick={(dataGridRows, event) => {
+            setCurrItem(dataGridRows.row.name);
+          }}
+          rows={dataGridRows}
+          columns={dataGridCols}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 10,
+              }
+            },
+            columns: {
+              columnVisibilityModel: {
+                id: false
+              }
+            }
+          }}
+          pageSizeOptions={[10]}
+          disableRowSelectionOnClick
+        />
+
         {items.map((item, index) => {
           return (
             item.name === currItem ? 
@@ -139,8 +132,8 @@ export default function Items() {
             />: ""
           )
         })}
-      </div>
-    </Container>
+      </Box>
+    </Box>
   )
 }
 

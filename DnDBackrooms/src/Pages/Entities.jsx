@@ -1,4 +1,4 @@
-import { Container } from '@mui/material'
+import { Box, Container } from '@mui/material'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react'
 import db from '../Components/firebase';
@@ -27,87 +27,82 @@ export default function Entities() {
       }
     }, [])
     
-    const CreateDataGrid = () => {
-      const dataGridCols = [
-          { field: 'id', headerName: 'ID', width: 90},
-          { 
-            field: 'name', 
-            headerName: 'Entity Name', 
-            width: 250 
-          },
-          {
-            field: 'num',
-            headerName: 'Entity number',
-            width: 250,
-          },
-          {
-            field: 'cr',
-            headerName: 'Challenge Rating',
-            width: 250,
-          },
-          {
-            field: 'location',
-            headerName: 'Spawn Locations',
-            width: 250,
-          }
-      ];
-      
-      let count = 0;
-      let cr = "";
-      const dataGridRows = [];
-      let spawnLocations = "";
+    const dataGridCols = [
+      { field: 'id', headerName: 'ID', flex: 0},
+      { 
+        field: 'name', 
+        headerName: 'Entity Name', 
+        flex: 1
+      },
+      {
+        field: 'num',
+        headerName: 'Entity number',
+        flex: 1
+      },
+      {
+        field: 'cr',
+        headerName: 'Challenge Rating',
+        flex: 1
+      },
+      {
+        field: 'location',
+        headerName: 'Spawn Locations',
+        flex: 1
+      }
+  ];
+  
+  let count = 0;
+  let cr = "";
+  const dataGridRows = [];
+  let spawnLocations = "";
 
-      entities.map(entity => {
-        {entity.challengeRating === 0 ? cr = "N/A": cr = entity.challengeRating}
-        {entity.locations.map((location, index) => {
-          if(index === 0) {
-            spawnLocations = location;
-          }
-          else {
-            spawnLocations = spawnLocations + ", " + location;
-          }
-        })}
+  entities.map(entity => {
+    {entity.challengeRating === 0 ? cr = "N/A": cr = entity.challengeRating}
+    {entity.locations.map((location, index) => {
+      if(index === 0) {
+        spawnLocations = location;
+      }
+      else {
+        spawnLocations = spawnLocations + ", " + location;
+      }
+    })}
 
-        count++;
-        const row = {
-          id: count,
-          name: entity.name,
-          num: entity.entityNum,
-          cr: cr,
-          location: spawnLocations
-        }
-        dataGridRows.push(row);
-        spawnLocations = "";
-      })
-
-      return (
-          <DataGrid
-            onRowClick={(dataGridRows) => {
-              setCurrEntity(dataGridRows.row.name);
-            }}
-            rows={dataGridRows}
-            columns={dataGridCols}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 10,
-                }
-              },
-              columns: {
-                columnVisibilityModel: {
-                  id: false
-                }
-              }
-            }}
-            pageSizeOptions={[10]}
-            disableRowSelectionOnClick
-          />
-      );
+    count++;
+    const row = {
+      id: count,
+      name: entity.name,
+      num: entity.entityNum,
+      cr: cr,
+      location: spawnLocations
     }
+    dataGridRows.push(row);
+    spawnLocations = "";
+  })
 
     return (
-      <Container>
-        <CreateDataGrid />
+      <Box paddingLeft={5} paddingRight={5}>
+        <DataGrid
+          onRowClick={(dataGridRows) => {
+            setCurrEntity(dataGridRows.row.name);
+          }}
+          rows={dataGridRows}
+          columns={dataGridCols}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 10,
+              }
+            },
+            columns: {
+              columnVisibilityModel: {
+                id: false
+              }
+            }
+          }}
+          pageSizeOptions={[10]}
+          disableRowSelectionOnClick
+        />
+        
         {entities.map((entity, index) => {
           return (
             entity.name === currEntity ? 
@@ -123,6 +118,6 @@ export default function Entities() {
             />: ""
           )
         })}
-      </Container>
+      </Box>
     )
 }

@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, Input, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import { Box, Button, Container, FormControl, Grid, Input, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import BackroomsItem from './BackroomsItem';
 import BackroomsEntities from './BackroomsEntities';
@@ -408,17 +408,17 @@ export default function BackroomsLevel(props) {
                   {row.map((cell, index) => {
                     switch(cell) {
                       case 0:
-                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index} onClick={swapColor}>{cell}</TableCell>
                       case 1:
                         return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index}>{cell}</TableCell>
                       case 2:
-                        return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index} onClick={swapColor}>{cell}</TableCell>
                       case 3:
-                        return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index} onClick={swapColor}>{cell}</TableCell>
                       case 4:
-                        return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index} onClick={swapColor}>{cell}</TableCell>
                       default:
-                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index}>{cell - 4}</TableCell>
+                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index} onClick={swapColor}>{cell - 4}</TableCell>
                     }
                   })}
                 </TableRow>
@@ -433,6 +433,49 @@ export default function BackroomsLevel(props) {
     setSpawnList(spawnedThings);
     setRegSpawnList(regSpawnedThings);
     setCurrMap(tables);
+  }
+
+  const swapColor = (e) => {
+    //Combat.
+    if(e.target.style.backgroundColor === 'red') {
+      e.target.style.backgroundColor = 'white';
+      e.target.style.color = 'white';
+      return
+    }
+
+    //Item
+    if(e.target.style.backgroundColor === 'green') {
+      e.target.style.backgroundColor = 'white';
+      e.target.style.color = 'white';
+      return
+    }
+
+    //Special
+    if(e.target.style.backgroundColor === 'orange') {
+      e.target.style.backgroundColor = 'white';
+      e.target.style.color = 'white';
+      return
+    }
+
+    //Reg item
+    if(e.target.style.backgroundColor === 'blue') {
+      e.target.style.backgroundColor = 'white';
+      e.target.style.color = 'white';
+      return
+    }
+
+    if(e.target.style.backgroundColor === 'white') {
+      e.target.style.backgroundColor = 'teal';
+      e.target.style.color = 'teal';
+    }
+    else if(e.target.style.backgroundColor === 'teal') {
+      e.target.style.backgroundColor = 'pink';
+      e.target.style.color = 'pink';
+    }
+    else {
+      e.target.style.backgroundColor = 'white';
+      e.target.style.color = 'white';
+    }
   }
 
   const getItemRarity = () => {
@@ -555,16 +598,39 @@ export default function BackroomsLevel(props) {
     )
   }
 
+  const DisplayMaps = () => {
+    return (
+      <Stack>
+        <Stack direction='row'>
+          {currMap[0]}
+          {currMap[1]}
+          {currMap[2]}
+        </Stack>
+        <Stack direction='row'>
+          {currMap[3]}
+          {currMap[4]}
+          {currMap[5]}
+        </Stack>
+        <Stack direction='row'>
+          {currMap[6]}
+          {currMap[7]}
+          {currMap[8]}
+        </Stack>
+      </Stack>
+    )
+  }
+
   const DisplayContent = () => {
     return (
-      <>
+      <Box>
         <Button variant='outlined' onClick={() => {setShowMap(false);}}>Hide Content</Button>
         <Button onClick={() => {setMapRendered(false);}} variant='outlined'>Generate new map</Button>
           {!mapRendered || currMap.length === 0 ?
             createMap()
           :
             <>
-              {currMap /* Change the map printing to be a 3x3 grid. */}
+              <DisplayMaps />
+
               <FormControl fullWidth>
                 <InputLabel id="room">Room</InputLabel>
                 <Select
@@ -589,7 +655,7 @@ export default function BackroomsLevel(props) {
               <DisplaySpawns />
             </>
           }
-      </>
+      </Box>
     )
   }
 

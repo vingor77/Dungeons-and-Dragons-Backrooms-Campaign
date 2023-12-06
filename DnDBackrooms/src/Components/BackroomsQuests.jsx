@@ -5,80 +5,75 @@ import { DataGrid } from '@mui/x-data-grid';
 export default function BackroomsQuests(props) {
   const [currQuest, setCurrQuest] = useState("");
 
-  const CreateUnlockedGrid = () => {
-    const dataGridCols = [
-      { field: 'id', headerName: 'ID', width: 50},
-      { 
-        field: 'name', 
-        headerName: 'Quest Name', 
-        width: 200
-      },
-      {
-        field: 'outpost',
-        headerName: 'Acquired from',
-        width: 200,
-      },
-      {
-        field: 'questGiver',
-        headerName: 'Quest giver',
-        width: 200,
-      },
-      {
-        field: 'type',
-        headerName: 'Quest Type',
-        width: 200
-      },
-      {
-        field: 'completed',
-        headerName: 'Completed',
-        width: 200,
-      },
-    ];
-  
-    let count = 0;
-    const dataGridRows = [];
+  const dataGridCols = [
+    { field: 'id', headerName: 'ID', flex: 0},
+    { 
+      field: 'name', 
+      headerName: 'Quest Name', 
+      flex: 1
+    },
+    {
+      field: 'outpost',
+      headerName: 'Acquired from',
+      flex: 1
+    },
+    {
+      field: 'questGiver',
+      headerName: 'Quest giver',
+      flex: 1
+    },
+    {
+      field: 'type',
+      headerName: 'Quest Type',
+      flex: 1
+    },
+    {
+      field: 'completed',
+      headerName: 'Completed',
+      flex: 1
+    },
+  ];
 
-    props.quests.map(quest => {
-      count++;
-      const row = {
-        id: count,
-        name : quest.name,
-        outpost: quest.outpost,
-        questGiver: quest.questGiver,
-        type: quest.type,
-        completed: quest.completed ? "Yes": "No",
-      }
-      dataGridRows.push(row);
-    })
+  let count = 0;
+  const dataGridRows = [];
 
-    return (
-      <DataGrid
-        onRowClick={(dataGridRows) => {setCurrQuest(dataGridRows.row.name)}}
-        rows={dataGridRows}
-        columns={dataGridCols}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            }
-          },
-          columns: {
-            columnVisibilityModel: {
-              id: false
-            }
-          }
-        }}
-        pageSizeOptions={[5]}
-        disableRowSelectionOnClick
-      />
-    )
-  }
+  props.quests.map(quest => {
+    count++;
+    const row = {
+      id: count,
+      name : quest.name,
+      outpost: quest.outpost,
+      questGiver: quest.questGiver,
+      type: quest.type,
+      completed: quest.completed ? "Yes": "No",
+    }
+    dataGridRows.push(row);
+  })
 
   return (
     <div>
       {props.quests.length > 0 ?
         <>
-          <CreateUnlockedGrid />
+          <DataGrid
+            onRowClick={(dataGridRows) => {setCurrQuest(dataGridRows.row.name)}}
+            rows={dataGridRows}
+            columns={dataGridCols}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 5,
+                }
+              },
+              columns: {
+                columnVisibilityModel: {
+                  id: false
+                }
+              }
+            }}
+            pageSizeOptions={[5]}
+            disableRowSelectionOnClick
+          />
+
           {props.quests.map((quest, index) => {
             return (
               <div key={index}>

@@ -39,34 +39,37 @@ export default function Avatars() {
     )
   }
 
-  const CreateDataGrid = () => {
-    const dataGridCols = [
-        { field: 'id', headerName: 'ID', width: 90},
-        { 
-          field: 'name',
-          headerName: 'Name',
-          width: 250 
-        },
-        {
-          field: 'status',
-          headerName: 'Status',
-          width: 250,
-        },
-        {
-          field: 'level',
-          headerName: 'Primary level',
-          width: 250,
-        },
-        {
-          field: 'god',
-          headerName: 'Avatar of',
-          width: 250,
-        },
-    ];
-    
-    let count = 0;
-    const dataGridRows = [];
-  
+  const dataGridCols = [
+    { field: 'id', headerName: 'ID', flex: 0},
+    { 
+      field: 'name',
+      headerName: 'Name',
+      flex: 1
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      flex: 1
+    },
+    {
+      field: 'level',
+      headerName: 'Primary level',
+      flex: 1
+    },
+    {
+      field: 'god',
+      headerName: 'Avatar of',
+      flex: 1
+    },
+  ];
+
+  let count = 0;
+  const dataGridRows = [];
+
+  if(avatars === null) {
+    getAvatars();
+  }
+  else {
     avatars.map(avatar => {
       count++;
       const row = {
@@ -78,8 +81,30 @@ export default function Avatars() {
       }
       dataGridRows.push(row);
     })
+  }
 
+  const ShowAvatarInfo = (props) => {
     return (
+      <>
+        <Typography variant='h2'>{props.avatar.name}, Avatar of {props.avatar.god}</Typography>
+        <Typography variant='h5'>Quote</Typography>
+        <Divider />
+        <br />
+        <Typography variant='body1'>{props.avatar.quote}</Typography>
+        <br />
+        <Typography variant='h5'>Overview</Typography>
+        <Divider />
+        <br />
+        <Typography variant='body1'>{props.avatar.overview}</Typography>
+      </>
+    )
+  }
+
+  return (
+    <Box paddingLeft={5} paddingRight={5}>
+      <Overview />
+      {avatars === null ? getAvatars() : 
+      <>
         <DataGrid
           onRowClick={(dataGridRows) => {
             setCurrAvatar(dataGridRows.row.name);
@@ -101,32 +126,7 @@ export default function Avatars() {
           pageSizeOptions={[10]}
           disableRowSelectionOnClick
         />
-    );
-  }
-
-  const ShowAvatarInfo = (props) => {
-    return (
-      <>
-        <Typography variant='h2'>{props.avatar.name}, avatar of {props.avatar.god}</Typography>
-        <Typography variant='h5'>Quote</Typography>
-        <Divider />
-        <br />
-        <Typography variant='body1'>{props.avatar.quote}</Typography>
-        <br />
-        <Typography variant='h5'>Overview</Typography>
-        <Divider />
-        <br />
-        <Typography variant='body1'>{props.avatar.overview}</Typography>
-      </>
-    )
-  }
-
-  return (
-    <Container>
-      <Overview />
-      {avatars === null ? getAvatars() : 
-      <>
-        <CreateDataGrid />
+        
         {avatars.map((avatar, index) => {
           return (
             <div key={index}>
@@ -141,6 +141,6 @@ export default function Avatars() {
         })}
       </>
       }
-    </Container>
+    </Box>
   )
 }

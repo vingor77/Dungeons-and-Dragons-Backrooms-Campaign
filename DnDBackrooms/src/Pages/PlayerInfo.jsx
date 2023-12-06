@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Typography } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 
 export default function GeneralInfo() {
   const DisplayInfo = () => {
@@ -100,8 +100,8 @@ export default function GeneralInfo() {
   }
 
   return (
-    <Container>
+    <Box paddingLeft={5} paddingRight={5}>
       <DisplayInfo />
-    </Container>
+    </Box>
   );
 }

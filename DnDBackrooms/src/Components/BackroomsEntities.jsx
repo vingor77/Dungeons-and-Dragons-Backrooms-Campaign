@@ -46,7 +46,7 @@ export default function BackroomsEntities(props) {
     }
 
     return (
-      <Box bgcolor='#fdf1dc' width='50%' padding={2} borderTop='5px solid orange' borderBottom='5px solid orange'>
+      <Box bgcolor='#fdf1dc' maxWidth='25%' minWidth={550} padding={2} borderTop='5px solid orange' borderBottom='5px solid orange'>
         <Typography variant='h2'>{creatures[entity].Name}</Typography>
         <Typography variant='body1'><i>{creatures[entity].Type}</i></Typography>
         <br />
@@ -270,31 +270,15 @@ export default function BackroomsEntities(props) {
           {creatures === null ? getCreatures() : ""}
           {props.challengeRating !== 0 && creatures !== null ?
             <>
-              <Typography variant='h5'>Spawn locations:</Typography>
-              <ul>
-                {props.locations.map((element, index) => {
-                  return (
-                    <li key={index}>{element}</li>
-                  );
-                })}
-              </ul>
-              <Typography variant='h5'>Description: <Typography variant='body1' display='inline'>{props.description}</Typography></Typography>
+              <Typography variant='h5' display='inline'>{props.description}</Typography>
               <br />
-              {props.drop !== undefined ? <Typography variant='h5'>Drops: <Typography variant='body1' display='inline'>{props.drop}</Typography></Typography> : ""}
+              <Divider />
+              {props.drop !== undefined ? <Typography variant='h5'><b>Drops:</b> {props.drop}</Typography> : ""}
               <StatBlock />
             </>
           :
             <>
-              <Typography variant='h2'>{props.name}</Typography>
-              <Typography variant='h5'>Spawn locations:</Typography>
-              <ul>
-                {props.locations.map((element, index) => {
-                  return (
-                    <li key={index}>{element}</li>
-                  );
-                })}
-              </ul>
-              <Typography variant='h5'>Description: <Typography variant='body1' display='inline'>{props.description}</Typography></Typography>
+              <Typography variant='h5'><b>{props.name}:</b> <Typography variant='body1' display='inline'>{props.description}</Typography></Typography>
               <br />
               {props.drop !== undefined ? <Typography variant='h5'>Drops: <Typography variant='body1' display='inline'>{props.drop}</Typography></Typography> : ""}
             </>

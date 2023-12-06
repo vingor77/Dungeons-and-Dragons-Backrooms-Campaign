@@ -1,4 +1,4 @@
-import { Button, Container, Typography } from '@mui/material'
+import { Box, Button, Container, Typography } from '@mui/material'
 import React from 'react'
 import { doc, setDoc } from 'firebase/firestore';
 import db from '../Components/firebase';
@@ -73,7 +73,7 @@ export default function Home() {
   */
 
   return (
-    <Container>
+    <Box paddingLeft={5} paddingRight={5}>
       {data.length === 0 ?
         <Button variant='outlined'>This aint do shit</Button>
       :
@@ -85,6 +85,6 @@ export default function Home() {
         This application allows me to do that, utilizing firebase. There is no logins or requirements to use it. If you are a player, you can look in the general and player informations.
         If you are a DM, you can look at everything.
       </Typography>
-    </Container>
+    </Box>
   )
 }

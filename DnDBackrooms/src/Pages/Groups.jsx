@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import db from '../Components/firebase';
-import { Button, Container, Divider, Typography } from '@mui/material';
+import { Box, Button, Container, Divider, Typography } from '@mui/material';
 import { collection, onSnapshot } from 'firebase/firestore';
 import BackroomsGroup from '../Components/BackroomsGroup';
 
@@ -25,13 +25,13 @@ export default function Groups() {
   }, [])
 
   return (
-    <Container>
+    <Box paddingLeft={5} paddingRight={5}>
       {groups.map((group, index) => {
         return (
           <Button onClick={() => setCurrGroup(group)} key={index} variant='outlined'>{group.name}</Button>
         )
       })}
       <BackroomsGroup currGroup={currGroup}/>
-    </Container>
+    </Box>
   )
 }

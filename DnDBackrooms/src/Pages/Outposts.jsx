@@ -1,4 +1,4 @@
-import { Container } from '@mui/material'
+import { Box, Container } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { collection, onSnapshot } from 'firebase/firestore'
 import db, { storage } from '../Components/firebase'
@@ -41,41 +41,41 @@ export default function Outposts() {
 
   }, [currOutpost])
 
-  const CreateOutpostGrid = () => {
-    const dataGridCols = [
-      { field: 'id', headerName: 'ID', width: 90},
-      { 
-        field: 'name', 
-        headerName: 'Outpost Name', 
-        width: 250 
-      },
-      {
-        field: 'group',
-        headerName: 'Belongs to',
-        width: 250,
-      },
-      {
-        field: 'location',
-        headerName: 'Location',
-        width: 250,
-      },
-    ];
-  
-    let count = 0;
-    const dataGridRows = [];
+  const dataGridCols = [
+    { field: 'id', headerName: 'ID', flex: 0},
+    { 
+      field: 'name', 
+      headerName: 'Outpost Name', 
+      flex: 1
+    },
+    {
+      field: 'group',
+      headerName: 'Belongs to',
+      flex: 1
+    },
+    {
+      field: 'location',
+      headerName: 'Location',
+      flex: 1
+    },
+  ];
 
-    outposts.map(outpost => {
-      count++;
-      const row = {
-        id: count,
-        name: outpost.name,
-        group: outpost.group,
-        location: outpost.location,
-      }
-      dataGridRows.push(row);
-    })
+  let count = 0;
+  const dataGridRows = [];
 
-    return (
+  outposts.map(outpost => {
+    count++;
+    const row = {
+      id: count,
+      name: outpost.name,
+      group: outpost.group,
+      location: outpost.location,
+    }
+    dataGridRows.push(row);
+  })
+
+  return (
+    <Box paddingLeft={5} paddingRight={5}>
       <DataGrid
         onRowClick={(dataGridRows) => setCurrOutpost(dataGridRows.row.name)}
         rows={dataGridRows}
@@ -95,17 +95,12 @@ export default function Outposts() {
         pageSizeOptions={[5]}
         disableRowSelectionOnClick
       />
-    )
-  }
-
-  return (
-    <Container>
-      <CreateOutpostGrid />
-        {outposts.map((outpost, index) => {
-          if(outpost.name === currOutpost) {
-            return <BackroomsOutposts outpost={outpost} shopImages={shopImages} key={index}/>
-          }
-        })}
-    </Container>
+      
+      {outposts.map((outpost, index) => {
+        if(outpost.name === currOutpost) {
+          return <BackroomsOutposts outpost={outpost} shopImages={shopImages} key={index}/>
+        }
+      })}
+    </Box>
   )
 }

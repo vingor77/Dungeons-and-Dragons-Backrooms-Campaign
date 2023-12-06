@@ -272,7 +272,7 @@ export default function Functions() {
   }
 
   return (
-    <Container>
+    <Box paddingLeft={5} paddingRight={5}>
       <Button variant='outlined' onClick={() => setShownFunctions("wifiDocGen")}>Wi-Fi document generator</Button>
       <Button variant='outlined' onClick={() => setShownFunctions("timers")}>Timers</Button>
       <Divider />
@@ -440,6 +440,6 @@ export default function Functions() {
         </>
         :""
       }
-    </Container>
+    </Box>
   )
 }

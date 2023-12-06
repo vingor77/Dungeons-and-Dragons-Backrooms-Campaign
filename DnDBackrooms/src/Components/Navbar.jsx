@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { AppBar, Stack, Toolbar, Link, Container, Menu, Button, MenuItem } from '@mui/material';
+import { AppBar, Stack, Toolbar, Link, Container, Menu, Button, MenuItem, Box } from '@mui/material';
 
 export default function Navbar() {
   const [open, setOpen] = useState(null);
@@ -7,7 +7,7 @@ export default function Navbar() {
   const [open3, setOpen3] = useState(null);
 
   return (
-    <Container>
+    <Box paddingLeft={5} paddingRight={5}>
       <AppBar position='sticky'>
         <Toolbar>
           <Stack direction='row' spacing={2} sx={{color: 'white'}}>
@@ -95,6 +95,6 @@ export default function Navbar() {
           </Stack>
         </Toolbar>
       </AppBar>
-    </Container>
+    </Box>
   )
 }

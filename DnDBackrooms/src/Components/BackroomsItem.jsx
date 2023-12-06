@@ -59,27 +59,17 @@ export default function BackroomsItem(props) {
     props.display === 'level' ?
       <Card>
         <CardContent>
-          <Typography variant='h2'>{props.name}</Typography>
-          <Typography variant='h5'>Description:</Typography>
-          <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
-          <SpecialItem style={{textAlign: 'center'}}/>
+          <Typography variant='h5'><b>{props.name}</b>: <Typography variant='body1' display='inline'>{props.description}</Typography></Typography>
+          <br />
+          <SpecialItem />
         </CardContent>
       </Card>
     :
       <Card>
         <CardContent>
-          <Typography variant='h2'>{props.name}</Typography>
-          <Typography variant='h5'>Spawn locations:</Typography>
-          <ul>
-            {props.locations.map((element, index) => {
-              return (
-                <li key={index}>{element}</li>
-              );
-            })}
-          </ul>
-          <Typography variant='h5'>Description:</Typography>
-          <Typography variant='body1' sx={{textIndent: 25}}>{props.description}</Typography>
-          <SpecialItem style={{textAlign: 'center'}}/>
+          <Typography variant='h5'><b>{props.name}</b>: <Typography variant='body1' display='inline'>{props.description}</Typography></Typography>
+          <br />
+          <SpecialItem />
         </CardContent>
       </Card>
   )

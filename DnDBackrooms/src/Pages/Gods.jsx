@@ -1,4 +1,4 @@
-import { Container, Divider, Typography } from '@mui/material'
+import { Box, Container, Divider, Typography } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid';
 import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useState } from 'react'
@@ -21,30 +21,33 @@ export default function Gods() {
 
     return () => unsub();
   }
-
-  const CreateDataGrid = () => {
-    const dataGridCols = [
-        { field: 'id', headerName: 'ID', width: 90},
-        { 
-          field: 'name',
-          headerName: 'Name',
-          width: 250
-        },
-        {
-          field: 'godOf',
-          headerName: 'God of',
-          width: 250,
-        },
-        {
-          field: 'avatarCount',
-          headerName: '# of avatars',
-          width: 250,
-        },
-    ];
-    
-    let count = 0;
-    const dataGridRows = [];
   
+  const dataGridCols = [
+    { field: 'id', headerName: 'ID', flex: 0},
+    { 
+      field: 'name',
+      headerName: 'Name',
+      flex: 1
+    },
+    {
+      field: 'godOf',
+      headerName: 'God of',
+      flex: 1
+    },
+    {
+      field: 'avatarCount',
+      headerName: '# of avatars',
+      flex: 1
+    },
+  ];
+
+  let count = 0;
+  const dataGridRows = [];
+
+  if(gods === null) {
+    getGods();
+  }
+  else {
     gods.map(god => {
       count++;
       const row = {
@@ -55,37 +58,34 @@ export default function Gods() {
       }
       dataGridRows.push(row);
     })
-
-    return (
-      <DataGrid
-        onRowClick={(dataGridRows) => {
-          setCurrGod(dataGridRows.row.name);
-        }}
-        rows={dataGridRows}
-        columns={dataGridCols}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            }
-          },
-          columns: {
-            columnVisibilityModel: {
-              id: false
-            }
-          }
-        }}
-        pageSizeOptions={[5]}
-        disableRowSelectionOnClick
-      />
-    );
   }
 
   return (
-    <Container>
+    <Box paddingLeft={5} paddingRight={5}>
       {gods === null ? getGods() : 
         <>
-          <CreateDataGrid />
+          <DataGrid
+            onRowClick={(dataGridRows) => {
+              setCurrGod(dataGridRows.row.name);
+            }}
+            rows={dataGridRows}
+            columns={dataGridCols}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 5,
+                }
+              },
+              columns: {
+                columnVisibilityModel: {
+                  id: false
+                }
+              }
+            }}
+            pageSizeOptions={[5]}
+            disableRowSelectionOnClick
+          />
+          
           {gods.map((god, index) => {
             return (
               <div key={index}>
@@ -107,6 +107,6 @@ export default function Gods() {
           })}
         </>
       }
-    </Container>
+    </Box>
   )
 }
