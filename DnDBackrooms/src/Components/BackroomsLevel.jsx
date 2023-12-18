@@ -600,23 +600,23 @@ export default function BackroomsLevel(props) {
 
   const DisplayMaps = () => {
     return (
-      <Stack>
-        <Stack direction='row'>
-          {currMap[0]}
-          {currMap[1]}
-          {currMap[2]}
-        </Stack>
-        <Stack direction='row'>
-          {currMap[3]}
-          {currMap[4]}
-          {currMap[5]}
-        </Stack>
-        <Stack direction='row'>
-          {currMap[6]}
-          {currMap[7]}
-          {currMap[8]}
-        </Stack>
-      </Stack>
+      <Grid container>
+        <Grid container>
+          <Grid item xs={4}>{currMap[0]}</Grid>
+          <Grid item xs={4}>{currMap[1]}</Grid>
+          <Grid item xs={4}>{currMap[2]}</Grid>
+        </Grid>
+        <Grid container>
+          <Grid item xs={4}>{currMap[3]}</Grid>
+          <Grid item xs={4}>{currMap[4]}</Grid>
+          <Grid item xs={4}>{currMap[5]}</Grid>
+        </Grid>
+        <Grid container>
+          <Grid item xs={4}>{currMap[6]}</Grid>
+          <Grid item xs={4}>{currMap[7]}</Grid>
+          <Grid item xs={4}>{currMap[8]}</Grid>
+        </Grid>
+      </Grid>
     )
   }
 

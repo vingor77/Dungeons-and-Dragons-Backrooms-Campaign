@@ -33,7 +33,7 @@ export default function Quests() {
   }, [quests])
 
   return (
-    <Box paddingLeft={5} paddingRight={5}>
+    <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
       <BackroomsQuests quests={unlock} />
     </Box>
   )

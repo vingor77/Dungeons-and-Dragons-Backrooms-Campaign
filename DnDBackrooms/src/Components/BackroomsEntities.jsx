@@ -271,8 +271,6 @@ export default function BackroomsEntities(props) {
           {props.challengeRating !== 0 && creatures !== null ?
             <>
               <Typography variant='h5' display='inline'>{props.description}</Typography>
-              <br />
-              <Divider />
               {props.drop !== undefined ? <Typography variant='h5'><b>Drops:</b> {props.drop}</Typography> : ""}
               <StatBlock />
             </>

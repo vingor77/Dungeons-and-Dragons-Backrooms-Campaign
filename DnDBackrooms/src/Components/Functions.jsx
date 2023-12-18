@@ -272,7 +272,7 @@ export default function Functions() {
   }
 
   return (
-    <Box paddingLeft={5} paddingRight={5}>
+    <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
       <Button variant='outlined' onClick={() => setShownFunctions("wifiDocGen")}>Wi-Fi document generator</Button>
       <Button variant='outlined' onClick={() => setShownFunctions("timers")}>Timers</Button>
       <Divider />

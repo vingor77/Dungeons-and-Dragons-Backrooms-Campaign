@@ -75,7 +75,7 @@ export default function Outposts() {
   })
 
   return (
-    <Box paddingLeft={5} paddingRight={5}>
+    <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
       <DataGrid
         onRowClick={(dataGridRows) => setCurrOutpost(dataGridRows.row.name)}
         rows={dataGridRows}

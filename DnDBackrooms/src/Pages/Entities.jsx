@@ -80,7 +80,7 @@ export default function Entities() {
   })
 
     return (
-      <Box paddingLeft={5} paddingRight={5}>
+      <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
         <DataGrid
           onRowClick={(dataGridRows) => {
             setCurrEntity(dataGridRows.row.name);
