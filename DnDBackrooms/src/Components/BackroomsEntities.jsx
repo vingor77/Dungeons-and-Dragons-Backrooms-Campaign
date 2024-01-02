@@ -170,6 +170,7 @@ export default function BackroomsEntities(props) {
           :<Typography variant='body1'><b>Languages</b> -</Typography>
         }
         <Typography variant='body1'><b>Challenge</b> {creatures[entity].Challenge}</Typography>
+        <Typography variant='body1'><b>Drops</b> {props.drop}</Typography>
         {creatures[entity].Traits.length > 0 ?
           <>
             <br />
@@ -240,27 +241,20 @@ export default function BackroomsEntities(props) {
   }
 
   if(props.displayType === 'Level') {
+    console.log(props.drop);
     return (
-      <Card>
-        <CardContent>
-          {creatures === null ? getCreatures() : ""}
-          {props.challengeRating !== 0 && creatures !== null ?
-            <>
-              {props.drop !== undefined ? <Typography variant='h5'>Drops: <Typography variant='body1' display='inline'>{props.drop}</Typography></Typography> : ""}
-              <br />
-              <StatBlock />
-            </>
-          :
-            <>
-              <Typography variant='h2'>{props.name}</Typography>
-              <br />
-              <Typography variant='h5'>Description: <Typography variant='body1' display='inline'>{props.description}</Typography></Typography>
-              <br />
-              {props.drop !== undefined ? <Typography variant='h5'>Drops: <Typography variant='body1' display='inline'>{props.drop}</Typography></Typography> : ""}
-            </>
-          }
-        </CardContent>
-      </Card>
+      <>
+        {creatures === null ? getCreatures() : ""}
+        {props.challengeRating !== 0 && creatures !== null ?
+          <StatBlock />
+        :
+          <>
+            <Typography variant='h2'>{props.name}</Typography>
+            <br />
+            <Typography variant='h5'>Description: <Typography variant='body1' display='inline'>{props.description}</Typography></Typography>
+          </>
+        }
+      </>
     )
   }
   else {
@@ -271,7 +265,6 @@ export default function BackroomsEntities(props) {
           {props.challengeRating !== 0 && creatures !== null ?
             <>
               <Typography variant='h5' display='inline'>{props.description}</Typography>
-              {props.drop !== undefined ? <Typography variant='h5'><b>Drops:</b> {props.drop}</Typography> : ""}
               <StatBlock />
             </>
           :

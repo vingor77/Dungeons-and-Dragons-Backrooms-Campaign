@@ -1,5 +1,5 @@
-import { Box, Button, Container, Typography } from '@mui/material'
-import React from 'react'
+import { Box, Button, Card, CardActions, CardContent, Container, Divider, Stack, Typography } from '@mui/material'
+import React, { useState } from 'react'
 import { doc, setDoc } from 'firebase/firestore';
 import db from '../Components/firebase';
 
@@ -72,9 +72,20 @@ export default function Home() {
   }
   */
 
+  const Items = [{"Item":"Anti-Smiler Armor","Pieces":"3 Smiler Repellent, 3 Firesalt","DC":10,"Stat":"Strength","Tier":1,"Tools":"Smith, Leatherworker"},
+  {"Item":"Iron Sheet (Good Condition)","Pieces":"3 Iron Sheets (Bad Condition)","DC":10,"Stat":"Strength","Tier":1,"Tools":"Smith, Alchemist"}];
+
+  const addShit = () => {
+    for(let i = 0; i < Items.length; i++) {
+      setDoc(doc(db, 'crafts', 'Crafts'), {
+        Items
+      })
+    }
+  }
+
   return (
     <Box paddingLeft={5} paddingRight={5}>
-      {data.length === 0 ?
+      {Items.length === 0 ?
         <Button variant='outlined'>This aint do shit</Button>
       :
         <button onClick={addShit}>Add shit</button>

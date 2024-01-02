@@ -12,6 +12,7 @@ import Functions from './Components/Functions';
 import GearSets from './Pages/GearSets';
 import Avatars from './Pages/Avatars';
 import Gods from './Pages/Gods';
+import Crafts from './Pages/Crafting';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path='/functions' element={<Functions />} />
             <Route path='/gods' element={<Gods />} />
             <Route path='/avatars' element={<Avatars />} />
+            <Route path='/crafts' element={<Crafts />} />
           </Routes>
         </div>
       </div>

@@ -34,6 +34,7 @@ export default function Navbar() {
                 }}
               >
                 <MenuItem><Link href='/items' color='inherit' underline='none'>Items</Link></MenuItem>
+                <MenuItem><Link href='/crafts' color='inherit' underline='none'>Crafts</Link></MenuItem>
                 <MenuItem><Link href='/gearSets' color='inherit' underline='none'>Gear Sets</Link></MenuItem>
                 <MenuItem><Link href='/groups' color='inherit' underline='none'>Groups</Link></MenuItem>
                 <MenuItem><Link href='/quests' color='inherit' underline='none'>Quests</Link></MenuItem>

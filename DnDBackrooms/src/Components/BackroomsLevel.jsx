@@ -400,11 +400,11 @@ export default function BackroomsLevel(props) {
 
     mapPieces.map((mapPiece, index) => {
       tables.push (
-        <Table sx={{border: '1px solid black'}} key={index}>
+        <Table sx={{border: '1px solid green'}} key={index}>
           <TableBody color='inherit'>
             {mapPiece.map((row, index) => {
               return (
-                <TableRow sx={{border: '1px solid black'}} key={index}>
+                <TableRow sx={{border: '1px solid green'}} key={index}>
                   {row.map((cell, index) => {
                     switch(cell) {
                       case 0:
@@ -542,81 +542,115 @@ export default function BackroomsLevel(props) {
     if(roomDisplay === -1) return;
     if(spawnList[roomDisplay] === null && regSpawnList[roomDisplay] === null) return
 
-    return (
-      <>
-        {spawnList[roomDisplay] !== null ?
-          spawnList[roomDisplay].map((thing, index) => {
-            if(thing.itemNum !== undefined) {
-              return (
-                <BackroomsItem
-                  key={index}
-                  name={thing.name}
-                  itemNum={thing.itemNum}
-                  locations={thing.locations}
-                  description={thing.description}
-                  table={thing.table}
-                  display='level'
-                />
-              )
+    if(spawnList[roomDisplay] !== null) {
+      if(spawnList[roomDisplay][0].entityNum !== undefined) { //Entity
+        return (
+          <>
+            <Stack direction='row' flexWrap='wrap' gap={1}>
+              {spawnList[roomDisplay].map((thing, index) => {
+                return (
+                  <BackroomsEntities 
+                    key={index}
+                    name={thing.name}
+                    locations={thing.locations}
+                    description={thing.description}
+                    statBlock={thing.statBlock}
+                    challengeRating={thing.challengeRating}
+                    entityNum={thing.entityNum}
+                    drop={thing.drop}
+                    displayType="Level"
+                  />
+                )
+              })}
+            </Stack>
+            {regSpawnList[roomDisplay] !== null ?
+              <ol type='number'>
+                {regSpawnList[roomDisplay].map((spawn, index) => {
+                  return <li key={index}>{spawn}</li>
+                })}
+              </ol>
+            :
+              ""
             }
-            else if(thing.entityNum !== undefined) {
-              return (
-                <BackroomsEntities 
-                  key={index}
-                  name={thing.name}
-                  locations={thing.locations}
-                  description={thing.description}
-                  statBlock={thing.statBlock}
-                  challengeRating={thing.challengeRating}
-                  entityNum={thing.entityNum}
-                  displayType="Level"
-                />
-              )
-            }
-            else {
-              return (
-                <>
-                  <Typography variant='h5'>{thing}</Typography>
-                </>
-              )
-            }
-          })
-        :
-          ""
-        }
+          </>
+        )
+      }
 
-        {regSpawnList[roomDisplay] !== null ?
-          <ol type='number'>
-            {regSpawnList[roomDisplay].map((spawn, index) => {
-              return <li key={index}>{spawn}</li>
-            })}
-          </ol>
-        :
-          ""
-        }
-      </>
-    )
+      if(spawnList[roomDisplay][0].itemNum !== undefined) { //Item
+        return (
+          <>
+            <BackroomsItem
+              name={spawnList[roomDisplay][0].name}
+              itemNum={spawnList[roomDisplay][0].itemNum}
+              locations={spawnList[roomDisplay][0].locations}
+              description={spawnList[roomDisplay][0].description}
+              table={spawnList[roomDisplay][0].table}
+              display='level'
+            />
+            {regSpawnList[roomDisplay] !== null ?
+              <ol type='number'>
+                {regSpawnList[roomDisplay].map((spawn, index) => {
+                  return <li key={index}>{spawn}</li>
+                })}
+              </ol>
+            :
+              ""
+            }
+          </>
+        )
+      }
+
+      return (
+        <>
+          <Typography variant='h5'>{spawnList[roomDisplay][0]}</Typography>
+          {regSpawnList[roomDisplay] !== null ?
+            <ol type='number'>
+              {regSpawnList[roomDisplay].map((spawn, index) => {
+                return <li key={index}>{spawn}</li>
+              })}
+            </ol>
+          :
+            ""
+          }
+        </>
+      )
+    }
+    else {
+      return (
+        <>
+          {regSpawnList[roomDisplay] !== null ?
+            <ol type='number'>
+              {regSpawnList[roomDisplay].map((spawn, index) => {
+                return <li key={index}>{spawn}</li>
+              })}
+            </ol>
+          :
+            ""
+          }
+        </>
+      )
+    }
   }
 
   const DisplayMaps = () => {
     return (
-      <Grid container>
-        <Grid container>
-          <Grid item xs={4}>{currMap[0]}</Grid>
-          <Grid item xs={4}>{currMap[1]}</Grid>
-          <Grid item xs={4}>{currMap[2]}</Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={4}>{currMap[3]}</Grid>
-          <Grid item xs={4}>{currMap[4]}</Grid>
-          <Grid item xs={4}>{currMap[5]}</Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={4}>{currMap[6]}</Grid>
-          <Grid item xs={4}>{currMap[7]}</Grid>
-          <Grid item xs={4}>{currMap[8]}</Grid>
-        </Grid>
-      </Grid>
+      <Stack>
+        <Stack direction='row'>
+          {currMap[0]}
+          {currMap[1]}
+          {currMap[2]}
+        </Stack>
+        <Stack direction='row'>
+          {currMap[3]}
+          {currMap[4]}
+          {currMap[5]}
+        </Stack>
+        <Stack direction='row'>
+          {currMap[6]}
+          {currMap[7]}
+          {currMap[8]}
+        </Stack>
+      </Stack>
     )
   }
 
