@@ -91,6 +91,7 @@ export default function Navbar() {
                 <MenuItem><Link href='/outposts' color='inherit' underline='none'>Outposts</Link></MenuItem>
                 <MenuItem><Link href='/entities' color='inherit' underline='none'>Entities</Link></MenuItem>
                 <MenuItem><Link href='/levels' color='inherit' underline='none'>Levels</Link></MenuItem>
+                <MenuItem><Link href='/edits' color='inherit' underline='none'>Updates</Link></MenuItem>
               </Menu>
             </div>
           </Stack>

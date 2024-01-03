@@ -6,21 +6,21 @@ import db from '../Components/firebase';
 export default function Home() {
   const data = [];
 
-  /* //Add shit for Quests
+  //Add shit for Quests
   const addShit = () => {
     for(let i = 0; i < data.length; i++) {
       setDoc(doc(db, 'quests', data[i].name), {
-        completed: data[i].completed,
+        completed: data[i].completed === 'TRUE',
         description: data[i].description,
         name: data[i].name,
         outpost: data[i].outpost,
         questGiver: data[i].questGiver,
         reward: data[i].reward,
-        unlocked: data[i].unlocked
+        unlocked: data[i].unlocked === 'TRUE',
+        type: data[i].type
       })
     }
   }
-  */
   
   /* //Add shit for levels
   const addShit = () => {
@@ -72,8 +72,9 @@ export default function Home() {
   }
   */
 
-  const Items = [{"Item":"Anti-Smiler Armor","Pieces":"3 Smiler Repellent, 3 Firesalt","DC":10,"Stat":"Strength","Tier":1,"Tools":"Smith, Leatherworker"},
-  {"Item":"Iron Sheet (Good Condition)","Pieces":"3 Iron Sheets (Bad Condition)","DC":10,"Stat":"Strength","Tier":1,"Tools":"Smith, Alchemist"}];
+  /*
+  const Items = [{"Item":"Anti-Smiler Armor","Pieces":"3 Smiler Repellent, 3 Firesalt","DC":10,"Stat":"Strength","Tier":1,"Tools":"Smith,Leatherworker","npc":"Yes","attempts":3},
+  {"Item":"Iron Sheet (Good Condition)","Pieces":"3 Iron Sheets (Bad Condition)","DC":10,"Stat":"Strength","Tier":1,"Tools":"Smith,Alchemist","npc":"No","attempts":3}];
 
   const addShit = () => {
     for(let i = 0; i < Items.length; i++) {
@@ -82,10 +83,11 @@ export default function Home() {
       })
     }
   }
+  */
 
   return (
     <Box paddingLeft={5} paddingRight={5}>
-      {Items.length === 0 ?
+      {data.length === 0 ?
         <Button variant='outlined'>This aint do shit</Button>
       :
         <button onClick={addShit}>Add shit</button>

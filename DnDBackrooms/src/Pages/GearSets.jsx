@@ -1,4 +1,4 @@
-import { Box, Container, Divider, Grid, Stack, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Container, Divider, Grid, Stack, Typography } from '@mui/material';
 import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useState } from 'react';
 import db from '../Components/firebase';
@@ -20,65 +20,52 @@ export default function GearSets() {
     return () => unsub();
   }
 
-  const ShowSetBonuses = (props) => {
-    if(props.set.revealed === 0) return <Typography variant='h5'>Bonuses not discovered.</Typography>
-
-    let bonus = JSON.parse(props.set.bonus);
-    let keys = Object.keys(bonus);
-
-    const revealedBonuses = [];
-    
-    for(let i = 0; i < props.set.revealed; i++) {
-      revealedBonuses.push([bonus[keys[i]], Object.keys(bonus[keys[i]])]);
-    }
+  const Bonuses = (props) => {
+    if(props.set.revealed === 0) return <Typography>Collect more items to reveal the bonuses.</Typography>
+    const bonus = JSON.parse(props.set.bonus);
+    const keys = Object.keys(bonus);
+    const gearType = Object.keys(bonus[keys[1]]);
 
     return (
-      <>
-        <Stack direction='row' spacing={2}>
-          {revealedBonuses.map((bonuses, index) => {
-            return (
-              <Box>
-                {bonuses[1].map((b) => {
-                  return (
-                    <Typography variant='body1'><b>({keys[index]}) {b}:</b> {bonuses[0][b]}</Typography>
-                  )
-                })}
-              </Box>
-            )
-          })}
-        </Stack>
-      </>
+      <Box>
+        {keys.map((key, index) => {
+          return (
+            index < props.set.revealed ?
+              <Typography><b>({key})</b> {bonus[keys[index]][gearType[props.bonusSet]]}</Typography>
+            :
+              ""
+          )
+        })}
+      </Box>
     )
   }
-
   
   return (
     <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
       {gearSets === null ? 
         getSets()
-        :
+      :
         <>
-          {gearSets.map((set) => {
+          {gearSets.map((set, index) => {
             return (
-              <>
-                <Box>
-                  <Stack direction='row' spacing={2}>
-                    <Typography variant='h5'><b>{set.setName}:</b></Typography>
-                    <Stack>
-                      {set.gear.map((gear, index) => {
-                        return  (
-                          <>
-                            <Typography variant='body1'>{gear}</Typography>
-                            <Divider />
-                          </>
-                        )
-                      })}
-                    </Stack>
-                    <ShowSetBonuses set={set}/>
-                  </Stack>
-                </Box>
-                <hr />
-              </>
+              <Card key={index} sx={{padding: 0, margin: 0, border: '1px solid black'}}>
+                <CardContent>
+                  <Box>
+                    <Typography variant='h5'><b><u>{set.setName}</u></b></Typography>
+                    {set.gear.map((gear, index) => {
+                      return (
+                        <>
+                          <Stack direction='row' key={index} spacing={2}>
+                            <Typography sx={{width: {md: '20%', lg: '10%'}, minWidth: {md: '20%', lg: '10%'}}}>{gear}</Typography>
+                            <Bonuses set={set} bonusSet={index}/>
+                          </Stack>
+                          <Divider />
+                        </>
+                      )
+                    })}
+                  </Box>
+                </CardContent>
+              </Card>
             )
           })}
         </>
