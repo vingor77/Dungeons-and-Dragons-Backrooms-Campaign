@@ -1,4 +1,4 @@
-import { Box, Button, Container, FormControl, Grid, Input, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import { Box, Button, Container, Divider, FormControl, Grid, Input, InputLabel, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import BackroomsItem from './BackroomsItem';
 import BackroomsEntities from './BackroomsEntities';
@@ -15,6 +15,19 @@ export default function BackroomsLevel(props) {
   const [spawnList, setSpawnList] = useState([]);
   const [regSpawnList, setRegSpawnList] = useState([]);
   const [roomDisplay, setRoomDisplay] = useState(-1);
+  const [mapGrids, setmapGrids] = useState([]);
+  const [menuData, setMenuData] = useState({
+    toggled: false,
+    location: {
+      x: 0,
+      y: 0
+    },
+    target: {
+      grid: 0,
+      row: 0,
+      cell: 0
+    }
+  });
 
   useEffect(() => {
     const collectionRef = collection(db, 'regularSpawns');
@@ -288,9 +301,16 @@ export default function BackroomsLevel(props) {
           [grid, selectedItem]
         )
       case "entity":
-        grid[x][y] = 3;
         let maxCR = getMaxCR([10, 60, 70, 80, 90]); //Tier 2 chars = [10, 20, 70, 80, 90]. Tier 3 = [10, 20, 30, 80, 90]. Tier 4 = [10, 20, 30, 80, 90]. Tier 5 = [10, 20, 30, 40, 90]. Tier 6 = [10, 20, 30, 40, 50].
         let entityList = getEntities(maxCR);
+        for(let i = 0; i < entityList.length; i++) {
+          while(grid[x][y] === 1 || grid[x][y] === 3) {
+            x = Math.floor(Math.random() * size);
+            y = Math.floor(Math.random() * size);
+          }
+          grid[x][y] = 3;
+        }
+        grid[x][y] = 3;
         return (
           [grid, entityList]
         );
@@ -394,31 +414,30 @@ export default function BackroomsLevel(props) {
       }
     }
 
-    //Finally, set the map to the mapPieces.
-    //setCurrMap(mapPieces);
     const tables = [];
+    setmapGrids(mapPieces);
 
-    mapPieces.map((mapPiece, index) => {
+    mapPieces.map((mapPiece, index1) => {
       tables.push (
-        <Table sx={{border: '1px solid green'}} key={index}>
+        <Table sx={{border: '1px solid green'}} key={index1}>
           <TableBody color='inherit'>
-            {mapPiece.map((row, index) => {
+            {mapPiece.map((row, index2) => {
               return (
-                <TableRow sx={{border: '1px solid green'}} key={index}>
-                  {row.map((cell, index) => {
+                <TableRow sx={{border: '1px solid green'}} key={index2}>
+                  {row.map((cell, index3) => {
                     switch(cell) {
                       case 0:
-                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index} onClick={swapColor}>{cell}</TableCell>
+                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell}</TableCell>
                       case 1:
-                        return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index}>{cell}</TableCell>
+                        return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index3}>{cell}</TableCell>
                       case 2:
-                        return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index} onClick={swapColor}>{cell}</TableCell>
+                        return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell}</TableCell>
                       case 3:
-                        return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index} onClick={swapColor}>{cell}</TableCell>
+                        return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell}</TableCell>
                       case 4:
-                        return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index} onClick={swapColor}>{cell}</TableCell>
+                        return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell}</TableCell>
                       default:
-                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index} onClick={swapColor}>{cell - 4}</TableCell>
+                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell - 4}</TableCell>
                     }
                   })}
                 </TableRow>
@@ -429,53 +448,25 @@ export default function BackroomsLevel(props) {
       )
     })
     
-    //TODO: Add a list for the things that spawned in a dropdown.
     setSpawnList(spawnedThings);
     setRegSpawnList(regSpawnedThings);
     setCurrMap(tables);
   }
 
-  const swapColor = (e) => {
-    //Combat.
-    if(e.target.style.backgroundColor === 'red') {
-      e.target.style.backgroundColor = 'white';
-      e.target.style.color = 'white';
-      return
-    }
-
-    //Item
-    if(e.target.style.backgroundColor === 'green') {
-      e.target.style.backgroundColor = 'white';
-      e.target.style.color = 'white';
-      return
-    }
-
-    //Special
-    if(e.target.style.backgroundColor === 'orange') {
-      e.target.style.backgroundColor = 'white';
-      e.target.style.color = 'white';
-      return
-    }
-
-    //Reg item
-    if(e.target.style.backgroundColor === 'blue') {
-      e.target.style.backgroundColor = 'white';
-      e.target.style.color = 'white';
-      return
-    }
-
-    if(e.target.style.backgroundColor === 'white') {
-      e.target.style.backgroundColor = 'teal';
-      e.target.style.color = 'teal';
-    }
-    else if(e.target.style.backgroundColor === 'teal') {
-      e.target.style.backgroundColor = 'pink';
-      e.target.style.color = 'pink';
-    }
-    else {
-      e.target.style.backgroundColor = 'white';
-      e.target.style.color = 'white';
-    }
+  const customMenu = (e, grid, row, cell) => {
+    e.preventDefault();
+    setMenuData({
+      toggled: true,
+      location: {
+        x: e.pageX,
+        y: e.pageY
+      },
+      target: {
+        grid: grid,
+        row: row,
+        cell: cell
+      }
+    });
   }
 
   const getItemRarity = () => {
@@ -700,6 +691,89 @@ export default function BackroomsLevel(props) {
     setShowMap(true);
   }
 
+  const handleContextMenuClick = (insideText) => {
+    mapGrids[menuData.target.grid][menuData.target.row][menuData.target.cell] = insideText;
+    //Set the color of the map piece.
+
+    const savedGrids = [];
+    for(let i = 0; i < mapGrids.length; i++) {
+      if(i === menuData.target.grid) {
+        savedGrids.push(
+          <Table sx={{border: '1px solid green'}}>
+            <TableBody color='inherit'>
+              {mapGrids[menuData.target.grid].map((row, index2) => {
+                return (
+                  <TableRow sx={{border: '1px solid green'}} key={index2}>
+                    {row.map((cell, index3) => {
+                      switch(cell) {
+                        case 0:
+                          return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
+                        case 1:
+                          return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index3}>{cell}</TableCell>
+                        case 2:
+                          return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
+                        case 3:
+                          return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
+                        case 4:
+                          return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
+                        default:
+                          return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell - 4}</TableCell>
+                      }
+                    })}
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        )
+      }
+      else {
+        savedGrids.push(currMap[i]);
+      }
+    }
+
+    setCurrMap(savedGrids);
+
+    setMenuData({
+      toggled: false,
+      location: {
+        x: 0,
+        y: 0
+      },
+      bgColor: 'white',
+      textColor: 'white',
+      target: {
+        grid: 0,
+        row: 0,
+        cell: 0
+      }
+    });
+  }
+
+  const CustomMenu = () => {
+    return (
+      <Paper sx={{ width: 320, maxWidth: '100%', top: menuData.location.y, left: menuData.location.x, position: 'absolute' }}>
+        <MenuList>
+          <MenuItem>
+            <ListItemText onClick={() => handleContextMenuClick(0)}>Open tile</ListItemText>
+          </MenuItem>
+          <MenuItem>
+            <ListItemText onClick={() => handleContextMenuClick(2)}>Item</ListItemText>
+          </MenuItem>
+          <MenuItem>
+            <ListItemText onClick={() => handleContextMenuClick(3)}>Entity</ListItemText>
+          </MenuItem>
+          <MenuItem>
+            <ListItemText onClick={() => handleContextMenuClick(4)}>Special</ListItemText>
+          </MenuItem>
+          <MenuItem>
+            <ListItemText onClick={() => handleContextMenuClick(5)}>Regular Spawn(value of 1)</ListItemText>
+          </MenuItem>
+        </MenuList>
+      </Paper>
+    );
+  }
+
   return (
     <>
       <Typography variant='h2'>Level {props.level.levelNum}, {props.level.name}</Typography>
@@ -709,6 +783,7 @@ export default function BackroomsLevel(props) {
         <Button variant='outlined' onClick={handleShowMap}>Show Content</Button>: 
         <>
           <DisplayContent />
+          {menuData.toggled ? <CustomMenu /> : ""}
         </>
       }
     </>

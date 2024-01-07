@@ -241,7 +241,6 @@ export default function BackroomsEntities(props) {
   }
 
   if(props.displayType === 'Level') {
-    console.log(props.drop);
     return (
       <>
         {creatures === null ? getCreatures() : ""}
