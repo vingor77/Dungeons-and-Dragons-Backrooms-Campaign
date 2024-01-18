@@ -78,7 +78,7 @@ export default function BackroomsQuests(props) {
             return (
               <div key={index}>
                 {quest.name === currQuest ?
-                  <Box textAlign='center'>
+                  <Box textAlign='center' border='1px solid black' width='30%' marginLeft='35%'>
                     <Typography variant='h4' textAlign='center'>{quest.name}</Typography>
                     <Typography variant='body1'><b>Objective:</b> {quest.description}</Typography>
                     <Typography variant='body1'><b>Reward:</b> {quest.reward}</Typography>

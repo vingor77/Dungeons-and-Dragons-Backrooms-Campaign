@@ -12,7 +12,7 @@ export default function Crafting() {
   
     const unsub = onSnapshot(collectionRef, (querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        const sorted = doc.data().Items.sort((t1, t2) => (t1.Tier > t2.Tier) ? 1 : (t1.Tier < t2.Tier) ? -1 : 0);
+        const sorted = doc.data().data.sort((t1, t2) => (t1.Tier > t2.Tier) ? 1 : (t1.Tier < t2.Tier) ? -1 : 0);
         setItems(sorted);
         setRevealed(doc.data().revealed);
       })

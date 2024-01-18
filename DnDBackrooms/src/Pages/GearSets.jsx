@@ -24,7 +24,7 @@ export default function GearSets() {
     if(props.set.revealed === 0) return <Typography>Collect more items to reveal the bonuses.</Typography>
     const bonus = JSON.parse(props.set.bonus);
     const keys = Object.keys(bonus);
-    const gearType = Object.keys(bonus[keys[1]]);
+    const gearType = Object.keys(bonus[keys[0]]);
 
     return (
       <Box>

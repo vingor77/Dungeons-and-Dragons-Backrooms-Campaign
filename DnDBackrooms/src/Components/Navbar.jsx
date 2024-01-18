@@ -1,19 +1,49 @@
 import React, { useState } from 'react'
-import { AppBar, Stack, Toolbar, Link, Container, Menu, Button, MenuItem, Box } from '@mui/material';
+import { AppBar, Stack, Toolbar, Link, Menu, Button, MenuItem, Box, IconButton, Divider } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 
 export default function Navbar() {
   const [open, setOpen] = useState(null);
   const [open2, setOpen2] = useState(null);
   const [open3, setOpen3] = useState(null);
+  const [openSmall, setOpenSmall] = useState(null);
 
   return (
     <Box paddingLeft={5} paddingRight={5}>
       <AppBar position='sticky'>
         <Toolbar>
-          <Stack direction='row' spacing={2} sx={{color: 'white'}}>
-            <Button href='/' color='inherit' underline='none'>Home</Button>
+          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={(e) => {setOpenSmall(e.currentTarget)}}
+              color="inherit"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              id="basic-menu"
+              anchorEl={openSmall}
+              open={openSmall}
+              onClose={() => setOpenSmall(null)}
+              MenuListProps={{
+                'aria-labelledby': 'basic-link',
+              }}
+            >
+              <Stack>
+                <Button href='/' color='inherit' underline='none'>Home</Button>
+                <Button onClick={(event) => setOpen(event.currentTarget)} color='inherit'>General information</Button>
+                <Button onClick={(event) => setOpen2(event.currentTarget)} color='inherit'>Player information</Button>
+                <Button onClick={(event) => setOpen3(event.currentTarget)} color='inherit'>DM information</Button>
+              </Stack>
+            </Menu>
+          </Box>
 
-            <div className='general'>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            <Button href='/' color='inherit' underline='none'>Home</Button>
+            <Box>
               <Button
                 id="basic-link"
                 aria-controls={open ? 'basic-menu' : undefined}
@@ -33,17 +63,18 @@ export default function Navbar() {
                   'aria-labelledby': 'basic-link',
                 }}
               >
-                <MenuItem><Link href='/items' color='inherit' underline='none'>Items</Link></MenuItem>
-                <MenuItem><Link href='/crafts' color='inherit' underline='none'>Crafts</Link></MenuItem>
-                <MenuItem><Link href='/gearSets' color='inherit' underline='none'>Gear Sets</Link></MenuItem>
-                <MenuItem><Link href='/groups' color='inherit' underline='none'>Groups</Link></MenuItem>
-                <MenuItem><Link href='/quests' color='inherit' underline='none'>Quests</Link></MenuItem>
-                <MenuItem><Link href='/gods' color='inherit' underline='none'>Gods</Link></MenuItem>
-                <MenuItem><Link href='/avatars' color='inherit' underline='none'>Avatars</Link></MenuItem>
+                <Stack divider={<Divider />}>
+                  <Button href='/items' color='inherit' underline='none' size='small'>Items</Button>
+                  <Button href='/crafts' color='inherit' underline='none' size='small'>Crafts</Button>
+                  <Button href='/gearSets' color='inherit' underline='none' size='small'>Gear Sets</Button>
+                  <Button href='/groups' color='inherit' underline='none' size='small'>Groups</Button>
+                  <Button href='/quests' color='inherit' underline='none' size='small'>Quests</Button>
+                  <Button href='/gods' color='inherit' underline='none' size='small'>Gods</Button>
+                  <Button href='/avatars' color='inherit' underline='none' size='small'>Avatars</Button>
+                </Stack>
               </Menu>
-            </div>
-
-            <div className='player'>
+            </Box>
+            <Box>
               <Button
                 id="basic-link"
                 aria-controls={open2 ? 'basic-menu' : undefined}
@@ -63,12 +94,13 @@ export default function Navbar() {
                   'aria-labelledby': 'basic-link',
                 }}
               >
-                <MenuItem><Link href='/info' color='inherit' underline='none'>Player Info</Link></MenuItem>
-                <MenuItem><Link href='/functions' color='inherit' underline='none'>Player Functions</Link></MenuItem>
+                <Stack divider={<Divider />}>
+                  <Button href='/info' color='inherit' underline='none' size='small'>Player Info</Button>
+                  <Button href='/functions' color='inherit' underline='none' size='small'>Player Functions</Button>
+                </Stack>
               </Menu>
-            </div>
-
-            <div className='dm'>
+            </Box>
+            <Box>
               <Button
                 id="basic-link"
                 aria-controls={open3 ? 'basic-menu' : undefined}
@@ -88,13 +120,15 @@ export default function Navbar() {
                   'aria-labelledby': 'basic-link',
                 }}
               >
-                <MenuItem><Link href='/outposts' color='inherit' underline='none'>Outposts</Link></MenuItem>
-                <MenuItem><Link href='/entities' color='inherit' underline='none'>Entities</Link></MenuItem>
-                <MenuItem><Link href='/levels' color='inherit' underline='none'>Levels</Link></MenuItem>
-                <MenuItem><Link href='/edits' color='inherit' underline='none'>Updates</Link></MenuItem>
+                <Stack divider={<Divider />}>
+                  <Button href='/outposts' color='inherit' underline='none' size='small'>Outposts</Button>
+                  <Button href='/entities' color='inherit' underline='none' size='small'>Entities</Button>
+                  <Button href='/levels' color='inherit' underline='none' size='small'>Levels</Button>
+                  <Button href='/edits' color='inherit' underline='none' size='small'>Updates</Button>
+                </Stack>
               </Menu>
-            </div>
-          </Stack>
+            </Box>
+          </Box>
         </Toolbar>
       </AppBar>
     </Box>

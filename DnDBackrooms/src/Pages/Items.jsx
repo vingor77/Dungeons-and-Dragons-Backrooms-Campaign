@@ -2,17 +2,16 @@ import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import db from '../Components/firebase'
 import React, { useEffect, useState } from 'react'
 import Item from '../Components/BackroomsItem';
-import { Box, Container, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Card, CardContent, Divider, Stack, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
 export default function Items() {
   const [items, setItems] = useState([]);
   const [currItem, setCurrItem] = useState("");
-
   const collectionRef = collection(db, 'items');
 
   useEffect(() => {
-    const q = query(collectionRef, orderBy("itemNum", "asc"));
+    const q = query(collectionRef, orderBy("rarity", "asc"));
 
     const unsub = onSnapshot(q, (querySnapshot) => {
       const objects = [];
@@ -28,13 +27,13 @@ export default function Items() {
   }, [])
 
   const rows = [
-    ["Common", "1", "0", "0", "0", "0", "0"],
-    ["Uncommon", "2", "1", "1", "1", "1.5", "1.5"],
-    ["Rare", "6", "3", "3", "3.5", "4", "5"],
-    ["Very Rare", "10", "5", "5.5", "6", "7", "8"],
-    ["Legendary", "14", "7", "8", "8.5", "10", "11"],
-    ["Artifact", "5x Tier 0 sell", "Varies per artifact", "N/A", "N/A", "N/A", "N/A"],
-    ["One-of-a-kind", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"],
+    ["Common", "1", "0"],
+    ["Uncommon", "2", "1"],
+    ["Rare", "6", "3"],
+    ["Very Rare", "10", "5"],
+    ["Legendary", "14", "7"],
+    ["Artifact", "5x Sell", "Varies"],
+    ["One-of-a-kind", "N/A", "N/A"]
   ]
 
   const dataGridCols = [
@@ -78,24 +77,35 @@ export default function Items() {
     dataGridRows.push(row);
   })
 
+  const Prices = () => {
+    return (
+      <Stack direction='row' flexWrap='wrap' gap={1}>
+        {rows.map((row, index) => {
+          return (
+            <Card sx={{width: '220px'}} key={index}>
+              <CardContent>
+                <Typography textAlign='center' variant='h5'><b>{row[0]}</b></Typography>
+                <Typography textAlign='center'>Buy price: {row[1]}</Typography>
+                <Typography textAlign='center'>Base sell price: {row[2]}</Typography>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </Stack>
+    )
+  }
+
   return (
     <Box paddingLeft={5} paddingRight={5}>
-      <Typography variant='h1'>Item Info and Pricing</Typography>
-      <ul>
-        <li>Almond water is worth the equivalent of 500 gold in D&D.</li>
-        <li>Magic item prices work per regular D&D rules such as a rare is 2,000 to 20,000 gold, which translates to 4 to 40 almond water.</li>
-        <li>Almond water is the only unbuyable resource within the game.</li>
-      </ul>
-      <ItemPrices rows={rows}/>
+      <Typography variant='h4' textAlign='center'>Prices</Typography>
+      <Prices />
       <br />
       <Typography variant='caption' fontWeight='bold'>Prices may vary.</Typography>
       <Divider />
-
       <br />
       <Box>
-        <Typography variant='h2'>Items:</Typography>
-        <Typography variant='body1'>Items of item number 0 are custom and/or magical.</Typography>
-
+        <Typography variant='h4' textAlign='center'>Items</Typography>
+        <Typography textAlign='center'>Items of item number 0 are custom and/or magical.</Typography>
         <DataGrid
           onRowClick={(dataGridRows, event) => {
             setCurrItem(dataGridRows.row.name);
@@ -135,39 +145,4 @@ export default function Items() {
       </Box>
     </Box>
   )
-}
-
-function ItemPrices(props) {
-  return (
-    <TableContainer component={Paper}>
-      <Table sx={{minWidth: 650}}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Type</TableCell>
-            <TableCell align='center'>Buy Price</TableCell>
-            <TableCell align='center'>Tier 0 Sell Price</TableCell>
-            <TableCell align='center'>Tier 3 Sell Price</TableCell>
-            <TableCell align='center'>Tier 5 Sell Price</TableCell>
-            <TableCell align='center'>Tier 6 Sell Price</TableCell>
-            <TableCell align='center'>Tier 9 Sell Price</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {props.rows.map(row => {
-            return (
-              <TableRow key={row[0]} sx={{ '&:last-child td, &:kast-child th': {border: 0}}}>
-                <TableCell>{row[0]}</TableCell>
-                <TableCell align='center'>{row[1]}</TableCell>
-                <TableCell align='center'>{row[2]}</TableCell>
-                <TableCell align='center'>{row[3]}</TableCell>
-                <TableCell align='center'>{row[4]}</TableCell>
-                <TableCell align='center'>{row[5]}</TableCell>
-                <TableCell align='center'>{row[6]}</TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
 }

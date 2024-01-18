@@ -1,13 +1,13 @@
 import { Box, Button, Card, CardActions, CardContent, Container, Divider, Stack, Typography } from '@mui/material'
 import React, { useState } from 'react'
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import db from '../Components/firebase';
 
 export default function Home() {
   const data = [];
 
-  //Add shit for Quests
-  const addShit = () => {
+  /* //Quests
+  const addToDB = () => {
     for(let i = 0; i < data.length; i++) {
       setDoc(doc(db, 'quests', data[i].name), {
         completed: data[i].completed === 'TRUE',
@@ -21,9 +21,27 @@ export default function Home() {
       })
     }
   }
+  */
   
-  /* //Add shit for levels
-  const addShit = () => {
+  /* //Items
+  const addToDB = () => {
+    for(let i = 0; i < data.length; i++) {
+      const locations = data[i].locations.split(",");
+      setDoc(doc(db, 'items', data[i].name), {
+        artifactPrice: data[i].artifactPrice,
+        description: data[i].description,
+        itemNum: data[i].itemNum,
+        locations: locations,
+        name: data[i].name,
+        rarity: data[i].rarity,
+        table: data[i].table === 'Y' ? true : false
+      })
+    }
+  }
+  */
+
+  /* //Levels
+  const addToDB = () => {
     for(let i = 0; i < data.length; i++) {
       let gens = data[i].genType.split(",");
       let spawn = data[i].spawns.split(",");
@@ -48,8 +66,8 @@ export default function Home() {
   }
   */
   
-  /* //Add shit for outposts
-  const addShit = () => {
+  /* //Outposts
+  const addToDB = () => {
     for(let i = 0; i < data.length; i++) {
       let people = data[i].notablePeople.split(",");
       let shops;
@@ -72,25 +90,21 @@ export default function Home() {
   }
   */
 
-  /*
-  const Items = [{"Item":"Anti-Smiler Armor","Pieces":"3 Smiler Repellent, 3 Firesalt","DC":10,"Stat":"Strength","Tier":1,"Tools":"Smith,Leatherworker","npc":"Yes","attempts":3},
-  {"Item":"Iron Sheet (Good Condition)","Pieces":"3 Iron Sheets (Bad Condition)","DC":10,"Stat":"Strength","Tier":1,"Tools":"Smith,Alchemist","npc":"No","attempts":3}];
-
-  const addShit = () => {
-    for(let i = 0; i < Items.length; i++) {
-      setDoc(doc(db, 'crafts', 'Crafts'), {
-        Items
+  //Crafts
+  const addToDB = () => {
+    for(let i = 0; i < data.length; i++) {
+      updateDoc(doc(db, 'crafts', 'Crafts'), {
+        data
       })
     }
   }
-  */
 
   return (
     <Box paddingLeft={5} paddingRight={5}>
       {data.length === 0 ?
-        <Button variant='outlined'>This aint do shit</Button>
+        <Button variant='outlined'>This currently does nothing</Button>
       :
-        <button onClick={addShit}>Add shit</button>
+        <button onClick={addToDB}>Add shit</button>
       }
       <Typography variant='h1'>Welcome!</Typography>
       <Typography variant='body1'>

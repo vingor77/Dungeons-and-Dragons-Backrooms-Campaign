@@ -1,9 +1,10 @@
-import { Box, Button, Container, Divider, FormControl, Grid, Input, InputLabel, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Collapse, Container, Divider, FormControl, Grid, Input, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, MenuItem, MenuList, Paper, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import BackroomsItem from './BackroomsItem';
 import BackroomsEntities from './BackroomsEntities';
 import { collection, onSnapshot } from 'firebase/firestore';
 import db from '../Components/firebase';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CasinoShop from '../Images/CasinoRoomShop.png';
 
 export default function BackroomsLevel(props) {
@@ -16,6 +17,7 @@ export default function BackroomsLevel(props) {
   const [regSpawnList, setRegSpawnList] = useState([]);
   const [roomDisplay, setRoomDisplay] = useState(-1);
   const [mapGrids, setmapGrids] = useState([]);
+  const [entityInfoOpen, setEntityInfoOpen] = useState(null);
   const [menuData, setMenuData] = useState({
     toggled: false,
     location: {
@@ -237,7 +239,7 @@ export default function BackroomsLevel(props) {
   
         if(entity.challengeRating <= currCR && entity.challengeRating > 0
 
-          && entity.entityNum > 0 && entity.entityNum < 62 && entity.entityNum !== 1 && entity.entityNum !== 18 && entity.entityNum !== 26 //entity num checks are in place since not all stat blocks are finished. Remove this line later.
+          && entity.entityNum > 0 && entity.entityNum < 67 && entity.entityNum !== 1 && entity.entityNum !== 18 && entity.entityNum !== 26 //entity num checks are in place since not all stat blocks are finished. Remove this line later.
 
         ) {
           currCR -= entity.challengeRating;
@@ -419,15 +421,15 @@ export default function BackroomsLevel(props) {
 
     mapPieces.map((mapPiece, index1) => {
       tables.push (
-        <Table sx={{border: '1px solid green'}} key={index1}>
+        <Table sx={{border: '5px solid black'}} key={index1}>
           <TableBody color='inherit'>
             {mapPiece.map((row, index2) => {
               return (
-                <TableRow sx={{border: '1px solid green'}} key={index2}>
+                <TableRow sx={{border: '1px solid black'}} key={index2}>
                   {row.map((cell, index3) => {
                     switch(cell) {
                       case 0:
-                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell}</TableCell>
+                        return <TableCell style={{color: 'white', border: '3px solid black', backgroundColor: 'white'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell}</TableCell>
                       case 1:
                         return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index3}>{cell}</TableCell>
                       case 2:
@@ -531,38 +533,53 @@ export default function BackroomsLevel(props) {
 
   const DisplaySpawns = () => {
     if(roomDisplay === -1) return;
-    if(spawnList[roomDisplay] === null && regSpawnList[roomDisplay] === null) return
+    if(spawnList[roomDisplay] === null && regSpawnList[roomDisplay] === null) {
+      return (
+        <Typography variant='h3'>No spawns have occured within the room.</Typography>
+      )
+    }
 
     if(spawnList[roomDisplay] !== null) {
       if(spawnList[roomDisplay][0].entityNum !== undefined) { //Entity
         return (
           <>
-            <Stack direction='row' flexWrap='wrap' gap={1}>
+            <Box borderRight='1px solid black' width='50%'>
+              <Typography variant='h4' textAlign='center'>Entities</Typography>
               {spawnList[roomDisplay].map((thing, index) => {
                 return (
-                  <BackroomsEntities 
-                    key={index}
-                    name={thing.name}
-                    locations={thing.locations}
-                    description={thing.description}
-                    statBlock={thing.statBlock}
-                    challengeRating={thing.challengeRating}
-                    entityNum={thing.entityNum}
-                    drop={thing.drop}
-                    displayType="Level"
-                  />
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>{thing.name}</AccordionSummary>
+                    <AccordionDetails>
+                      <BackroomsEntities
+                        key={index}
+                        name={thing.name}
+                        locations={thing.locations}
+                        description={thing.description}
+                        statBlock={thing.statBlock}
+                        challengeRating={thing.challengeRating}
+                        entityNum={thing.entityNum}
+                        drop={thing.drop}
+                        displayType="Level"
+                      />
+                    </AccordionDetails>
+                  </Accordion>
                 )
               })}
-            </Stack>
-            {regSpawnList[roomDisplay] !== null ?
-              <ol type='number'>
-                {regSpawnList[roomDisplay].map((spawn, index) => {
-                  return <li key={index}>{spawn}</li>
-                })}
-              </ol>
-            :
-              ""
-            }
+            </Box>
+            <Box width='25%'>
+              {regSpawnList[roomDisplay] !== null ?
+                <Stack>
+                  <Typography variant='h4' textAlign='center'>Reg spawns</Typography>
+                  <ol type='number'>
+                    {regSpawnList[roomDisplay].map((spawn, index) => {
+                      return <li key={index}>{spawn}</li>
+                    })}
+                  </ol>
+                </Stack>
+              :
+                ""
+              }
+            </Box>
           </>
         )
       }
@@ -570,55 +587,74 @@ export default function BackroomsLevel(props) {
       if(spawnList[roomDisplay][0].itemNum !== undefined) { //Item
         return (
           <>
-            <BackroomsItem
-              name={spawnList[roomDisplay][0].name}
-              itemNum={spawnList[roomDisplay][0].itemNum}
-              locations={spawnList[roomDisplay][0].locations}
-              description={spawnList[roomDisplay][0].description}
-              table={spawnList[roomDisplay][0].table}
-              display='level'
-            />
-            {regSpawnList[roomDisplay] !== null ?
-              <ol type='number'>
-                {regSpawnList[roomDisplay].map((spawn, index) => {
-                  return <li key={index}>{spawn}</li>
-                })}
-              </ol>
-            :
-              ""
-            }
+            <Box borderRight='1px solid black' width='50%'>
+              <Typography variant='h4' textAlign='center'>Item</Typography>
+              <BackroomsItem
+                name={spawnList[roomDisplay][0].name}
+                itemNum={spawnList[roomDisplay][0].itemNum}
+                locations={spawnList[roomDisplay][0].locations}
+                description={spawnList[roomDisplay][0].description}
+                table={spawnList[roomDisplay][0].table}
+                display='level'
+              />
+            </Box>
+            <Box width='25%'>
+              {regSpawnList[roomDisplay] !== null ?
+                <Stack>
+                  <Typography variant='h4' textAlign='center'>Reg spawns</Typography>
+                  <ol type='number'>
+                    {regSpawnList[roomDisplay].map((spawn, index) => {
+                      return <li key={index}>{spawn}</li>
+                    })}
+                  </ol>
+                </Stack>
+              :
+                ""
+              }
+            </Box>
           </>
         )
       }
 
       return (
         <>
-          <Typography variant='h5'>{spawnList[roomDisplay][0]}</Typography>
-          {regSpawnList[roomDisplay] !== null ?
-            <ol type='number'>
-              {regSpawnList[roomDisplay].map((spawn, index) => {
-                return <li key={index}>{spawn}</li>
-              })}
-            </ol>
-          :
-            ""
-          }
+          <Box width='50%' borderRight='1px solid black'>
+            <Typography variant='h4' textAlign='center'>Special</Typography>
+            <Typography variant='h5'>{spawnList[roomDisplay][0]}</Typography>
+          </Box>
+          <Box width='25%'>
+            {regSpawnList[roomDisplay] !== null ?
+              <Stack>
+                <Typography variant='h4' textAlign='center'>Reg spawns</Typography>
+                <ol type='number'>
+                  {regSpawnList[roomDisplay].map((spawn, index) => {
+                    return <li key={index}>{spawn}</li>
+                  })}
+                </ol>
+              </Stack>
+            :
+              ""
+            }
+          </Box>
         </>
       )
     }
     else {
       return (
-        <>
+        <Box width='75%'>
           {regSpawnList[roomDisplay] !== null ?
-            <ol type='number'>
-              {regSpawnList[roomDisplay].map((spawn, index) => {
-                return <li key={index}>{spawn}</li>
-              })}
-            </ol>
+            <Stack>
+              <Typography variant='h4' textAlign='center'>Reg spawns</Typography>
+              <ol type='number'>
+                {regSpawnList[roomDisplay].map((spawn, index) => {
+                  return <li key={index}>{spawn}</li>
+                })}
+              </ol>
+            </Stack>
           :
             ""
           }
-        </>
+        </Box>
       )
     }
   }
@@ -648,36 +684,38 @@ export default function BackroomsLevel(props) {
   const DisplayContent = () => {
     return (
       <Box>
-        <Button variant='outlined' onClick={() => {setShowMap(false);}}>Hide Content</Button>
-        <Button onClick={() => {setMapRendered(false);}} variant='outlined'>Generate new map</Button>
+        <Button variant='outlined' onClick={() => {setShowMap(false);}} sx={{marginBottom: 2}}>Hide Content</Button>
+        <Button onClick={() => {setMapRendered(false);}} variant='outlined' sx={{marginBottom: 2}}>Generate new map</Button>
           {!mapRendered || currMap.length === 0 ?
             createMap()
           :
             <>
-              <DisplayMaps />
-
-              <FormControl fullWidth>
-                <InputLabel id="room">Room</InputLabel>
-                <Select
-                  labelId="room"
-                  id="roomSelect"
-                  value={roomDisplay}
-                  label="Room #"
-                  onChange={(e) => {setRoomDisplay(e.target.value)}}
+              <Stack direction='row'>
+                <List
+                  sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', borderRight: '1px solid black' }}
+                  component="nav"
+                  aria-labelledby="nested-list-subheader"
+                  subheader={
+                    <ListSubheader component="div" id="nested-list-subheader">
+                      Map rooms
+                    </ListSubheader>
+                  }
                 >
-                  <MenuItem value={0}>Room 1</MenuItem>
-                  <MenuItem value={1}>Room 2</MenuItem>
-                  <MenuItem value={2}>Room 3</MenuItem>
-                  <MenuItem value={3}>Room 4</MenuItem>
-                  <MenuItem value={4}>Room 5</MenuItem>
-                  <MenuItem value={5}>Room 6</MenuItem>
-                  <MenuItem value={6}>Room 7</MenuItem>
-                  <MenuItem value={7}>Room 8</MenuItem>
-                  <MenuItem value={8}>Room 9</MenuItem>
-                </Select>
-              </FormControl>
+                  <ListItemButton onClick={() => {setRoomDisplay(0); setEntityInfoOpen(null)}}><ListItemText primary='Room 1'/></ListItemButton>
+                  <ListItemButton onClick={() => {setRoomDisplay(1); setEntityInfoOpen(null)}}><ListItemText primary='Room 2'/></ListItemButton>
+                  <ListItemButton onClick={() => {setRoomDisplay(2); setEntityInfoOpen(null)}}><ListItemText primary='Room 3'/></ListItemButton>
+                  <ListItemButton onClick={() => {setRoomDisplay(3); setEntityInfoOpen(null)}}><ListItemText primary='Room 4'/></ListItemButton>
+                  <ListItemButton onClick={() => {setRoomDisplay(4); setEntityInfoOpen(null)}}><ListItemText primary='Room 5'/></ListItemButton>
+                  <ListItemButton onClick={() => {setRoomDisplay(5); setEntityInfoOpen(null)}}><ListItemText primary='Room 6'/></ListItemButton>
+                  <ListItemButton onClick={() => {setRoomDisplay(6); setEntityInfoOpen(null)}}><ListItemText primary='Room 7'/></ListItemButton>
+                  <ListItemButton onClick={() => {setRoomDisplay(7); setEntityInfoOpen(null)}}><ListItemText primary='Room 8'/></ListItemButton>
+                  <ListItemButton onClick={() => {setRoomDisplay(8); setEntityInfoOpen(null)}}><ListItemText primary='Room 9'/></ListItemButton>
+                </List>
+                
+                <DisplaySpawns />
+              </Stack>
 
-              <DisplaySpawns />
+              <DisplayMaps />
             </>
           }
       </Box>
@@ -699,15 +737,15 @@ export default function BackroomsLevel(props) {
     for(let i = 0; i < mapGrids.length; i++) {
       if(i === menuData.target.grid) {
         savedGrids.push(
-          <Table sx={{border: '1px solid green'}}>
+          <Table sx={{border: '5px solid black'}}>
             <TableBody color='inherit'>
               {mapGrids[menuData.target.grid].map((row, index2) => {
                 return (
-                  <TableRow sx={{border: '1px solid green'}} key={index2}>
+                  <TableRow sx={{border: '1px solid black'}} key={index2}>
                     {row.map((cell, index3) => {
                       switch(cell) {
                         case 0:
-                          return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'white'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
+                          return <TableCell style={{color: 'white', border: '3px solid black', backgroundColor: 'white'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
                         case 1:
                           return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index3}>{cell}</TableCell>
                         case 2:
@@ -776,9 +814,8 @@ export default function BackroomsLevel(props) {
 
   return (
     <>
-      <Typography variant='h2'>Level {props.level.levelNum}, {props.level.name}</Typography>
-      <Typography variant='h5'>Description:</Typography>
-      <Typography variant='body1' sx={{textIndent: 25}}>{props.level.description}</Typography>
+      <Typography variant='h3' textAlign='center'>Level {props.level.levelNum}, {props.level.name}</Typography>
+      <Typography textAlign='center'>{props.level.description}</Typography>
       {!showMap ? 
         <Button variant='outlined' onClick={handleShowMap}>Show Content</Button>: 
         <>

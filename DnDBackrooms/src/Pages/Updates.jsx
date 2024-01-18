@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import db from '../Components/firebase';
 
 export default function Updates() {
-  const [craftTier, setCraftTier] = useState(0);
+  const [craftTier, setCraftTier] = useState(1);
   const [tool, setTool] = useState('');
   const [toolList, setToolList] = useState(null);
 
@@ -85,8 +85,14 @@ export default function Updates() {
   }
 
   const editCraft = () => {
-    if(craftTier > 5) return;
-    if(tool === '') return;
+    if(craftTier > 5 || craftTier < 1) {
+      alert('Crafting tier must be between 1 and 5.');
+      return;
+    }
+    if(tool === '') {
+      alert('Please select tool.');
+      return;
+    }
 
     let tempTools = toolList['0'];
     tempTools[tool] = craftTier;
@@ -94,10 +100,16 @@ export default function Updates() {
     updateDoc(doc(db, 'crafts', 'Crafts'), {
       revealed: tempTools
     });
+
+    setCraftTier(0);
+    setTool('');
   }
 
   const editGear = () => {
-    if(gear === '') return;
+    if(gear === '') {
+      alert('Please select gear.')
+      return
+    }
 
     let gearCount = 0;
 
@@ -107,31 +119,51 @@ export default function Updates() {
       }
     }
 
-    if(gearBonuses >= gearCount) return
+    if(gearBonuses >= gearCount || gearBonuses < 0) {
+      alert('Revealed must be between 0 and ' + (gearCount - 1));
+      return;
+    }
 
     updateDoc(doc(db, "gearSets", gear), {
       revealed: gearBonuses
     });
+
+    setGearBonuses(0);
+    setGear('');
   }
 
   const editGroups = () => {
-    if(selectedGroup === '') return;
+    if(selectedGroup === '') {
+      alert('Please select a group.');
+      return;
+    }
 
-    if(relationValues[0] > 10 || relationValues[1] > 5) return;
-    if(relationValues[0] < 0 || relationValues[1] < 0) return;
+    if(relationValues[0] > 10 || relationValues[1] > 5 || relationValues[0] < 0 || relationValues[1] < 0) {
+      alert('Tier must be within 0 and 10 and Points must be within 0 and 5.');
+      return;
+    }
 
     updateDoc(doc(db, "groups", selectedGroup), {
       relations: relationValues
     });
+
+    setRelationValues([0, 0]);
+    setSelectedGroup('');
   }
 
   const editQuests = () => {
-    if(selectedQuest === '') return;
+    if(selectedQuest === '') {
+      alert('Please select a quest');
+      return;
+    }
 
     updateDoc(doc(db, "quests", selectedQuest), {
       unlocked: unlockComplete[0],
       completed: unlockComplete[1]
     });
+
+    setUnlockComplete([false, false]);
+    setSelectedQuest('');
   }
 
   return (
@@ -143,20 +175,25 @@ export default function Updates() {
           <Card sx={{width: '49%', minWidth: '49%', border: '1px solid black'}}>
             <CardContent>
               <Typography variant='h5'>Edit crafting tier</Typography>
-              <FormControl sx={{ m: 1, minWidth: 100 }}>
-                <InputLabel id="toolSelection">Tool</InputLabel>
-                <Select
-                  labelId='toolSelection'
-                  label={"Select Tool"}
-                  onChange={e => {setTool(e.target.value)}}
-                  value={tool}
-                >
-                  {Object.keys(toolList['0']).map((t) => {
-                    return <MenuItem value={t}>{t}</MenuItem>
-                  })}
-                </Select>
-              </FormControl>
-              <Input type='number' value={craftTier} onChange={(e) => setCraftTier(parseInt(e.target.value))} placeholder='Enter tier change'></Input>
+              <Stack direction='row'>
+                <FormControl sx={{ m: 1, minWidth: 100 }}>
+                  <InputLabel id="toolSelection">Tool</InputLabel>
+                  <Select
+                    labelId='toolSelection'
+                    label={"Select Tool"}
+                    onChange={e => {setTool(e.target.value)}}
+                    value={tool}
+                  >
+                    {Object.keys(toolList['0']).map((t) => {
+                      return <MenuItem value={t}>{t}</MenuItem>
+                    })}
+                  </Select>
+                </FormControl>
+                <Box>
+                  <InputLabel id='toolTier'>Tier</InputLabel>
+                  <Input type='number' value={craftTier} onChange={(e) => setCraftTier(parseInt(e.target.value))} labelId='toolTier'></Input>
+                </Box>
+              </Stack>
             </CardContent>
             <CardActions>
               <Button onClick={editCraft}>Submit changes</Button>
@@ -170,20 +207,25 @@ export default function Updates() {
           <Card sx={{width: '50%', minWidth: '50%', border: '1px solid black'}}>
             <CardContent>
               <Typography variant='h5'>Edit gear set</Typography>
-              <FormControl sx={{ m: 1, minWidth: 100 }}>
-                <InputLabel id="gearSelection">Gear</InputLabel>
-                <Select
-                  labelId='gearSelection'
-                  label={"Select Gear"}
-                  onChange={e => {setGear(e.target.value)}}
-                  value={gear}
-                >
-                  {gearSets.map((set) => {
-                    return <MenuItem value={set.setName}>{set.setName}</MenuItem>
-                  })}
-                </Select>
-              </FormControl>
-              <Input type='number' value={gearBonuses} onChange={(e) => setGearBonuses(parseInt(e.target.value))} placeholder='Enter tier change'></Input>
+              <Stack direction='row'>
+                <FormControl sx={{ m: 1, minWidth: 100 }}>
+                  <InputLabel id="gearSelection">Gear</InputLabel>
+                  <Select
+                    labelId='gearSelection'
+                    label={"Select Gear"}
+                    onChange={e => {setGear(e.target.value)}}
+                    value={gear}
+                  >
+                    {gearSets.map((set) => {
+                      return <MenuItem value={set.setName}>{set.setName}</MenuItem>
+                    })}
+                  </Select>
+                </FormControl>
+                <Box>
+                  <InputLabel id='gearRevealed'>Revealed</InputLabel>
+                  <Input type='number' value={gearBonuses} onChange={(e) => setGearBonuses(parseInt(e.target.value))} placeholder='Enter tier change' labelId='gearRevealed'></Input>
+                </Box>
+              </Stack>
             </CardContent>
             <CardActions>
               <Button onClick={editGear}>Submit changes</Button>
@@ -197,23 +239,31 @@ export default function Updates() {
           <Card sx={{width: '49%', minWidth: '49%', border: '1px solid black'}}>
             <CardContent>
               <Typography variant='h5'>Edit group relations</Typography>
-              <FormControl sx={{ m: 1, minWidth: 100 }}>
-                <InputLabel id="groupSelection">Group</InputLabel>
-                <Select
-                  labelId='groupSelection'
-                  label={"Select group"}
-                  onChange={e => {setSelectedGroup(e.target.value)}}
-                  value={selectedGroup}
-                >
-                  {groups.map((group) => {
-                    return (
-                      group.relations[0] === 'None' ? "" : <MenuItem value={group.name}>{group.name}</MenuItem>
-                    )
-                  })}
-                </Select>
-              </FormControl>
-              <Input type='number' value={relationValues[0]} onChange={(e) => setRelationValues([parseInt(e.target.value), relationValues[1]])} placeholder='Enter tier change'></Input>
-              <Input type='number' value={relationValues[1]} onChange={(e) => setRelationValues([relationValues[0], parseInt(e.target.value)])} placeholder='Enter points change'></Input>
+              <Stack direction='row' spacing={1}>
+                <FormControl sx={{ m: 1, minWidth: 100 }}>
+                  <InputLabel id="groupSelection">Group</InputLabel>
+                  <Select
+                    labelId='groupSelection'
+                    label={"Select group"}
+                    onChange={e => {setSelectedGroup(e.target.value)}}
+                    value={selectedGroup}
+                  >
+                    {groups.map((group) => {
+                      return (
+                        group.relations[0] === 'None' ? "" : <MenuItem value={group.name}>{group.name}</MenuItem>
+                      )
+                    })}
+                  </Select>
+                </FormControl>
+                <Box>
+                  <InputLabel id='relationTier'>Tier</InputLabel>
+                  <Input type='number' value={relationValues[0]} onChange={(e) => setRelationValues([parseInt(e.target.value), relationValues[1]])} placeholder='Enter tier change' id='relationTier'></Input>
+                </Box>
+                <Box>
+                  <InputLabel id='relationPoint'>Points</InputLabel>
+                  <Input type='number' value={relationValues[1]} onChange={(e) => setRelationValues([relationValues[0], parseInt(e.target.value)])} placeholder='Enter points change' id='relationPoint'></Input>
+                </Box>
+              </Stack>
             </CardContent>
             <CardActions>
               <Button onClick={editGroups}>Submit changes</Button>

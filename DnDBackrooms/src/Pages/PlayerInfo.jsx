@@ -1,66 +1,196 @@
-import React from 'react'
-import { Box, Container, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
+import React, { useState } from 'react'
+import { Box, Container, List, ListItem, ListItemButton, ListItemText, ListSubheader, Stack, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 
 export default function GeneralInfo() {
+  const [shownRules, setShownRules] = useState("");
+
   const DisplayInfo = () => {
     return (
       <>
-        <div className='information'>
-          <div className='houserules'>
-            <Typography variant='h2'>House rules</Typography>
-            <ol>
-              <li>Full perkins crit</li>
-              <li>Keep track of ammunition, rations, and time passed within game.</li>
-              <li>1 ration is required per day.</li>
-              <li>Any effects that recharge after 24 hours also resets on a long rest.</li>
-              <li>Armor/Gear is slot based, similar to a video game. The slots are:
-                <ul>
-                  <li>Helmet</li>
-                  <li>Chest</li>
-                  <li>Arms</li>
-                  <li>Belt</li>
-                  <li>Leg</li>
-                  <li>Ring x10</li>
-                  <li>Necklace</li>
-                  <li>Cloak</li>
-                  <li>Main hand</li>
-                  <li>Off hand</li>
-                  <li>Miscellaneous</li>
-                </ul>
-              </li>
-              <li>Due to anomalous darkness, darkvision is removed and replaced with either a AA flashlight with 4 extra batteries or a C lantern with 1 extra battery.</li>
-              <li>There are 4 battery types, AA (8 hours), AAA(10 hours), C(30 hours), and D(40 hours).</li>
-              <li>Flashlights have a range of 60 ft. in a cone while lanterns have a 30 ft. range in a radius.</li>
-            </ol>
-          </div>
-          <div className='fleeing'>
-            <Typography variant='h2'>Fleeing rules (under construction)</Typography>
-          </div>
-          <div className='generalworkings'>
-            <Typography variant='h2'>General information</Typography>
-            <Typography variant='body1'><b>Time:</b> A multiplier to alter the flow of time.</Typography>
-            <Typography variant='body1'><b>Wi-Fi:</b> A numerical value to determine how well the Wi-Fi works.</Typography>
-            <Typography variant='body1'>
-              <b>Sanity:</b> A numerical value to represent how sane you are. The maximum is 100. Every 30 minutes, 1 sanity is removed unless within a safe area.
-            </Typography>
-            <Table sx={{width: '50%'}}>
-              <TableBody>
-                <TableRow>
-                  <TableCell sx={{border: '1px solid black', textAlign: 'center'}}><b>While at or below 75 sanity</b></TableCell>
-                  <TableCell sx={{border: '1px solid black', textAlign: 'center'}}><b>While at or below 50 sanity</b></TableCell>
-                  <TableCell sx={{border: '1px solid black', textAlign: 'center'}}><b>While at or below 25 sanity</b></TableCell>
-                  <TableCell sx={{border: '1px solid black', textAlign: 'center'}}><b>While at 0 sanity</b></TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell sx={{border: '1px solid black'}}>Reduce any mental stat by 1 or maximum health by 10.</TableCell>
-                  <TableCell sx={{border: '1px solid black'}}>Reduce any physical stat by 1 or maximum health by 15.</TableCell>
-                  <TableCell sx={{border: '1px solid black'}}>Reduce any stat by 2 or maximum health by 20.</TableCell>
-                  <TableCell sx={{border: '1px solid black'}}>Make a DC 10 Wisdom Saving Throw. On a pass, raise the DC by 5 (max 30). On a fail, gain 1 level of exhaustion. Remake this save every 10 minutes.</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+        <Stack direction='row' borderBottom='1px solid black'>
+          <Box borderRight='1px solid black' width='10%'>
+            <List>
+              <ListSubheader>Rule select</ListSubheader>
+              <ListItemButton onClick={() => setShownRules("house")}>
+                <ListItemText primary="House rules" />
+              </ListItemButton>
+              <ListItemButton onClick={() => setShownRules("flee")}>
+                <ListItemText primary="Fleeing rules" />
+              </ListItemButton>
+              <ListItemButton onClick={() => setShownRules("level")}>
+                <ListItemText primary="Level rules" />
+              </ListItemButton>
+            </List>
+          </Box>
+          <Box width='90%'>
+            {shownRules === 'house' ?
+              <Stack direction='row'>
+                <Box borderRight='1px solid black' width='60%'>
+                <Typography variant='h4' textAlign='center'>Rules</Typography>
+                  <List>
+                    <ListItem>
+                      <ListItemText primary="Full perkins crit" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Ammunition, rations, and time passed in-game are kept track of. 1 Ration per day required" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="All effects or immunities that state 1 day or 24 hours also reset on a log rest" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Long rests may only be taken in certified safe spots, unless a shelter is built" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Due to anomalous darkness, darkvision is removed. It is instead replace by either a AA flashlight with 4 extra batteries, or a C lantern with 1 extra battery." />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="The available tool sets are: Alchemist, Calligrapher, Cook, Leatherworker, Smith, Carpenter, and Thieves tools" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="While in combat, no new rooms will be generated. Instead, when leaving the edge of the map, you instead loop to the other side" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="There is a 5% chance to loop to the other side of the map when trying to leave" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Almond water is worth 500 gold each for purposes of magic items" />
+                    </ListItem>
+                  </List>
+                </Box>
+                <Box width='40%'>
+                  <Typography variant='h4' textAlign='center'>Gear slots</Typography>
+                  <List>
+                    <ListItem>
+                      <ListItemText primary="Helmet" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Chest" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Arms (Including hands)" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Belt" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Legs (Including feet)" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="10 Rings (Each finger)" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Necklace" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Cloak" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Main Hand" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Off Hand" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText primary="Any number of Miscellaneous" />
+                    </ListItem>
+                  </List>
+                </Box>
+              </Stack>
+            :
+              shownRules === 'flee' ?
+                <>
+                  <Typography variant='h4' textAlign='center'>Fleeing</Typography>
+                  <Stack direction='row' spacing={2}>
+                    <Box borderRight='1px solid black' width='33%'>
+                      <Typography textAlign='center' sx={{textDecoration: 'underline'}}>Pre-requisites for running away:</Typography>
+                      <List>
+                        <ListItem>
+                          <ListItemText primary="1. All party members must be at least 60 feet away from any creature currently engaged in combat" />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary="2. All party members must agree to fleeing" />
+                        </ListItem>
+                      </List>
+                    </Box>
+                    <Box borderRight='1px solid black' width='34%'>
+                      <Typography textAlign='center' sx={{textDecoration: 'underline'}}>Action of running away:</Typography>
+                      <List>
+                        <ListItem>
+                          <ListItemText primary="1. All party members must make a Dexterity skill check. This is then averaged between all rolls" />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary="2. The DC is equal to the highest Challenge Rating among creatures currently engaged in combat minus the average player level" />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary="3. The minimum DC is 13" />
+                        </ListItem>
+                      </List>
+                    </Box>
+                    <Box width='33%'>
+                      <Typography textAlign='center' sx={{textDecoration: 'underline'}}>Effects of running away:</Typography>
+                      <List>
+                        <ListItem>
+                          <ListItemText primary="1. If successful, all creatures engaged in combat despawn and drop nothing" />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary="2. If successful, all party members are instantly teleported back together" />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary="3. If unsuccessful, all party members resume combat as normal. This may be attempted again after 1 full round of combat has passed" />
+                        </ListItem>
+                      </List>
+                    </Box>
+                  </Stack>
+                </>
+              :
+                <>
+                  <Typography variant='h4' textAlign='center'>Level</Typography>
+                  <Stack direction='row'>
+                    <Box width='50%' borderRight='1px solid black'>
+                      <List>
+                        <ListItem>
+                          <ListItemText><b>Time:</b> A multiplier representing the rate in which time flows within the level. This value is anywhere between x0.5 and x2</ListItemText>
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText><b>Wi-Fi:</b> A percentage representing the strength of the Wi-Fi within the level</ListItemText>
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText><b>Sanity:</b> A numerical value between 0 and 100 representing how sane a player is. This decreases while within levels at varying rates</ListItemText>
+                        </ListItem>
+                      </List>
+                    </Box>
+                    <Box width='50%'>
+                      <Typography textAlign='center' sx={{textDecoration: 'underline'}}>Effects of low sanity:</Typography>
+                      <List>
+                        <ListItem>
+                          <ListItemText primary="While at or below 75 sanity, any mental stat is decreased by 1 OR maximum health is decreaed by 10" />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary="While at or below 50 sanity, any physical stat is decreased by 1 OR maximum health is decreaed by 15" />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary="While at or below 25 sanity, any stat is decreased by 2 OR maximum health is decreaed by 20" />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary="While at 0 sanity, you are fighting for life. Initially, the creature at 0 sanity must make a DC 10 Wisdom saving throw. This saving throw is remade every 10 minutes regardless of location" />
+                        </ListItem>
+                        <Stack direction='row' spacing={2}>
+                          <Box width='50%'>
+                            <Typography textAlign='center' sx={{textDecoration: 'underline'}}>On a pass</Typography>
+                            <Typography textAlign='center'>Raise the DC by 5. No other effects</Typography>
+                          </Box>
+                          <Box width='50%'>
+                            <Typography textAlign='center' sx={{textDecoration: 'underline'}}>On a fail</Typography>
+                            <Typography textAlign='center'>Gain 1 level of exhaustion. The DC remains the same</Typography>
+                          </Box>
+                        </Stack>
+                      </List>
+                    </Box>
+                  </Stack>
+                </>
+            }
+          </Box>
+        </Stack>
       </>
     )
   }
