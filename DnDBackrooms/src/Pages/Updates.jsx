@@ -172,7 +172,7 @@ export default function Updates() {
         {toolList === null ?
           getTools()
         :
-          <Card sx={{width: '49%', minWidth: '49%', border: '1px solid black'}}>
+          <Card sx={{width: {xs: '100%', md: '48%'}, border: '1px solid black'}}>
             <CardContent>
               <Typography variant='h5'>Edit crafting tier</Typography>
               <Stack direction='row'>
@@ -204,7 +204,7 @@ export default function Updates() {
         {gearSets === null ?
           getGear()
         :
-          <Card sx={{width: '50%', minWidth: '50%', border: '1px solid black'}}>
+          <Card sx={{width: {xs: '100%', md: '48%'}, border: '1px solid black'}}>
             <CardContent>
               <Typography variant='h5'>Edit gear set</Typography>
               <Stack direction='row'>
@@ -236,7 +236,7 @@ export default function Updates() {
         {groups === null ?
           getGroups()
         :
-          <Card sx={{width: '49%', minWidth: '49%', border: '1px solid black'}}>
+          <Card sx={{width: {xs: '100%', md: '48%'}, border: '1px solid black'}}>
             <CardContent>
               <Typography variant='h5'>Edit group relations</Typography>
               <Stack direction='row' spacing={1}>
@@ -274,7 +274,7 @@ export default function Updates() {
         {quests === null ?
           getQuests()
         :
-          <Card sx={{width: '50%', minWidth: '50%', border: '1px solid black'}}>
+          <Card sx={{width: {xs: '100%', md: '48%'}, border: '1px solid black'}}>
             <CardContent>
               <Typography variant='h5'>Edit quest relations</Typography>
               <FormControl sx={{ m: 1, minWidth: 100 }}>

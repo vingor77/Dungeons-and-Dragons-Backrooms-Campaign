@@ -5,7 +5,6 @@ import BackroomsEntities from './BackroomsEntities';
 import { collection, onSnapshot } from 'firebase/firestore';
 import db from '../Components/firebase';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CasinoShop from '../Images/CasinoRoomShop.png';
 
 export default function BackroomsLevel(props) {
   const [possibleRegSpawns, setPossibleRegSpawns] = useState([]);
@@ -589,14 +588,19 @@ export default function BackroomsLevel(props) {
           <>
             <Box borderRight='1px solid black' width='50%'>
               <Typography variant='h4' textAlign='center'>Item</Typography>
-              <BackroomsItem
-                name={spawnList[roomDisplay][0].name}
-                itemNum={spawnList[roomDisplay][0].itemNum}
-                locations={spawnList[roomDisplay][0].locations}
-                description={spawnList[roomDisplay][0].description}
-                table={spawnList[roomDisplay][0].table}
-                display='level'
-              />
+              <Box>
+                <BackroomsItem
+                  name={spawnList[roomDisplay][0].name}
+                  itemNum={spawnList[roomDisplay][0].itemNum}
+                  locations={spawnList[roomDisplay][0].locations}
+                  description={spawnList[roomDisplay][0].description}
+                  table={spawnList[roomDisplay][0].table}
+                  rarity={spawnList[roomDisplay][0].rarity}
+                  artifactPrice={spawnList[roomDisplay][0].artifactPrice}
+                  display='level'
+                  style={{margin: 'auto'}}
+                />
+              </Box>
             </Box>
             <Box width='25%'>
               {regSpawnList[roomDisplay] !== null ?

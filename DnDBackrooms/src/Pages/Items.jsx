@@ -2,16 +2,17 @@ import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import db from '../Components/firebase'
 import React, { useEffect, useState } from 'react'
 import Item from '../Components/BackroomsItem';
-import { Box, Card, CardContent, Divider, Stack, Typography } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { Box, Card, CardContent, Divider, FormControl, Input, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 
 export default function Items() {
   const [items, setItems] = useState([]);
-  const [currItem, setCurrItem] = useState("");
   const collectionRef = collection(db, 'items');
+  const [name, setName] = useState('');
+  const [num, setNum] = useState('');
+  const [rarity, setRarity] = useState('');
 
   useEffect(() => {
-    const q = query(collectionRef, orderBy("rarity", "asc"));
+    const q = query(collectionRef, orderBy("name", "asc"));
 
     const unsub = onSnapshot(q, (querySnapshot) => {
       const objects = [];
@@ -36,53 +37,12 @@ export default function Items() {
     ["One-of-a-kind", "N/A", "N/A"]
   ]
 
-  const dataGridCols = [
-    { field: 'id', headerName: 'ID', flex: 0},
-    { 
-      field: 'name', 
-      headerName: 'Item Name', 
-      flex: 1
-    },
-    {
-      field: 'num',
-      headerName: 'Item number',
-      flex: 1
-    },
-    {
-      field: 'rarity',
-      headerName: 'Rarity',
-      flex: 1
-    },
-    {
-      field: 'price',
-      headerName: 'Artifact Price',
-      flex: 1
-    },
-  ];
-
-  let count = 0;
-  let arPrice = 0;
-  const dataGridRows = [];
-
-  items.map(item => {
-    {item.artifactPrice === -1 ? arPrice = "N/A": arPrice = item.artifactPrice}
-    count++;
-    const row = {
-      id: count,
-      name: item.name,
-      num: item.itemNum,
-      rarity: item.rarity,
-      price: arPrice,
-    }
-    dataGridRows.push(row);
-  })
-
   const Prices = () => {
     return (
       <Stack direction='row' flexWrap='wrap' gap={1}>
         {rows.map((row, index) => {
           return (
-            <Card sx={{width: '220px'}} key={index}>
+            <Card sx={{width: {xs: '100%', md: '220px'}}} key={index}>
               <CardContent>
                 <Typography textAlign='center' variant='h5'><b>{row[0]}</b></Typography>
                 <Typography textAlign='center'>Buy price: {row[1]}</Typography>
@@ -95,42 +55,30 @@ export default function Items() {
     )
   }
 
-  return (
-    <Box paddingLeft={5} paddingRight={5}>
-      <Typography variant='h4' textAlign='center'>Prices</Typography>
-      <Prices />
-      <br />
-      <Typography variant='caption' fontWeight='bold'>Prices may vary.</Typography>
-      <Divider />
-      <br />
-      <Box>
-        <Typography variant='h4' textAlign='center'>Items</Typography>
-        <Typography textAlign='center'>Items of item number 0 are custom and/or magical.</Typography>
-        <DataGrid
-          onRowClick={(dataGridRows, event) => {
-            setCurrItem(dataGridRows.row.name);
-          }}
-          rows={dataGridRows}
-          columns={dataGridCols}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              }
-            },
-            columns: {
-              columnVisibilityModel: {
-                id: false
-              }
-            }
-          }}
-          pageSizeOptions={[10]}
-          disableRowSelectionOnClick
-        />
+  const DisplayItems = () => {
+    const filtered = [];
 
-        {items.map((item, index) => {
+    for(let i = 0; i < items.length; i++) {
+      if(
+        (items[i].name.toUpperCase().includes(name.toUpperCase()) || name === '') &&
+        (items[i].rarity === rarity || rarity === '') &&
+        ((parseInt(num) === 0 && items[i].itemNum === 0) || num === '')
+      ) {
+        filtered.push(items[i]);
+      }
+      else if(
+        (items[i].name.toUpperCase().includes(name.toUpperCase()) || name === '') &&
+        (items[i].rarity === rarity || rarity === '') &&
+        ((parseInt(num) !== 0 && items[i].itemNum !== 0) || num === '')
+      ) {
+        filtered.push(items[i]);
+      }
+    }
+
+    return (
+      <Stack direction='row' flexWrap='wrap' gap={1}>
+        {filtered.map((item, index) => {
           return (
-            item.name === currItem ? 
             <Item 
               key={index}
               name={item.name}
@@ -138,11 +86,63 @@ export default function Items() {
               locations={item.locations}
               description={item.description}
               table={item.table}
+              rarity={item.rarity}
+              artifactPrice={item.artifactPrice}
               display="normal"
-            />: ""
+            />
           )
         })}
-      </Box>
+      </Stack>
+    )
+  }
+
+  return (
+    <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
+      <Typography variant='h4' textAlign='center'>Prices</Typography>
+      <Prices />
+      <br />
+      <Typography variant='caption' fontWeight='bold'>Prices may vary.</Typography>
+      <Divider />
+      <br />
+
+      <Stack direction={{xs: 'column', md: 'row'}} spacing={2} flexWrap='wrap' gap={1}>
+        <Box>
+          <Input value={name} onChange={e => setName(e.target.value)} placeholder='Enter item name' labelId='name'></Input>
+        </Box>
+        <FormControl sx={{minWidth: 150}}>
+          <InputLabel id="rarity">Select Type</InputLabel>
+          <Select
+            labelId='type'
+            label={"Select type"}
+            onChange={e => setNum(e.target.value)}
+            value={num}
+          >
+            <MenuItem value=''>None</MenuItem>
+            <MenuItem value='0'>Custom</MenuItem>
+            <MenuItem value='1'>Backrooms</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl sx={{minWidth: 150}}>
+          <InputLabel id="rarity">Select Rarity</InputLabel>
+          <Select
+            labelId='rarity'
+            label={"Select Rarity"}
+            onChange={e => setRarity(e.target.value)}
+            value={rarity}
+          >
+            <MenuItem value=''>None</MenuItem>
+            <MenuItem value='Common'>Common</MenuItem>
+            <MenuItem value='Uncommon'>Uncommon</MenuItem>
+            <MenuItem value='Rare'>Rare</MenuItem>
+            <MenuItem value='Very Rare'>Very Rare</MenuItem>
+            <MenuItem value='Legendary'>Legendary</MenuItem>
+            <MenuItem value='Artifact'>Artifact</MenuItem>
+            <MenuItem value='One-of-a-kind'>One-of-a-kind</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
+
+      <DisplayItems />
     </Box>
   )
 }

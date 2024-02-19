@@ -6,10 +6,7 @@ import BackroomsGroup from '../Components/BackroomsGroup';
 
 export default function Groups() {
   const [groups, setGroups] = useState([]);
-  const [currRelationGroup, setCurrRelationGroup] = useState(null);
-  const [currNonRelationGroup, setCurrNonRelationGroup] = useState(null);
-  const [relationGroups, setRelationGroups] = useState([]);
-  const [noRelationGroups, setNoRelationGroups] = useState([]);
+  const [currGroup, setCurrGroup] = useState(null);
 
   useEffect(() => {
     const collectionRef = collection(db, 'groups');
@@ -20,21 +17,6 @@ export default function Groups() {
         objects.push(doc.data());
       })
       setGroups(objects);
-
-      const relations = [];
-      const noRelations = [];
-  
-      for(let i = 0; i < objects.length; i++) {
-        if(objects[i].relations[0] === 'None') {
-          noRelations.push(objects[i]);
-        }
-        else {
-          relations.push(objects[i]);
-        }
-      }
-  
-      setRelationGroups(relations);
-      setNoRelationGroups(noRelations);
     })
 
     return () => {
@@ -45,44 +27,24 @@ export default function Groups() {
   return (
     <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
       <Stack direction='row' spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-        <Box width='50%'>
+        <Box width='100%'>
           <FormControl fullWidth>
-            <InputLabel id="relations">Relational Groups</InputLabel>
+            <InputLabel id="groups">Groups</InputLabel>
             <Select
-              labelId="relations"
-              id="relationsID"
-              value={currRelationGroup}
-              label="Relational"
-              onChange={e => {setCurrRelationGroup(e.target.value)}}
+              labelId="groups"
+              id="groupsID"
+              value={currGroup}
+              label="Groups"
+              onChange={e => {setCurrGroup(e.target.value)}}
             >
-            {relationGroups.map((group, index) => {
+            {groups.map((group, index) => {
               return (
-                <MenuItem value={group}>{group.name}</MenuItem>
+                <MenuItem value={group} key={index}>{group.name}</MenuItem>
               )
             })}
             </Select>
           </FormControl>
-          {currRelationGroup !== null ? <BackroomsGroup currGroup={currRelationGroup}/> : ""}
-        </Box>
-        
-        <Box width='50%'>
-          <FormControl fullWidth>
-            <InputLabel id="noRelations">Non-Relational Groups</InputLabel>
-            <Select
-              labelId="noRelations"
-              id="noRelationsID"
-              value={currNonRelationGroup}
-              label="Non-Relational"
-              onChange={e => {setCurrNonRelationGroup(e.target.value)}}
-            >
-            {noRelationGroups.map((group, index) => {
-              return (
-                <MenuItem value={group}>{group.name}</MenuItem>
-              )
-            })}
-            </Select>
-          </FormControl>
-          {currNonRelationGroup !== null ? <BackroomsGroup currGroup={currNonRelationGroup}/> : ""}
+          {currGroup !== null ? <BackroomsGroup currGroup={currGroup}/> : ""}
         </Box>
       </Stack>
     </Box>
