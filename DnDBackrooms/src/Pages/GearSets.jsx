@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Container, Divider, Grid, Input, Stack, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Container, Divider, Grid, Input, Stack, Toolbar, Typography } from '@mui/material';
 import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useState } from 'react';
 import db from '../Components/firebase';
@@ -71,6 +71,7 @@ export default function GearSets() {
   
   return (
     <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
+      <Toolbar />
       {gearSets === null ? 
         getSets()
       :

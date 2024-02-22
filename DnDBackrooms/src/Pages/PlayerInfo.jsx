@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Box, Container, List, ListItem, ListItemButton, ListItemText, ListSubheader, Stack, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
+import { Box, Container, List, ListItem, ListItemButton, ListItemText, ListSubheader, Stack, Table, TableBody, TableCell, TableRow, Toolbar, Typography } from '@mui/material';
 
 export default function GeneralInfo() {
   const [shownRules, setShownRules] = useState("");
@@ -7,26 +7,27 @@ export default function GeneralInfo() {
   const DisplayInfo = () => {
     return (
       <>
-        <Stack direction='row' borderBottom='1px solid black'>
-          <Box borderRight='1px solid black' width='10%'>
-            <List>
+        <Stack direction={{xs: 'column', md: 'row'}} spacing={{xs: 2, md: 0}}>
+          <Box border='1px solid black' borderRight={{xs: '1px solid black', md: 'none'}} minHeight={{xs: '50px', md: '450px'}} minWidth='100px'>
+            <List sx={{display: 'flex', flexDirection: {xs: 'row', md: 'column'}, padding: 0}}>
               <ListSubheader>Rule select</ListSubheader>
               <ListItemButton onClick={() => setShownRules("house")}>
-                <ListItemText primary="House rules" />
+                <ListItemText primary="House" />
               </ListItemButton>
               <ListItemButton onClick={() => setShownRules("flee")}>
-                <ListItemText primary="Fleeing rules" />
+                <ListItemText primary="Fleeing" />
               </ListItemButton>
               <ListItemButton onClick={() => setShownRules("level")}>
-                <ListItemText primary="Level rules" />
+                <ListItemText primary="Level" />
               </ListItemButton>
             </List>
           </Box>
-          <Box width='90%'>
+          <Box>
             {shownRules === 'house' ?
-              <Stack direction='row'>
-                <Box borderRight='1px solid black' width='60%'>
-                <Typography variant='h4' textAlign='center'>Rules</Typography>
+            <>
+              <Stack direction={{xs: 'column', md: 'row'}} spacing={{xs: 2, md: 0}}>
+                <Box border='1px solid black' minHeight={{xs: '50px', md: '450px'}}>
+                <Typography variant='h4' textAlign='center'>Main rules</Typography>
                   <List>
                     <ListItem>
                       <ListItemText primary="Full perkins crit" />
@@ -57,52 +58,52 @@ export default function GeneralInfo() {
                     </ListItem>
                   </List>
                 </Box>
-                <Box width='40%'>
+                <Box border='1px solid black' borderLeft={{xs: '1px solid black', md: 'none'}} minHeight={{xs: '50px', md: '450px'}}>
                   <Typography variant='h4' textAlign='center'>Gear slots</Typography>
                   <List>
                     <ListItem>
-                      <ListItemText primary="Helmet" />
+                      <ListItemText primary="1x Helmet" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Chest" />
+                      <ListItemText primary="1x Chest" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Arms (Including hands)" />
+                      <ListItemText primary="1x Arms" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Belt" />
+                      <ListItemText primary="1x Belt" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Legs (Including feet)" />
+                      <ListItemText primary="1x Legs" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="10 Rings (Each finger)" />
+                      <ListItemText primary="10x Rings" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Necklace" />
+                      <ListItemText primary="1x Necklace" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Cloak" />
+                      <ListItemText primary="1x Cloak" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Main Hand" />
+                      <ListItemText primary="1x Main Hand" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Off Hand" />
+                      <ListItemText primary="1x Off Hand" />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Any number of Miscellaneous" />
+                      <ListItemText primary="Any # Miscellaneous" />
                     </ListItem>
                   </List>
                 </Box>
               </Stack>
+            </>
             :
               shownRules === 'flee' ?
                 <>
-                  <Typography variant='h4' textAlign='center'>Fleeing</Typography>
-                  <Stack direction='row' spacing={2}>
-                    <Box borderRight='1px solid black' width='33%'>
-                      <Typography textAlign='center' sx={{textDecoration: 'underline'}}>Pre-requisites for running away:</Typography>
+                  <Stack direction={{xs: 'column', md: 'row'}} spacing={{xs: 2, md: 0}}>
+                    <Box border='1px solid black' minHeight={{xs: '50px', md: '450px'}}>
+                      <Typography variant='h4' textAlign='center'>Pre-requisites</Typography>
                       <List>
                         <ListItem>
                           <ListItemText primary="1. All party members must be at least 60 feet away from any creature currently engaged in combat" />
@@ -112,8 +113,8 @@ export default function GeneralInfo() {
                         </ListItem>
                       </List>
                     </Box>
-                    <Box borderRight='1px solid black' width='34%'>
-                      <Typography textAlign='center' sx={{textDecoration: 'underline'}}>Action of running away:</Typography>
+                    <Box borderRight={{xs: '1px solid black', md: 'none'}} borderLeft={{xs: '1px solid black', md: 'none'}} borderTop='1px solid black' borderBottom='1px solid black' minHeight={{xs: '50px', md: '450px'}}>
+                      <Typography variant='h4' textAlign='center'>Actions</Typography>
                       <List>
                         <ListItem>
                           <ListItemText primary="1. All party members must make a Dexterity skill check. This is then averaged between all rolls" />
@@ -126,8 +127,8 @@ export default function GeneralInfo() {
                         </ListItem>
                       </List>
                     </Box>
-                    <Box width='33%'>
-                      <Typography textAlign='center' sx={{textDecoration: 'underline'}}>Effects of running away:</Typography>
+                    <Box border='1px solid black' minHeight={{xs: '50px', md: '450px'}}>
+                      <Typography variant='h4' textAlign='center'>Effects</Typography>
                       <List>
                         <ListItem>
                           <ListItemText primary="1. If successful, all creatures engaged in combat despawn and drop nothing" />
@@ -144,9 +145,9 @@ export default function GeneralInfo() {
                 </>
               :
                 <>
-                  <Typography variant='h4' textAlign='center'>Level</Typography>
-                  <Stack direction='row'>
-                    <Box width='50%' borderRight='1px solid black'>
+                  <Stack direction={{xs: 'column', md: 'row'}} spacing={{xs: 2, md: 0}}>
+                    <Box border='1px solid black' minHeight={{xs: '50px', md: '450px'}}>
+                      <Typography variant='h4' textAlign='center'>Main rules</Typography>
                       <List>
                         <ListItem>
                           <ListItemText><b>Time:</b> A multiplier representing the rate in which time flows within the level. This value is anywhere between x0.5 and x2</ListItemText>
@@ -159,8 +160,8 @@ export default function GeneralInfo() {
                         </ListItem>
                       </List>
                     </Box>
-                    <Box width='50%'>
-                      <Typography textAlign='center' sx={{textDecoration: 'underline'}}>Effects of low sanity:</Typography>
+                    <Box border='1px solid black' borderLeft={{xs: '1px solid black', md: 'none'}} minHeight={{xs: '50px', md: '450px'}}>
+                      <Typography variant='h4' textAlign='center'>Sanity effects</Typography>
                       <List>
                         <ListItem>
                           <ListItemText primary="While at or below 75 sanity, any mental stat is decreased by 1 OR maximum health is decreaed by 10" />
@@ -197,6 +198,7 @@ export default function GeneralInfo() {
 
   return (
     <Box paddingLeft={5} paddingRight={5}>
+      <Toolbar />
       <DisplayInfo />
     </Box>
   );

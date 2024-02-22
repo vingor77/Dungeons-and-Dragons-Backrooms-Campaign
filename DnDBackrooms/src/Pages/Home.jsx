@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, Container, Divider, Stack, Typography } from '@mui/material'
+import { Box, Button, Card, CardActions, CardContent, Container, Divider, Stack, Toolbar, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import db from '../Components/firebase';
@@ -101,6 +101,7 @@ export default function Home() {
 
   return (
     <Box paddingLeft={5} paddingRight={5}>
+      <Toolbar />
       {data.length === 0 ?
         <Button variant='outlined'>This currently does nothing</Button>
       :

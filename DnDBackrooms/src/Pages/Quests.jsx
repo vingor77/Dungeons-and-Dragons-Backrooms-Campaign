@@ -1,4 +1,4 @@
-import { Box, Container, Typography } from '@mui/material'
+import { Box, Container, Toolbar, Typography } from '@mui/material'
 import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
 import db from '../Components/firebase';
@@ -34,6 +34,7 @@ export default function Quests() {
 
   return (
     <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
+      <Toolbar />
       <BackroomsQuests quests={unlock} />
     </Box>
   )

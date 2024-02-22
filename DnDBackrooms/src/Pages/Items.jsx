@@ -2,7 +2,7 @@ import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import db from '../Components/firebase'
 import React, { useEffect, useState } from 'react'
 import Item from '../Components/BackroomsItem';
-import { Box, Card, CardContent, Divider, FormControl, Input, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, Card, CardContent, Divider, FormControl, Input, InputLabel, MenuItem, Select, Stack, Toolbar, Typography } from '@mui/material';
 
 export default function Items() {
   const [items, setItems] = useState([]);
@@ -98,6 +98,7 @@ export default function Items() {
 
   return (
     <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
+      <Toolbar />
       <Typography variant='h4' textAlign='center'>Prices</Typography>
       <Prices />
       <br />

@@ -1,4 +1,4 @@
-import { Box, Container, Divider, Typography } from '@mui/material'
+import { Box, Container, Divider, Toolbar, Typography } from '@mui/material'
 import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useState } from 'react'
 import db from '../Components/firebase'
@@ -102,6 +102,7 @@ export default function Avatars() {
 
   return (
     <Box paddingLeft={5} paddingRight={5}>
+      <Toolbar />
       <Overview />
       {avatars === null ? getAvatars() : 
       <>

@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
-import { AppBar, Stack, Toolbar, Link, Menu, Button, MenuItem, Box, IconButton, Divider } from '@mui/material';
+import { AppBar, Stack, Toolbar, Link, Menu, Button, MenuItem, Box, IconButton, Divider, Drawer, Typography, Input } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 export default function Navbar() {
-  const [open, setOpen] = useState(null);
+  const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(null);
   const [open3, setOpen3] = useState(null);
   const [openSmall, setOpenSmall] = useState(null);
 
   return (
     <Box paddingLeft={5} paddingRight={5}>
-      <AppBar position='sticky'>
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton

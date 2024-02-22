@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, FormControl, Input, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material'
+import { Box, Button, Card, CardActions, CardContent, FormControl, Input, InputLabel, MenuItem, Select, Stack, Toolbar, Typography } from '@mui/material'
 import { collection, doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react'
 import db from '../Components/firebase';
@@ -168,6 +168,7 @@ export default function Updates() {
 
   return (
     <Box marginLeft={5} marginRight={4} marginTop={2}>
+      <Toolbar />
       <Stack direction='row' flexWrap='wrap' gap={1}>
         {toolList === null ?
           getTools()

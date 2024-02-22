@@ -1,4 +1,4 @@
-import { Box, Container, Divider, Typography } from '@mui/material'
+import { Box, Container, Divider, Toolbar, Typography } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid';
 import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useState } from 'react'
@@ -62,6 +62,7 @@ export default function Gods() {
 
   return (
     <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
+      <Toolbar />
       {gods === null ? getGods() : 
         <>
           <DataGrid

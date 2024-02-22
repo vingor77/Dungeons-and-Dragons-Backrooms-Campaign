@@ -3,7 +3,7 @@ import db from '../Components/firebase';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { DataGrid } from '@mui/x-data-grid';
 import BackroomsLevel from '../Components/BackroomsLevel';
-import { Box, Container } from '@mui/material';
+import { Box, Container, Toolbar } from '@mui/material';
 
 export default function Levels() {
   const [levels, setLevels] = useState([]);
@@ -156,6 +156,7 @@ export default function Levels() {
   return (
     <>
       <Box paddingLeft={5} paddingRight={5}>
+      <Toolbar />
         <DataGrid
           onRowClick={(dataGridRows) => {setCurrLevel(dataGridRows.row.name)}}
           rows={dataGridRows}

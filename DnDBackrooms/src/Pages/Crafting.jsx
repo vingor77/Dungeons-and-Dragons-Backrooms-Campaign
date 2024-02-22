@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Divider, FormControl, Input, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material'
+import { Box, Card, CardContent, Divider, FormControl, Input, InputLabel, MenuItem, Select, Stack, Toolbar, Typography } from '@mui/material'
 import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useState } from 'react'
 import db from '../Components/firebase'
@@ -103,6 +103,7 @@ export default function Crafting() {
 
   return (
     <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
+      <Toolbar />
       {items === null ?
         <>
           {getItems()}

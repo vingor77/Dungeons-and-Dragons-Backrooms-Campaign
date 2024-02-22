@@ -1,4 +1,4 @@
-import { Box, Container } from '@mui/material'
+import { Box, Container, Toolbar } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { collection, onSnapshot } from 'firebase/firestore'
 import db, { storage } from '../Components/firebase'
@@ -76,6 +76,7 @@ export default function Outposts() {
 
   return (
     <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
+      <Toolbar />
       <DataGrid
         onRowClick={(dataGridRows) => setCurrOutpost(dataGridRows.row.name)}
         rows={dataGridRows}

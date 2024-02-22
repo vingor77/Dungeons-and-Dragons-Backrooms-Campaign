@@ -27,7 +27,7 @@ export default function BackroomsQuests(props) {
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   <Typography variant='h4' textAlign='center'>{quest.name}</Typography>
-                  {quest.completed ? <Chip label='Completion status: Complete' /> : <Chip label='Completion status: Incomplete' />}
+                  {quest.completed ? <Chip label='Complete' /> : <Chip label='Incomplete' />}
                 </Stack>
                 <Divider />
                 <Stack direction='row' textAlign='center'>

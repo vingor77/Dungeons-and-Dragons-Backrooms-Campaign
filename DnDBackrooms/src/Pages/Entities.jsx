@@ -1,4 +1,4 @@
-import { Box, Container } from '@mui/material'
+import { Box, Container, Toolbar } from '@mui/material'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react'
 import db from '../Components/firebase';
@@ -81,6 +81,7 @@ export default function Entities() {
 
     return (
       <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
+        <Toolbar />
         <DataGrid
           onRowClick={(dataGridRows) => {
             setCurrEntity(dataGridRows.row.name);

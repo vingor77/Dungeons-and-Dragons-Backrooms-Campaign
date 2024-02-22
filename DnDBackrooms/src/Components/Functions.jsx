@@ -1,7 +1,7 @@
 import { addDoc, collection, deleteDoc, doc, onSnapshot, query, setDoc, where } from 'firebase/firestore'
 import db from '../Components/firebase'
 import React, { useEffect, useState } from 'react'
-import { Box, Button, Container, Divider, FormControl, Input, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Box, Button, Container, Divider, FormControl, Input, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Toolbar, Typography } from '@mui/material';
 
 export default function Functions() {
   //Uncovered docs
@@ -273,6 +273,7 @@ export default function Functions() {
 
   return (
     <Box paddingLeft={5} paddingRight={5} paddingTop={2}>
+      <Toolbar />
       <Button variant='outlined' onClick={() => setShownFunctions("wifiDocGen")}>Wi-Fi document generator</Button>
       <Button variant='outlined' onClick={() => setShownFunctions("timers")}>Timers</Button>
       <Divider />
@@ -351,11 +352,11 @@ export default function Functions() {
 
               <br />
               <Stack border='1px solid black' padding={2}>
-                <Typography variant='h5'>Add a new timer</Typography>
+                <Typography variant='h5'>Add timer</Typography>
                 <Divider />
                 <br />
                 <Stack direction='row' spacing={2}>
-                  <Input type='text' value={currTimer.name} onChange={e => setCurrTimer({...currTimer, name: e.target.value})} placeholder='Enter timer name'></Input>
+                  <Input type='text' value={currTimer.name} onChange={e => setCurrTimer({...currTimer, name: e.target.value})} placeholder='Enter name'></Input>
                   <Input type='number' value={currTimer.time} onChange={e => {setCurrTimer({...currTimer, time: e.target.value}); setCurrTimeInHours((e.target.value / 60).toFixed(2))}} placeholder='Enter minutes'></Input>
                   <Input type='number' value={currTimeInHours} onChange={e => {setCurrTimeInHours(e.target.value); setCurrTimer({...currTimer, time: e.target.value * 60})}} placeholder='Enter hours'></Input>
                   <Button variant='outlined' onClick={addTimer}>Add</Button>
@@ -383,7 +384,7 @@ export default function Functions() {
                       })}
                     </Select>
                   </FormControl>
-                  <Input type='text' value={editTimer.time} onChange={(e) => seteditTimer({...editTimer, time: e.target.value})} placeholder='Enter time change'></Input>
+                  <Input type='text' value={editTimer.time} onChange={(e) => seteditTimer({...editTimer, time: e.target.value})} placeholder='Change'></Input>
                   <Input disabled value={displayNewTime} placeholder='New time in minutes'></Input>
                   <Input disabled value={(displayNewTime / 60).toFixed(2)} placeholder='New time in hours'></Input>
                   <Button variant='outlined' onClick={editTime}>Confirm</Button>
@@ -421,7 +422,7 @@ export default function Functions() {
                 <Divider />
                 <br />
                 <Stack direction='row' spacing={2}>
-                  <Input type='text' value={timeReduction} onChange={(e) => setTimeReduction(e.target.value)} placeholder='Enter value'></Input>
+                  <Input type='text' value={timeReduction} onChange={(e) => setTimeReduction(e.target.value)} placeholder='Enter time'></Input>
                   <Button variant='outlined' onClick={removeTime}>Remove</Button>
                 </Stack>
               </Stack>
