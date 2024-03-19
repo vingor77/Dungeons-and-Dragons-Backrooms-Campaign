@@ -1,20 +1,19 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Collapse, Container, Divider, FormControl, Grid, Input, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, MenuItem, MenuList, Paper, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, CardContent, Chip, Collapse, Container, Divider, FormControl, Grid, Input, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, MenuItem, MenuList, Paper, Select, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import BackroomsItem from './BackroomsItem';
 import BackroomsEntities from './BackroomsEntities';
 import { collection, onSnapshot } from 'firebase/firestore';
 import db from '../Components/firebase';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Thalassophobia from './SpecialtyLevels/Thalassophobia';
 
 export default function BackroomsLevel(props) {
   const [possibleRegSpawns, setPossibleRegSpawns] = useState([]);
-  const [showMap, setShowMap] = useState(false);
-  const [initalize, setInitialize] = useState(true);
   const [currMap, setCurrMap] = useState([]);
   const [mapRendered, setMapRendered] = useState(null);
   const [spawnList, setSpawnList] = useState([]);
   const [regSpawnList, setRegSpawnList] = useState([]);
-  const [roomDisplay, setRoomDisplay] = useState(-1);
+  const [roomDisplay, setRoomDisplay] = useState(0);
   const [mapGrids, setmapGrids] = useState([]);
   const [entityInfoOpen, setEntityInfoOpen] = useState(null);
   const [menuData, setMenuData] = useState({
@@ -46,7 +45,7 @@ export default function BackroomsLevel(props) {
     }
   }, [])
 
-  const createRoomPaths = (grid, size, center, gridNum) => {
+  const createRoomPaths = (grid, size, center) => {
     const paths = [];
     
     const startPoints = [];
@@ -124,10 +123,10 @@ export default function BackroomsLevel(props) {
       }
     }
 
-    return finishMap(grid, size, center, gridNum);
+    return finishMap(grid, size, center);
   }
 
-  const createHallPaths = (grid, size, center, gridNum) => {
+  const createHallPaths = (grid, size, center) => {
     const quadrants = [];
     for(let i = 0; i < 4; i++) {
       quadrants[i] = Math.floor(Math.random() * 2); //0 for fail, 1 for success
@@ -201,20 +200,18 @@ export default function BackroomsLevel(props) {
       }
     }
 
-    return finishMap(grid, size, center, gridNum);
+    return finishMap(grid, size, center);
   }
 
-  const finishMap = (grid, size, center, gridNum) => {
+  const finishMap = (grid, size, center) => {
     //Create map side walls 
     for(let i = 0; i < grid.length; i++) {
       for(let j = 0; j < grid[i].length; j++) {
-        if(gridNum !== 4) {
-          if((i < (center - 2) || i > (center + 2)) && (j === 0 || j === (size - 1))) {
-            grid[i][j] = 1;
-          }
-          if((j < (center - 2) || j > (center + 2)) && (i === 0 || i === (size - 1))) {
-            grid[i][j] = 1;
-          }
+        if((i < (center - 2) || i > (center + 2)) && (j === 0 || j === (size - 1))) {
+          grid[i][j] = 1;
+        }
+        if((j < (center - 2) || j > (center + 2)) && (i === 0 || i === (size - 1))) {
+          grid[i][j] = 1;
         }
 
         if(grid[i][j] === -1) {
@@ -363,7 +360,7 @@ export default function BackroomsLevel(props) {
     const mapPieces = [];
     const spawnedThings = [];
     const regSpawnedThings = [];
-    for(let i = 0; i < 9; i++) {
+    for(let i = 0; i < 4; i++) {
       //Make the grid with the openings being set to -1.
       let grid = [];
       for(let i = 0; i < size; i++) {
@@ -420,8 +417,8 @@ export default function BackroomsLevel(props) {
 
     mapPieces.map((mapPiece, index1) => {
       tables.push (
-        <Table sx={{border: '5px solid black'}} key={index1}>
-          <TableBody color='inherit'>
+        <Table sx={{border: '2px solid black'}} key={index1}>
+          <TableBody>
             {mapPiece.map((row, index2) => {
               return (
                 <TableRow sx={{border: '1px solid black'}} key={index2}>
@@ -542,7 +539,7 @@ export default function BackroomsLevel(props) {
       if(spawnList[roomDisplay][0].entityNum !== undefined) { //Entity
         return (
           <>
-            <Box borderRight='1px solid black' width='50%'>
+            <Box borderRight='1px solid black' width={{xs: '100%', md: '50%'}}>
               <Typography variant='h4' textAlign='center'>Entities</Typography>
               {spawnList[roomDisplay].map((thing, index) => {
                 return (
@@ -565,7 +562,7 @@ export default function BackroomsLevel(props) {
                 )
               })}
             </Box>
-            <Box width='25%'>
+            <Box width={{xs: '100%', md: '25%'}}>
               {regSpawnList[roomDisplay] !== null ?
                 <Stack>
                   <Typography variant='h4' textAlign='center'>Reg spawns</Typography>
@@ -586,7 +583,7 @@ export default function BackroomsLevel(props) {
       if(spawnList[roomDisplay][0].itemNum !== undefined) { //Item
         return (
           <>
-            <Box borderRight='1px solid black' width='50%'>
+            <Box borderRight='1px solid black' width={{xs: '100%', md: '50%'}}>
               <Typography variant='h4' textAlign='center'>Item</Typography>
               <Box>
                 <BackroomsItem
@@ -602,7 +599,7 @@ export default function BackroomsLevel(props) {
                 />
               </Box>
             </Box>
-            <Box width='25%'>
+            <Box width={{xs: '100%', md: '25%'}}>
               {regSpawnList[roomDisplay] !== null ?
                 <Stack>
                   <Typography variant='h4' textAlign='center'>Reg spawns</Typography>
@@ -622,11 +619,11 @@ export default function BackroomsLevel(props) {
 
       return (
         <>
-          <Box width='50%' borderRight='1px solid black'>
+          <Box width={{xs: '100%', md: '50%'}} borderRight={{xs: 'none', md: '1px solid black'}}>
             <Typography variant='h4' textAlign='center'>Special</Typography>
             <Typography variant='h5'>{spawnList[roomDisplay][0]}</Typography>
           </Box>
-          <Box width='25%'>
+          <Box width={{xs: '100%', md: '25%'}}>
             {regSpawnList[roomDisplay] !== null ?
               <Stack>
                 <Typography variant='h4' textAlign='center'>Reg spawns</Typography>
@@ -665,72 +662,62 @@ export default function BackroomsLevel(props) {
 
   const DisplayMaps = () => {
     return (
-      <Stack>
+      <Stack overflow='auto'>
         <Stack direction='row'>
           {currMap[0]}
           {currMap[1]}
+        </Stack>
+        <Stack direction='row'>
           {currMap[2]}
-        </Stack>
-        <Stack direction='row'>
           {currMap[3]}
-          {currMap[4]}
-          {currMap[5]}
-        </Stack>
-        <Stack direction='row'>
-          {currMap[6]}
-          {currMap[7]}
-          {currMap[8]}
         </Stack>
       </Stack>
     )
   }
 
+  const NoGenLevel = () => {
+    switch(props.level.name) {
+      case "Thalassophobia":
+        return <Thalassophobia content={JSON.parse(props.level.extraContent)} playerLoc={props.level['Player Location']}/>
+      default:
+        return <Typography>Not implemented yet</Typography>
+    }
+  }
+
   const DisplayContent = () => {
     return (
       <Box>
-        <Button variant='outlined' onClick={() => {setShowMap(false);}} sx={{marginBottom: 2}}>Hide Content</Button>
-        <Button onClick={() => {setMapRendered(false);}} variant='outlined' sx={{marginBottom: 2}}>Generate new map</Button>
-          {!mapRendered || currMap.length === 0 ?
-            createMap()
-          :
-            <>
-              <Stack direction='row'>
-                <List
-                  sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', borderRight: '1px solid black' }}
-                  component="nav"
-                  aria-labelledby="nested-list-subheader"
-                  subheader={
-                    <ListSubheader component="div" id="nested-list-subheader">
-                      Map rooms
-                    </ListSubheader>
-                  }
-                >
-                  <ListItemButton onClick={() => {setRoomDisplay(0); setEntityInfoOpen(null)}}><ListItemText primary='Room 1'/></ListItemButton>
-                  <ListItemButton onClick={() => {setRoomDisplay(1); setEntityInfoOpen(null)}}><ListItemText primary='Room 2'/></ListItemButton>
-                  <ListItemButton onClick={() => {setRoomDisplay(2); setEntityInfoOpen(null)}}><ListItemText primary='Room 3'/></ListItemButton>
-                  <ListItemButton onClick={() => {setRoomDisplay(3); setEntityInfoOpen(null)}}><ListItemText primary='Room 4'/></ListItemButton>
-                  <ListItemButton onClick={() => {setRoomDisplay(4); setEntityInfoOpen(null)}}><ListItemText primary='Room 5'/></ListItemButton>
-                  <ListItemButton onClick={() => {setRoomDisplay(5); setEntityInfoOpen(null)}}><ListItemText primary='Room 6'/></ListItemButton>
-                  <ListItemButton onClick={() => {setRoomDisplay(6); setEntityInfoOpen(null)}}><ListItemText primary='Room 7'/></ListItemButton>
-                  <ListItemButton onClick={() => {setRoomDisplay(7); setEntityInfoOpen(null)}}><ListItemText primary='Room 8'/></ListItemButton>
-                  <ListItemButton onClick={() => {setRoomDisplay(8); setEntityInfoOpen(null)}}><ListItemText primary='Room 9'/></ListItemButton>
-                </List>
-                
-                <DisplaySpawns />
-              </Stack>
-
-              <DisplayMaps />
-            </>
-          }
+        {props.level.genType === 'None' ? 
+          <>
+            <NoGenLevel />
+          </>
+        :
+          <>
+            <Button onClick={() => {setMapRendered(false);}} variant='outlined' sx={{marginBottom: 2}}>Generate new map</Button>
+            {!mapRendered || currMap.length === 0 ?
+              createMap()
+            :
+              <>
+                <Box sx={{width: '100%', typography: 'body1'}}>
+                  <Tabs value={roomDisplay} onChange={(event, val) => {setRoomDisplay(val); setEntityInfoOpen(null)}} sx={{overflow: 'auto'}}>
+                    <Tab value="0" label='Room 1'></Tab>
+                    <Tab value="1" label='Room 2'></Tab>
+                    <Tab value="2" label='Room 3'></Tab>
+                    <Tab value="3" label='Room 4'></Tab>
+                  </Tabs>
+                </Box>
+                <Divider />
+                <br />
+                <Stack direction={{xs: 'column', md: 'row'}} sx={{height: '400px'}}>
+                  <DisplaySpawns />
+                </Stack>
+                <DisplayMaps />
+              </>
+            }
+          </>
+        }
       </Box>
     )
-  }
-
-  const handleShowMap = () => {
-    if(initalize) {
-      setInitialize(false);
-    }
-    setShowMap(true);
   }
 
   const handleContextMenuClick = (insideText) => {
@@ -741,7 +728,7 @@ export default function BackroomsLevel(props) {
     for(let i = 0; i < mapGrids.length; i++) {
       if(i === menuData.target.grid) {
         savedGrids.push(
-          <Table sx={{border: '5px solid black'}}>
+          <Table sx={{border: '2px solid black'}}>
             <TableBody color='inherit'>
               {mapGrids[menuData.target.grid].map((row, index2) => {
                 return (
@@ -749,17 +736,17 @@ export default function BackroomsLevel(props) {
                     {row.map((cell, index3) => {
                       switch(cell) {
                         case 0:
-                          return <TableCell style={{color: 'white', border: '3px solid black', backgroundColor: 'white'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
+                          return <TableCell style={{color: 'white', border: '3px solid black', backgroundColor: 'white'}} sx={{width: '5px'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
                         case 1:
-                          return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index3}>{cell}</TableCell>
+                          return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} sx={{width: '5px'}} key={index3}>{cell}</TableCell>
                         case 2:
-                          return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
+                          return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} sx={{width: '5px'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
                         case 3:
-                          return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
+                          return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} sx={{width: '5px'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
                         case 4:
-                          return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
+                          return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} sx={{width: '5px'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
                         default:
-                          return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell - 4}</TableCell>
+                          return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} sx={{width: '5px'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell - 4}</TableCell>
                       }
                     })}
                   </TableRow>
@@ -820,13 +807,64 @@ export default function BackroomsLevel(props) {
     <>
       <Typography variant='h3' textAlign='center'>Level {props.level.levelNum}, {props.level.name}</Typography>
       <Typography textAlign='center'>{props.level.description}</Typography>
-      {!showMap ? 
-        <Button variant='outlined' onClick={handleShowMap}>Show Content</Button>: 
-        <>
-          <DisplayContent />
-          {menuData.toggled ? <CustomMenu /> : ""}
-        </>
-      }
+      <br />
+      <Stack direction={{xs: 'column', md: 'row'}} justifyContent="space-between" alignItems="flex-start">
+        <Chip label={'Wi-Fi Strength: ' + props.level.wifi} />
+        <Chip label={'Sanity Drain Class: ' + props.level.sanityDrainClass} />
+        <Chip label={'Survival Difficulty Class: ' + props.level.survivalDifficultyClass} />
+      </Stack>
+      <br />
+      <Divider />
+      <br />
+      <DisplayContent />
+      {menuData.toggled ? <CustomMenu /> : ""}
     </>
   )
 }
+
+const customContent = {
+  'Player Location': [0, 0, 0, 0],
+  Daylight: {
+    Name: 'The Daylight Zone',
+    Description: 'The area between the surface and 5000 feet below the surface. This area is considered bright light.',
+    'Sanity Drain Class': 1,
+    Time: '10 minutes per 1000 feet traveled',
+    Events: {
+      'Exit 9': 'At 500 feet North and 500 feet deep, a large gray rock with brown and black pipes puncturing it sits floating in the water. A small hole, about the size of a person, intersects the rock. This is an exit to Level 9.',
+      'Exit 880': 'At 20000 feet West and 0 feet deep, an exit to Level 880 exists. There is no visual markings, but upon crossing the threshold the player is teleported.',
+      'Tiny': 'Anywhere within the Daylight Zone, Tiny may appear and attack the players. Once every 1000 feet traversed, Tiny has a 5% chance to appear.'
+    }
+  },
+  Twilight: {
+    Name: 'The Twilight Zone',
+    Description: 'The area between 5000 and 20000 feet below the surface. This area is considered dim light.',
+    'Sanity Drain Class': 2,
+    Time: '10 minutes per 1500 feet traveled',
+    Events: {
+      'Exit 8': 'At 20000 feet deep, a mountainous eruption of gray rocks comes into view. On the rocks are flashing green and red lights, leading through a large cave mouth. This leads to Level 8.',
+      'Tiny': 'Anywhere within the Twilight Zone, Tiny may appear and attack the players. Once every 1000 feet traversed, Tiny has a 5% chance to appear.'
+    }
+  },
+  Midnight: {
+    Name: 'The Midnight Zone',
+    Description: 'The area between 20000 and 300000 feet below the surface. This area is considered dark.',
+    'Sanity Drain Class': 3,
+    Time: '10 minutes per 1000 feet traveled',
+    Events: {
+      'Thing': 'Anywhere within the Midnight Zone, The Thing may appear and attack the players. Once every 1000 feet traversed, The Thing has a 5% chance to appear.'
+    }
+  },
+  Abyss: {
+    Name: 'The Abyss',
+    Description: 'The area 30000 feet and deeper. This area is too dark for flashlights to work.',
+    'Sanity Drain Class': 5,
+    Time: '10 minutes per 500 feet traveled',
+    Events: {
+      'Exit 83': 'Upon reaching The Abyss, there is a chance of falling unconcious. This leads the player to Level 83.',
+      'Leviathan Tooth': 'At North 1000, East 10000, and depth 35000, there lies a cave of orangish-red rocks that contains a Leviathans Tooth',
+      'Thing': 'Anywhere within the Abyss, The Thing may appear and attack the players. Once every 1000 feet traversed, The Thing has a 5% chance to appear.'
+    }
+  }
+}
+
+//console.log(JSON.stringify(customContent));

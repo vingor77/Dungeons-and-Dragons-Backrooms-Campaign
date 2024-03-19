@@ -27,7 +27,7 @@ function App() {
             <Route path='/outposts' element={<Outposts />} />
             <Route path='/levels' element={<Levels />} />
             <Route path='/items' element={<Items />} />
-            <Route path='/gearSets' element={<GearSets />} />
+            <Route path='/gearsets' element={<GearSets />} />
             <Route path='/entities' element={<Entities />} />
             <Route path='/quests' element={<Quests />} />
             <Route path='/info' element={<GeneralInfo />} />
@@ -35,7 +35,7 @@ function App() {
             <Route path='/gods' element={<Gods />} />
             <Route path='/avatars' element={<Avatars />} />
             <Route path='/crafts' element={<Crafts />} />
-            <Route path='edits' element={<Updates />} />
+            <Route path='/edits' element={<Updates />} />
           </Routes>
         </div>
       </div>

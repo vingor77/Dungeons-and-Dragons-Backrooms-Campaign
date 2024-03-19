@@ -333,7 +333,7 @@ export default function Functions() {
                 <Typography variant='h5'>Log in</Typography>
                 <Divider />
                 <br />
-                <Stack direction='row' spacing={2}>
+                <Stack direction={{xs: 'column', md: 'row'}} spacing={2}>
                   <Input type='text' value={playerName} onChange={e => setPlayerName(e.target.value)} placeholder='Enter username'></Input>
                   <Button variant='outlined' onClick={handleNameSubmission}>Submit name</Button>
                 </Stack>
@@ -355,7 +355,7 @@ export default function Functions() {
                 <Typography variant='h5'>Add timer</Typography>
                 <Divider />
                 <br />
-                <Stack direction='row' spacing={2}>
+                <Stack direction={{xs: 'column', md: 'row'}} spacing={2}>
                   <Input type='text' value={currTimer.name} onChange={e => setCurrTimer({...currTimer, name: e.target.value})} placeholder='Enter name'></Input>
                   <Input type='number' value={currTimer.time} onChange={e => {setCurrTimer({...currTimer, time: e.target.value}); setCurrTimeInHours((e.target.value / 60).toFixed(2))}} placeholder='Enter minutes'></Input>
                   <Input type='number' value={currTimeInHours} onChange={e => {setCurrTimeInHours(e.target.value); setCurrTimer({...currTimer, time: e.target.value * 60})}} placeholder='Enter hours'></Input>
@@ -368,7 +368,7 @@ export default function Functions() {
                 <Typography variant='h5'>Edit timer</Typography>
                 <Divider />
                 <br />
-                <Stack direction='row' spacing={2}>
+                <Stack direction={{xs: 'column', md: 'row'}} spacing={2}>
                   <FormControl sx={{ m: 1, minWidth: 100 }}>
                     <InputLabel id="timerSelection">Timer</InputLabel>
                     <Select

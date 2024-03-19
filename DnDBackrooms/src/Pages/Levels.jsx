@@ -3,7 +3,7 @@ import db from '../Components/firebase';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { DataGrid } from '@mui/x-data-grid';
 import BackroomsLevel from '../Components/BackroomsLevel';
-import { Box, Container, Toolbar } from '@mui/material';
+import { Box, Chip, Container, Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemButton, ListItemText, ListSubheader, OutlinedInput, Toolbar, Typography } from '@mui/material';
 
 export default function Levels() {
   const [levels, setLevels] = useState([]);
@@ -14,6 +14,8 @@ export default function Levels() {
   const [filteredItems, setFilteredItems] = useState([]);
   const [filteredEntities, setFilteredEntities] = useState([]);
   const [filteredLevels, setFilteredLevels] = useState([]);
+  const [mappedSearched, setMappedSearched] = useState([]);
+  const [noMappedSearched, setNoMappedSearched] = useState([]);
 
   useEffect(() => {
     const levelsRef = collection(db, 'levels');
@@ -25,13 +27,17 @@ export default function Levels() {
       const objects = [];
       const noGens = [];
       querySnapshot.forEach((doc) => {
-        objects.push(doc.data());
-        if(doc.data().genType[0] === 'None') {
-          noGens.push(doc.data().name);
+        if(doc.data().genType === 'None') {
+          noGens.push(doc.data());
+        }
+        else {
+          objects.push(doc.data());
         }
       })
       setLevels(objects);
       setFilteredLevels(noGens);
+      setMappedSearched(objects);
+      setNoMappedSearched(noGens);
     })
 
     const unsubItems = onSnapshot(itemsRef, (querySnapshot) => {
@@ -96,98 +102,94 @@ export default function Levels() {
     }
   }, [currLevel])
 
-  const dataGridCols = [
-    { field: 'id', headerName: 'ID', flex: 0},
-    { 
-      field: 'name', 
-      headerName: 'Level Name', 
-      flex: 1
-    },
-    {
-      field: 'levelNum',
-      headerName: 'Level number',
-      flex: 1
-    },
-    {
-      field: 'time',
-      headerName: 'Time flow',
-      flex: 1
-    },
-    {
-      field: 'wifi',
-      headerName: 'Wi-Fi strength',
-      flex: 1
-    },
-    {
-      field: 'sanityDrainClass',
-      headerName: 'Sanity Drain Class',
-      flex: 1
-    },
-    {
-      field: 'sanityDrainType',
-      headerName: 'Sanity Drain Type',
-      flex: 1
-    },
-    {
-      field: 'survivalDifficultyClass',
-      headerName: 'Survival Difficulty Class',
-      flex: 1
-    },
-  ];
-
-  let count = 0;
-  const dataGridRows = [];
-
-  levels.map(level => {
-    count++;
-    const row = {
-      id: count,
-      name: level.name,
-      levelNum: level.levelNum,
-      time: level.time,
-      wifi: level.wifi,
-      sanityDrainClass: level.sanityDrainClass,
-      sanityDrainType: level.sanityDrainType,
-      survivalDifficultyClass: level.survivalDifficultyClass,
+  const handleMappedSearch = (e) => {
+    let searchedLevels = [];
+    if(e.target.value === "") {
+      setMappedSearched(levels);
+      return;
     }
-    dataGridRows.push(row);
-  })
+
+    for(let i = 0; i < levels.length; i++) {
+      if(levels[i].name.toUpperCase().includes(e.target.value.toUpperCase()) || levels[i].levelNum.toUpperCase().includes(e.target.value.toUpperCase())) {
+        searchedLevels.push(levels[i]);
+      }
+    }
+    setMappedSearched(searchedLevels);
+  }
+
+  const handleNoMapSearch = (e) => {
+    let searchedLevels = [];
+    if(e.target.value === "") {
+      setNoMappedSearched(filteredLevels);
+      return;
+    }
+
+    for(let i = 0; i < filteredLevels.length; i++) {
+      if(filteredLevels[i].name.toUpperCase().includes(e.target.value.toUpperCase()) || filteredLevels[i].levelNum.toUpperCase().includes(e.target.value.toUpperCase())) {
+        searchedLevels.push(filteredLevels[i]);
+      }
+    }
+    setNoMappedSearched(searchedLevels);
+  }
 
   return (
     <>
-      <Box paddingLeft={5} paddingRight={5}>
-      <Toolbar />
-        <DataGrid
-          onRowClick={(dataGridRows) => {setCurrLevel(dataGridRows.row.name)}}
-          rows={dataGridRows}
-          columns={dataGridCols}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              }
-            },
-            columns: {
-              columnVisibilityModel: {
-                id: false
-              }
-            }
+      <Box paddingLeft={5} paddingRight={5} display='flex'>
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: {xs: '20%', md: '10%'},
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: { width: {xs: '20%', md: '10%'}, boxSizing: 'border-box' }
           }}
-          pageSizeOptions={[10]}
-          disableRowSelectionOnClick
-        />
-
-        {levels.map((level, index) => {
-          return (
-            level.name === currLevel ? 
-            <BackroomsLevel 
-              key={index}
-              items={filteredItems}
-              entities={filteredEntities}
-              level={level}
-            />: ""
-          )
-        })}
+        >
+          <Toolbar />
+          <Box>
+            <List>
+              <ListSubheader>Mapped</ListSubheader>
+              <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+                <InputLabel htmlFor="search">Search level</InputLabel>
+                <OutlinedInput
+                  id="search"
+                  type='text'
+                  label="search"
+                  onChange={(e) => handleMappedSearch(e)}
+                />
+              </FormControl>
+              {mappedSearched.map((level, index) => (
+                <ListItem key={index} disablePadding>
+                  <ListItemButton onClick={() => setCurrLevel(level)}>
+                    <ListItemText><Chip label={level.levelNum} />{level.name}</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+            <Divider />
+            <List>
+              <ListSubheader>Not Mapped</ListSubheader>
+              <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+                <InputLabel htmlFor="search2">Search level</InputLabel>
+                <OutlinedInput
+                  id="search2"
+                  type='text'
+                  label="search2"
+                  onChange={(e) => handleNoMapSearch(e)}
+                />
+              </FormControl>
+              {noMappedSearched.map((level, index) => (
+                <ListItem key={index} disablePadding>
+                  <ListItemButton onClick={() => setCurrLevel(level)}>
+                    <ListItemText><Chip label={level.levelNum} />{level.name}</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Drawer>
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Toolbar />
+          {currLevel !== null ? <BackroomsLevel items={filteredItems} entities={filteredEntities} level={currLevel} /> : ""}
+      </Box>
       </Box>
     </>
   )
