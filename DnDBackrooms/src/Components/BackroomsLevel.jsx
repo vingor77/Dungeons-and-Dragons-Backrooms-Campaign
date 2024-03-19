@@ -9,6 +9,8 @@ import Thalassophobia from './SpecialtyLevels/Thalassophobia';
 
 export default function BackroomsLevel(props) {
   const [possibleRegSpawns, setPossibleRegSpawns] = useState([]);
+  const [showMap, setShowMap] = useState(false);
+  const [initalize, setInitialize] = useState(true);
   const [currMap, setCurrMap] = useState([]);
   const [mapRendered, setMapRendered] = useState(null);
   const [spawnList, setSpawnList] = useState([]);
@@ -45,7 +47,7 @@ export default function BackroomsLevel(props) {
     }
   }, [])
 
-  const createRoomPaths = (grid, size, center) => {
+  const createRoomPaths = (grid, size, center, gridNum) => {
     const paths = [];
     
     const startPoints = [];
@@ -689,10 +691,12 @@ export default function BackroomsLevel(props) {
       <Box>
         {props.level.genType === 'None' ? 
           <>
+            <Button variant='outlined' onClick={() => {setShowMap(false);}} sx={{marginBottom: 2}}>Hide Content</Button>
             <NoGenLevel />
           </>
         :
           <>
+            <Button variant='outlined' onClick={() => {setShowMap(false);}} sx={{marginBottom: 2}}>Hide Content</Button>
             <Button onClick={() => {setMapRendered(false);}} variant='outlined' sx={{marginBottom: 2}}>Generate new map</Button>
             {!mapRendered || currMap.length === 0 ?
               createMap()
@@ -718,6 +722,13 @@ export default function BackroomsLevel(props) {
         }
       </Box>
     )
+  }
+
+  const handleShowMap = () => {
+    if(initalize) {
+      setInitialize(false);
+    }
+    setShowMap(true);
   }
 
   const handleContextMenuClick = (insideText) => {
@@ -816,8 +827,13 @@ export default function BackroomsLevel(props) {
       <br />
       <Divider />
       <br />
-      <DisplayContent />
-      {menuData.toggled ? <CustomMenu /> : ""}
+      {!showMap ? 
+        <Button variant='outlined' onClick={handleShowMap}>Show Content</Button>: 
+        <>
+          <DisplayContent />
+          {menuData.toggled ? <CustomMenu /> : ""}
+        </>
+      }
     </>
   )
 }

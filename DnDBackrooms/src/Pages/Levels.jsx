@@ -188,8 +188,8 @@ export default function Levels() {
         </Drawer>
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <Toolbar />
-          {currLevel !== null ? <BackroomsLevel items={filteredItems} entities={filteredEntities} level={currLevel} /> : ""}
-      </Box>
+          {currLevel !== null ? <BackroomsLevel items={filteredItems} entities={filteredEntities} level={currLevel} key={new Date().getTime()} /> : ""}
+        </Box>
       </Box>
     </>
   )
