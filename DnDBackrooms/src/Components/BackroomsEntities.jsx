@@ -245,7 +245,7 @@ export default function BackroomsEntities(props) {
       {creatures === null ? getCreatures() : ""}
       {props.challengeRating !== 0 && creatures !== null ?
         <>
-          <Typography>{props.description}</Typography>
+          <Typography padding={1}>{props.description}</Typography>
           <StatBlock />
         </>
       :

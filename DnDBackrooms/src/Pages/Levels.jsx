@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import db from '../Components/firebase';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { DataGrid } from '@mui/x-data-grid';
 import BackroomsLevel from '../Components/BackroomsLevel';
-import { Box, Chip, Container, Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemButton, ListItemText, ListSubheader, OutlinedInput, Toolbar, Typography } from '@mui/material';
+import { Box, Chip, Container, Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemButton, ListItemText, ListSubheader, MenuItem, OutlinedInput, Select, Toolbar, Typography } from '@mui/material';
 
 export default function Levels() {
   const [levels, setLevels] = useState([]);
@@ -14,8 +13,7 @@ export default function Levels() {
   const [filteredItems, setFilteredItems] = useState([]);
   const [filteredEntities, setFilteredEntities] = useState([]);
   const [filteredLevels, setFilteredLevels] = useState([]);
-  const [mappedSearched, setMappedSearched] = useState([]);
-  const [noMappedSearched, setNoMappedSearched] = useState([]);
+  const [levelType, setLevelType] = useState(' ');
 
   useEffect(() => {
     const levelsRef = collection(db, 'levels');
@@ -25,19 +23,11 @@ export default function Levels() {
   
     const unsubLevels = onSnapshot(q, (querySnapshot) => {
       const objects = [];
-      const noGens = [];
       querySnapshot.forEach((doc) => {
-        if(doc.data().genType === 'None') {
-          noGens.push(doc.data());
-        }
-        else {
-          objects.push(doc.data());
-        }
+        objects.push(doc.data());
       })
       setLevels(objects);
-      setFilteredLevels(noGens);
-      setMappedSearched(objects);
-      setNoMappedSearched(noGens);
+      setFilteredLevels(objects);
     })
 
     const unsubItems = onSnapshot(itemsRef, (querySnapshot) => {
@@ -102,10 +92,12 @@ export default function Levels() {
     }
   }, [currLevel])
 
-  const handleMappedSearch = (e) => {
+  const handleSearch = (e) => {
+    setCurrLevel(null); //Do this first to prevent re-rendering while typing
+
     let searchedLevels = [];
     if(e.target.value === "") {
-      setMappedSearched(levels);
+      setFilteredLevels(levels);
       return;
     }
 
@@ -114,78 +106,71 @@ export default function Levels() {
         searchedLevels.push(levels[i]);
       }
     }
-    setMappedSearched(searchedLevels);
+    setFilteredLevels(searchedLevels);
   }
 
-  const handleNoMapSearch = (e) => {
-    let searchedLevels = [];
-    if(e.target.value === "") {
-      setNoMappedSearched(filteredLevels);
-      return;
-    }
-
-    for(let i = 0; i < filteredLevels.length; i++) {
-      if(filteredLevels[i].name.toUpperCase().includes(e.target.value.toUpperCase()) || filteredLevels[i].levelNum.toUpperCase().includes(e.target.value.toUpperCase())) {
-        searchedLevels.push(filteredLevels[i]);
-      }
-    }
-    setNoMappedSearched(searchedLevels);
+  const handleTypeSearch = (e) => {
+    setCurrLevel(null); //Do this first to prevent re-rendering when the value is ""
+    setLevelType(e.target.value);
   }
 
   return (
     <>
       <Box paddingLeft={5} paddingRight={5} display='flex'>
-        <Drawer
-          variant="permanent"
-          sx={{
-            width: {xs: '20%', md: '10%'},
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: { width: {xs: '20%', md: '10%'}, boxSizing: 'border-box' }
-          }}
-        >
+        <Box>
           <Toolbar />
-          <Box>
-            <List>
-              <ListSubheader>Mapped</ListSubheader>
-              <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                <InputLabel htmlFor="search">Search level</InputLabel>
-                <OutlinedInput
-                  id="search"
-                  type='text'
-                  label="search"
-                  onChange={(e) => handleMappedSearch(e)}
-                />
-              </FormControl>
-              {mappedSearched.map((level, index) => (
-                <ListItem key={index} disablePadding>
-                  <ListItemButton onClick={() => setCurrLevel(level)}>
-                    <ListItemText><Chip label={level.levelNum} />{level.name}</ListItemText>
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-            <Divider />
-            <List>
-              <ListSubheader>Not Mapped</ListSubheader>
-              <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                <InputLabel htmlFor="search2">Search level</InputLabel>
-                <OutlinedInput
-                  id="search2"
-                  type='text'
-                  label="search2"
-                  onChange={(e) => handleNoMapSearch(e)}
-                />
-              </FormControl>
-              {noMappedSearched.map((level, index) => (
-                <ListItem key={index} disablePadding>
-                  <ListItemButton onClick={() => setCurrLevel(level)}>
-                    <ListItemText><Chip label={level.levelNum} />{level.name}</ListItemText>
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        </Drawer>
+          <List>
+            <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+              <InputLabel htmlFor="search">Search level</InputLabel>
+              <OutlinedInput
+                id="search"
+                type='text'
+                label="search"
+                onChange={(e) => handleSearch(e)}
+              />
+            </FormControl>
+            <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+              <InputLabel htmlFor="levelType">Level type</InputLabel>
+              <Select
+                labelId="levelType"
+                id="levelType"
+                value={levelType}
+                label="levelType"
+                onChange={(e) => handleTypeSearch(e)}
+              >
+                <MenuItem value={' '}>All</MenuItem>
+                <MenuItem value={'mapped'}>Mapped</MenuItem>
+                <MenuItem value={'noMap'}>Not mapped</MenuItem>
+              </Select>
+            </FormControl>
+            {filteredLevels.map((level, index) => {
+              return (
+                levelType === ' ' ? 
+                  <ListItem key={index} disablePadding>
+                    <ListItemButton onClick={() => setCurrLevel(level)}>
+                      <ListItemText><Chip label={level.levelNum} />{level.name}</ListItemText>
+                    </ListItemButton>
+                  </ListItem>
+                :
+                  (level.genType[0] === "Room" || level.genType[0] === "Hall") && levelType === "mapped" ?
+                    <ListItem key={index} disablePadding>
+                      <ListItemButton onClick={() => setCurrLevel(level)}>
+                        <ListItemText><Chip label={level.levelNum} />{level.name}</ListItemText>
+                      </ListItemButton>
+                    </ListItem>
+                  :
+                    level.genType === "None" && levelType === "noMap" ?
+                      <ListItem key={index} disablePadding>
+                        <ListItemButton onClick={() => setCurrLevel(level)}>
+                          <ListItemText><Chip label={level.levelNum} />{level.name}</ListItemText>
+                        </ListItemButton>
+                      </ListItem>
+                    :
+                      ""
+              )
+            })}
+          </List>
+        </Box>
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <Toolbar />
           {currLevel !== null ? <BackroomsLevel items={filteredItems} entities={filteredEntities} level={currLevel} key={new Date().getTime()} /> : ""}

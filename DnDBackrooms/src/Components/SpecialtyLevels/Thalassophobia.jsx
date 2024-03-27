@@ -5,7 +5,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 
 export default function Thalassophobia(props) {
   const directions = ['North', 'South', 'East', 'West'];
-  const [chosenDirection, setChosenDirection] = useState("");
+  const [chosenDirection, setChosenDirection] = useState("North");
   const [value, setValue] = useState(0);
 
   const updateLocation = () => {

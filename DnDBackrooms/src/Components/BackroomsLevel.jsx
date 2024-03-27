@@ -1,37 +1,23 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, CardContent, Chip, Collapse, Container, Divider, FormControl, Grid, Input, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, MenuItem, MenuList, Paper, Select, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Typography } from '@mui/material'
+import { AppBar, Box, Button, Chip, Dialog, Divider, ListItemText, MenuItem, MenuList, Modal, Paper, Stack, Table, TableBody, TableCell, TableRow, Toolbar, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import BackroomsItem from './BackroomsItem';
 import BackroomsEntities from './BackroomsEntities';
 import { collection, onSnapshot } from 'firebase/firestore';
 import db from '../Components/firebase';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Thalassophobia from './SpecialtyLevels/Thalassophobia';
 
 export default function BackroomsLevel(props) {
   const [possibleRegSpawns, setPossibleRegSpawns] = useState([]);
-  const [showMap, setShowMap] = useState(false);
-  const [initalize, setInitialize] = useState(true);
+  const [showMap, setShowMap] = useState(true);
   const [currMap, setCurrMap] = useState([]);
   const [mapRendered, setMapRendered] = useState(null);
   const [spawnList, setSpawnList] = useState([]);
   const [regSpawnList, setRegSpawnList] = useState([]);
   const [roomDisplay, setRoomDisplay] = useState(0);
-  const [mapGrids, setmapGrids] = useState([]);
-  const [entityInfoOpen, setEntityInfoOpen] = useState(null);
-  const [menuData, setMenuData] = useState({
-    toggled: false,
-    location: {
-      x: 0,
-      y: 0
-    },
-    target: {
-      grid: 0,
-      row: 0,
-      cell: 0
-    }
-  });
+  const [entityOpen, setEntityOpen] = useState([false, false, false, false, false]);
+  const [openMap, setOpenMap] = useState(true);
 
-  useEffect(() => {
+  const getRegSpawns = () => {
     const collectionRef = collection(db, 'regularSpawns');
 
     const unsub = onSnapshot(collectionRef, (querySnapshot) => {
@@ -45,7 +31,7 @@ export default function BackroomsLevel(props) {
     return () => {
       unsub();
     }
-  }, [])
+  }
 
   const createRoomPaths = (grid, size, center, gridNum) => {
     const paths = [];
@@ -356,117 +342,102 @@ export default function BackroomsLevel(props) {
 
   const createMap = () => {
     if(props.level.genType[0] === 'None') return;
-
-    const size = 17; //Arbitrary number I like.
-    const center = 8;
-    const mapPieces = [];
-    const spawnedThings = [];
-    const regSpawnedThings = [];
-    for(let i = 0; i < 4; i++) {
-      //Make the grid with the openings being set to -1.
-      let grid = [];
-      for(let i = 0; i < size; i++) {
-        let tempArr = [];
-        for(let j = 0; j < size; j++) {
-          if(i >= (center - 2) && i <= (center + 2) && (j === 0 || j === (size - 1))) {
-            tempArr[j] = -1;
+    if(possibleRegSpawns.length === 0) getRegSpawns();
+    else {
+      const size = 17; //Arbitrary number I like.
+      const center = 8;
+      const mapPieces = [];
+      const spawnedThings = [];
+      const regSpawnedThings = [];
+      for(let i = 0; i < 4; i++) {
+        //Make the grid with the openings being set to -1.
+        let grid = [];
+        for(let i = 0; i < size; i++) {
+          let tempArr = [];
+          for(let j = 0; j < size; j++) {
+            if(i >= (center - 2) && i <= (center + 2) && (j === 0 || j === (size - 1))) {
+              tempArr[j] = -1;
+            }
+            else if((i === 0 || i === (size - 1)) && j >= (center - 2) && j <= (center + 2)) {
+              tempArr[j] = -1;
+            }
+            else {
+              tempArr[j] = 1;
+            }
           }
-          else if((i === 0 || i === (size - 1)) && j >= (center - 2) && j <= (center + 2)) {
-            tempArr[j] = -1;
-          }
-          else {
-            tempArr[j] = 1;
-          }
+          grid.push(tempArr);
         }
-        grid.push(tempArr);
-      }
-
-      //Set up the map, then find what spawns, then add regular spawns. Also, check spawn type.
-      const type = props.level.genType[Math.floor(Math.random() * props.level.genType.length)];
-      setMapRendered(true);
   
-      switch(type) {
-        case 'Room':
-          grid = createRoomPaths(grid, size, center, i);
-          break;
-        case 'Hall':
-          grid = createHallPaths(grid, size, center, i);
-          break;
-      }
-
-      const spawnedItems = createSpawn(grid, size);
-      const regSpawns = createRegSpawns(spawnedItems[0], size);
-      grid = regSpawns[0];
-
-      mapPieces.push(grid);
-      if(spawnedItems[1] !== null) {
-        spawnedThings.push(spawnedItems[1]);
-      }
-      else {
-        spawnedThings.push(null);
-      }
-
-      if(regSpawns[1].length !== 0) {
-        regSpawnedThings.push(regSpawns[1]);
-      }
-      else {
-        regSpawnedThings.push(null);
-      }
-    }
-
-    const tables = [];
-    setmapGrids(mapPieces);
-
-    mapPieces.map((mapPiece, index1) => {
-      tables.push (
-        <Table sx={{border: '2px solid black'}} key={index1}>
-          <TableBody>
-            {mapPiece.map((row, index2) => {
-              return (
-                <TableRow sx={{border: '1px solid black'}} key={index2}>
-                  {row.map((cell, index3) => {
-                    switch(cell) {
-                      case 0:
-                        return <TableCell style={{color: 'white', border: '3px solid black', backgroundColor: 'white'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell}</TableCell>
-                      case 1:
-                        return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index3}>{cell}</TableCell>
-                      case 2:
-                        return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell}</TableCell>
-                      case 3:
-                        return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell}</TableCell>
-                      case 4:
-                        return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell}</TableCell>
-                      default:
-                        return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index3} onContextMenu={e => customMenu(e, index1, index2, index3)}>{cell - 4}</TableCell>
-                    }
-                  })}
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-      )
-    })
+        //Set up the map, then find what spawns, then add regular spawns. Also, check spawn type.
+        const type = props.level.genType[Math.floor(Math.random() * props.level.genType.length)];
+        setMapRendered(true);
     
-    setSpawnList(spawnedThings);
-    setRegSpawnList(regSpawnedThings);
-    setCurrMap(tables);
-  }
-
-  const customMenu = (e, grid, row, cell) => {
-    e.preventDefault();
-    setMenuData({
-      toggled: true,
-      location: {
-        x: e.pageX,
-        y: e.pageY
-      },
-      target: {
-        grid: grid,
-        row: row,
-        cell: cell
+        switch(type) {
+          case 'Room':
+            grid = createRoomPaths(grid, size, center, i);
+            break;
+          case 'Hall':
+            grid = createHallPaths(grid, size, center, i);
+            break;
+        }
+  
+        const spawnedItems = createSpawn(grid, size);
+        const regSpawns = createRegSpawns(spawnedItems[0], size);
+        grid = regSpawns[0];
+  
+        mapPieces.push(grid);
+        if(spawnedItems[1] !== null) {
+          spawnedThings.push(spawnedItems[1]);
+        }
+        else {
+          spawnedThings.push(null);
+        }
+  
+        if(regSpawns[1].length !== 0) {
+          regSpawnedThings.push(regSpawns[1]);
+        }
+        else {
+          regSpawnedThings.push(null);
+        }
       }
-    });
+  
+      const tables = [];
+  
+      mapPieces.map((mapPiece, index1) => {
+        tables.push (
+          <Table sx={{border: '2px solid black'}} key={index1}>
+            <TableBody>
+              {mapPiece.map((row, index2) => {
+                return (
+                  <TableRow sx={{border: '1px solid black'}} key={index2}>
+                    {row.map((cell, index3) => {
+                      switch(cell) {
+                        case 0:
+                          return <TableCell style={{color: 'white', border: '3px solid black', backgroundColor: 'white'}} key={index3}>{cell}</TableCell>
+                        case 1:
+                          return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} key={index3}>{cell}</TableCell>
+                        case 2:
+                          return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} key={index3}>{cell}</TableCell>
+                        case 3:
+                          return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} key={index3}>{cell}</TableCell>
+                        case 4:
+                          return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} key={index3}>{cell}</TableCell>
+                        default:
+                          return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} key={index3}>{cell - 4}</TableCell>
+                      }
+                    })}
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        )
+      })
+      
+      setSpawnList(spawnedThings);
+      setRegSpawnList(regSpawnedThings);
+      setCurrMap(tables);
+    }
   }
 
   const getItemRarity = () => {
@@ -529,6 +500,25 @@ export default function BackroomsLevel(props) {
     }
   }
 
+  const handleEntityModalOpen = (index) => {
+    const temp = [];
+    for(let i = 0; i < entityOpen.length; i++) {
+      temp.push(entityOpen[i]);
+    }
+    temp[index] = true;
+    setEntityOpen(temp);
+  }
+
+  const handleEntityModalClose = (index) => {
+    const temp = [];
+    for(let i = 0; i < entityOpen.length; i++) {
+      temp.push(entityOpen[i]);
+    }
+    temp[index] = false;
+    setEntityOpen(temp);
+  }
+
+
   const DisplaySpawns = () => {
     if(roomDisplay === -1) return;
     if(spawnList[roomDisplay] === null && regSpawnList[roomDisplay] === null) {
@@ -539,15 +529,32 @@ export default function BackroomsLevel(props) {
 
     if(spawnList[roomDisplay] !== null) {
       if(spawnList[roomDisplay][0].entityNum !== undefined) { //Entity
+        const style = {
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: '#fdf1dc',
+          border: '2px solid #000',
+          maxHeight: '80%',
+          maxWidth: 601,
+          overflow: 'auto'
+        };
         return (
           <>
             <Box borderRight='1px solid black' width={{xs: '100%', md: '50%'}}>
               <Typography variant='h4' textAlign='center'>Entities</Typography>
               {spawnList[roomDisplay].map((thing, index) => {
                 return (
-                  <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>{thing.name}</AccordionSummary>
-                    <AccordionDetails>
+                 <>
+                  <Button onClick={() => handleEntityModalOpen(index)} variant='outlined' sx={{marginRight: '2px'}}>{thing.name}</Button>
+                  <Modal
+                    open={entityOpen[index]}
+                    onClose={() => handleEntityModalClose(index)}
+                    aria-labelledby="entityStatblock"
+                    aria-describedby="Stat-block"
+                  >
+                    <Box sx={style}>
                       <BackroomsEntities
                         key={index}
                         name={thing.name}
@@ -559,8 +566,9 @@ export default function BackroomsLevel(props) {
                         drop={thing.drop}
                         displayType="Level"
                       />
-                    </AccordionDetails>
-                  </Accordion>
+                    </Box>
+                  </Modal>
+                 </>
                 )
               })}
             </Box>
@@ -662,21 +670,6 @@ export default function BackroomsLevel(props) {
     }
   }
 
-  const DisplayMaps = () => {
-    return (
-      <Stack overflow='auto'>
-        <Stack direction='row'>
-          {currMap[0]}
-          {currMap[1]}
-        </Stack>
-        <Stack direction='row'>
-          {currMap[2]}
-          {currMap[3]}
-        </Stack>
-      </Stack>
-    )
-  }
-
   const NoGenLevel = () => {
     switch(props.level.name) {
       case "Thalassophobia":
@@ -691,31 +684,67 @@ export default function BackroomsLevel(props) {
       <Box>
         {props.level.genType === 'None' ? 
           <>
-            <Button variant='outlined' onClick={() => {setShowMap(false);}} sx={{marginBottom: 2}}>Hide Content</Button>
             <NoGenLevel />
           </>
         :
           <>
-            <Button variant='outlined' onClick={() => {setShowMap(false);}} sx={{marginBottom: 2}}>Hide Content</Button>
-            <Button onClick={() => {setMapRendered(false);}} variant='outlined' sx={{marginBottom: 2}}>Generate new map</Button>
             {!mapRendered || currMap.length === 0 ?
               createMap()
             :
               <>
-                <Box sx={{width: '100%', typography: 'body1'}}>
-                  <Tabs value={roomDisplay} onChange={(event, val) => {setRoomDisplay(val); setEntityInfoOpen(null)}} sx={{overflow: 'auto'}}>
-                    <Tab value="0" label='Room 1'></Tab>
-                    <Tab value="1" label='Room 2'></Tab>
-                    <Tab value="2" label='Room 3'></Tab>
-                    <Tab value="3" label='Room 4'></Tab>
-                  </Tabs>
-                </Box>
-                <Divider />
-                <br />
-                <Stack direction={{xs: 'column', md: 'row'}} sx={{height: '400px'}}>
-                  <DisplaySpawns />
-                </Stack>
-                <DisplayMaps />
+                <Button onClick={() => setOpenMap(true)}>Open Map</Button>
+                <Dialog
+                  fullScreen
+                  open={openMap}
+                  onClose={() => setOpenMap(false)}
+                >
+                  <AppBar sx={{ position: 'relative' }}>
+                    <Toolbar>
+                      <Button onClick={() => {setMapRendered(false);}} color='inherit' variant='outlined'>Generate new map</Button>
+                      <Box sx={{width: '100%', typography: 'body1', ml: 2, flex: 1 }}>
+                        <Stack direction='row'>
+                          <Button color='inherit' onClick={() => {setRoomDisplay(0)}}>Room 1</Button>
+                          <Button color='inherit' onClick={() => {setRoomDisplay(1)}}>Room 2</Button>
+                          <Button color='inherit' onClick={() => {setRoomDisplay(2)}}>Room 3</Button>
+                          <Button color='inherit' onClick={() => {setRoomDisplay(3)}}>Room 4</Button>
+                        </Stack>
+                      </Box>
+                      <Button autoFocus color="inherit" onClick={() => setOpenMap(false)}>
+                        Close
+                      </Button>
+                    </Toolbar>
+                  </AppBar>
+
+                  <Box padding={1} paddingBottom={0}>
+                    <Typography variant='h3' textAlign='center'>Level {props.level.levelNum}, {props.level.name}</Typography>
+                    <Typography textAlign='center'>{props.level.description}</Typography>
+                    <br />
+                    <Stack direction={{xs: 'column', md: 'row'}} justifyContent="space-between" alignItems="flex-start">
+                      <Chip label={'Wi-Fi Strength: ' + props.level.wifi} />
+                      <Chip label={'Sanity Drain Class: ' + props.level.sanityDrainClass} />
+                      <Chip label={'Survival Difficulty Class: ' + props.level.survivalDifficultyClass} />
+                    </Stack>
+                  </Box>
+                  <br />
+
+                  <Divider />
+                  <br />
+                  <Stack direction={{xs: 'column', md: 'row'}} sx={{height: '400px'}}>
+                    <DisplaySpawns />
+                  </Stack>
+                  <Box>
+                    <Stack overflow='auto'>
+                      <Stack direction='row'>
+                        {currMap[0]}
+                        {currMap[1]}
+                      </Stack>
+                      <Stack direction='row'>
+                        {currMap[2]}
+                        {currMap[3]}
+                      </Stack>
+                    </Stack>
+                  </Box>
+                </Dialog>
               </>
             }
           </>
@@ -725,115 +754,19 @@ export default function BackroomsLevel(props) {
   }
 
   const handleShowMap = () => {
-    if(initalize) {
-      setInitialize(false);
-    }
     setShowMap(true);
-  }
-
-  const handleContextMenuClick = (insideText) => {
-    mapGrids[menuData.target.grid][menuData.target.row][menuData.target.cell] = insideText;
-    //Set the color of the map piece.
-
-    const savedGrids = [];
-    for(let i = 0; i < mapGrids.length; i++) {
-      if(i === menuData.target.grid) {
-        savedGrids.push(
-          <Table sx={{border: '2px solid black'}}>
-            <TableBody color='inherit'>
-              {mapGrids[menuData.target.grid].map((row, index2) => {
-                return (
-                  <TableRow sx={{border: '1px solid black'}} key={index2}>
-                    {row.map((cell, index3) => {
-                      switch(cell) {
-                        case 0:
-                          return <TableCell style={{color: 'white', border: '3px solid black', backgroundColor: 'white'}} sx={{width: '5px'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
-                        case 1:
-                          return <TableCell style={{color: 'black', border: '1px solid black', backgroundColor: 'black'}} sx={{width: '5px'}} key={index3}>{cell}</TableCell>
-                        case 2:
-                          return <TableCell style={{color: 'green', border: '1px solid black', backgroundColor: 'green'}} sx={{width: '5px'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
-                        case 3:
-                          return <TableCell style={{color: 'red', border: '1px solid black', backgroundColor: 'red'}} sx={{width: '5px'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
-                        case 4:
-                          return <TableCell style={{color: 'orange', border: '1px solid black', backgroundColor: 'orange'}} sx={{width: '5px'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell}</TableCell>
-                        default:
-                          return <TableCell style={{color: 'white', border: '1px solid black', backgroundColor: 'blue'}} sx={{width: '5px'}} key={index3} onContextMenu={e => customMenu(e, menuData.target.grid, index2, index3)}>{cell - 4}</TableCell>
-                      }
-                    })}
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        )
-      }
-      else {
-        savedGrids.push(currMap[i]);
-      }
-    }
-
-    setCurrMap(savedGrids);
-
-    setMenuData({
-      toggled: false,
-      location: {
-        x: 0,
-        y: 0
-      },
-      bgColor: 'white',
-      textColor: 'white',
-      target: {
-        grid: 0,
-        row: 0,
-        cell: 0
-      }
-    });
-  }
-
-  const CustomMenu = () => {
-    return (
-      <Paper sx={{ width: 320, maxWidth: '100%', top: menuData.location.y, left: menuData.location.x, position: 'absolute' }}>
-        <MenuList>
-          <MenuItem>
-            <ListItemText onClick={() => handleContextMenuClick(0)}>Open tile</ListItemText>
-          </MenuItem>
-          <MenuItem>
-            <ListItemText onClick={() => handleContextMenuClick(2)}>Item</ListItemText>
-          </MenuItem>
-          <MenuItem>
-            <ListItemText onClick={() => handleContextMenuClick(3)}>Entity</ListItemText>
-          </MenuItem>
-          <MenuItem>
-            <ListItemText onClick={() => handleContextMenuClick(4)}>Special</ListItemText>
-          </MenuItem>
-          <MenuItem>
-            <ListItemText onClick={() => handleContextMenuClick(5)}>Regular Spawn(value of 1)</ListItemText>
-          </MenuItem>
-        </MenuList>
-      </Paper>
-    );
   }
 
   return (
     <>
-      <Typography variant='h3' textAlign='center'>Level {props.level.levelNum}, {props.level.name}</Typography>
-      <Typography textAlign='center'>{props.level.description}</Typography>
-      <br />
-      <Stack direction={{xs: 'column', md: 'row'}} justifyContent="space-between" alignItems="flex-start">
-        <Chip label={'Wi-Fi Strength: ' + props.level.wifi} />
-        <Chip label={'Sanity Drain Class: ' + props.level.sanityDrainClass} />
-        <Chip label={'Survival Difficulty Class: ' + props.level.survivalDifficultyClass} />
-      </Stack>
-      <br />
-      <Divider />
-      <br />
-      {!showMap ? 
-        <Button variant='outlined' onClick={handleShowMap}>Show Content</Button>: 
-        <>
-          <DisplayContent />
-          {menuData.toggled ? <CustomMenu /> : ""}
-        </>
-      }
+      <Box width='85%'>
+        {!showMap ? 
+          <Button variant='outlined' onClick={handleShowMap}>Show Content</Button>: 
+          <>
+            <DisplayContent />
+          </>
+        }
+      </Box>
     </>
   )
 }
